@@ -1,41 +1,83 @@
 name: CI
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
-    types:
-      – opened
-      – synchronize
-      – reopened
-      – edited
+    branches:
+      - main
 
 jobs:
   validate-pr:
+    name: Validate PR Title
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - uses: aslafy-z/conventional-pr-title-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  build:
+  lint:
+    name: Run ESLint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: 16
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run prettier
-      - run: npm run build
-      - run: npm run test
-  deploy:
-    needs: build
+
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        shell: bash
+        run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
+
+      - uses: actions/cache@v3
+        id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - run: mv .env.example .env
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Prettier
+        run: npm run prettier
+
+  prettier:
+    name: Run Prettier
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: amondnet/vercel-action@v20
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
         with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          vercel-org-id: ${{ secrets.ORG_ID}}
-          vercel-project-id: ${{ secrets.PROJECT_ID}}
-          working-directory: ./
+          node-version: 16
+
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        shell: bash
+        run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
+
+      - uses: actions/cache@v3
+        id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Prettier
+        run: npm run prettier
