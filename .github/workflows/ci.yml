@@ -10,6 +10,7 @@ on:
 
 jobs:
   validate-pr:
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - uses: aslafy-z/conventional-pr-title-action@v3
