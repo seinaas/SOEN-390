@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es2017",
     "lib": ["dom", "dom.iterable", "esnext"],
+    "types": ["jest"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -17,5 +18,5 @@
     "noUncheckedIndexedAccess": true
   },
   "include": ["./**/*"],
-  "exclude": ["node_modules", "tests/cypress/**/*"]
+  "exclude": ["node_modules", "tests/cypress/**/*", "cypress.config.js"]
 }

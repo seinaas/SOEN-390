@@ -46,8 +46,6 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - run: mv .env.example .env
-
       - name: Lint
         run: npm run lint
 
@@ -84,7 +82,10 @@ jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
+<<<<<<< HEAD
     permissions: write-all
+=======
+>>>>>>> 5953473 (feat: [SOEN-42] Created testing suite for e2e, unit, and component tests)
     needs: [lint, prettier]
     steps:
       - uses: actions/checkout@v3
