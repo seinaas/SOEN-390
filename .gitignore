@@ -6,7 +6,10 @@
 .pnp.js
 
 # testing
+/jest-coverage
+/cy-coverage
 /coverage
+/.nyc_output
 
 # database
 /prisma/db.sqlite
