@@ -109,6 +109,8 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - run: mv .env.example .env
+
       - name: Test
         run: npm run test
 
