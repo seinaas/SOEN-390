@@ -18,6 +18,7 @@
  */
 import { type CreateNextContextOptions } from '@trpc/server/adapters/next';
 import { type Session } from 'next-auth';
+import { mockDeep } from 'jest-mock-extended';
 
 import { getServerAuthSession } from '../auth';
 import { prisma } from '../db';
@@ -35,10 +36,17 @@ type CreateContextOptions = {
  * - trpc's `createSSGHelpers` where we don't have req/res
  * @see https://create.t3.gg/en/usage/trpc#-servertrpccontextts
  */
-export const createInnerTRPCContext = (opts: CreateContextOptions) => {
+const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
     prisma,
+  };
+};
+
+export const createMockTRPCContext = (opts: CreateContextOptions) => {
+  return {
+    session: opts.session,
+    prisma: mockDeep<PrismaClient>(),
   };
 };
 
@@ -66,6 +74,7 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
  */
 import { initTRPC, TRPCError } from '@trpc/server';
 import superjson from 'superjson';
+import { PrismaClient } from '@prisma/client';
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
