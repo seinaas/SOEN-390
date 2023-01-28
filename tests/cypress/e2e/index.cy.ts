@@ -10,8 +10,27 @@ describe('Example Cypress TodoMVC test', () => {
     cy.visit('/');
   });
 
-  it('should see sign in button', function () {
+  it('should see sign in button if not signed in', () => {
     cy.get('[data-cy=auth-button]').should('have.text', 'Sign in');
+  });
+
+  it('should see sign out button if signed in', () => {
+    cy.intercept('GET', '/api/auth/session', {
+      body: {
+        user: {
+          id: '1',
+          name: 'John Doe',
+        },
+      },
+    });
+
+    cy.visit('/');
+    cy.get('[data-cy=auth-button]').should('have.text', 'Sign out');
+  });
+
+  it('should navigate to sign in page when clicking sign in button', () => {
+    cy.get('[data-cy=auth-button]').click();
+    cy.url().should('include', '/auth/signin');
   });
 
   // more examples
