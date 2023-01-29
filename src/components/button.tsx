@@ -13,7 +13,7 @@ export const Button: React.FC<Props> = ({ reverse, variant = 'primary', fullWidt
   return (
     <button
       type='submit'
-      className={`flex items-center justify-center gap-x-3 rounded-md border-4 px-5 py-3 font-bold uppercase disabled:opacity-75 ${
+      className={`flex items-center justify-center gap-x-3 rounded-md border-2 px-5 py-3 font-bold uppercase disabled:opacity-75 ${
         variant === 'primary'
           ? reverse
             ? 'border-white bg-white text-primary-600'
