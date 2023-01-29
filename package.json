@@ -17,7 +17,7 @@
     "test": "npm run test:jest && npm run test:cypress:component && npm run test:cypress:e2e",
     "reports:copy": "mkdir coverage .nyc_output || true && cp cy-coverage/coverage-final.json coverage/from-cypress.json && cp jest-coverage/coverage-final.json coverage/from-jest.json",
     "reports:combine": "npx nyc merge coverage && mv coverage.json .nyc_output/out.json",
-    "reports:report": "npx nyc report --reporter html --reporter text --reporter cobertura --report-dir coverage",
+    "reports:report": "npx nyc report --reporter html --reporter text --reporter lcovonly --report-dir coverage",
     "coverage": "npm run reports:copy && npm run reports:combine && npm run reports:report"
   },
   "nyc": {
