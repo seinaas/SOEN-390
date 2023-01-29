@@ -7,6 +7,7 @@ const customJestConfig = {
   coverageDirectory: 'jest-coverage',
   // coverageReporters: ['json'],
   collectCoverageFrom: ['src/**/*.{ts,tsx}'],
+  coveragePathIgnorePatterns: ['src/pages', 'src/components'],
 };
 
 module.exports = createJestConfig(customJestConfig);
