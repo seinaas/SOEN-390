@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 /**
  * This is the client-side entrypoint for your tRPC API.
  * It's used to create the `api` object which contains the Next.js App-wrapper

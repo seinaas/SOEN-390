@@ -21,6 +21,7 @@ jobs:
   lint:
     name: Run ESLint
     runs-on: ubuntu-latest
+    needs: validate-pr
     steps:
       - uses: actions/checkout@v3
 
@@ -50,12 +51,10 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Prettier
-        run: npm run prettier
-
   prettier:
     name: Run Prettier
     runs-on: ubuntu-latest
+    needs: validate-pr
     steps:
       - uses: actions/checkout@v3
 
@@ -82,3 +81,46 @@ jobs:
 
       - name: Prettier
         run: npm run prettier
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    permissions: write-all
+    needs: [lint, prettier]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        shell: bash
+        run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
+
+      - uses: actions/cache@v3
+        id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - run: mv .env.example .env
+
+      - name: Test
+        run: npm run test
+
+      - name: Generate Coverage
+        run: npm run coverage
+
+      - name: Coverage Report
+        uses: romeovs/lcov-reporter-action@2a28ec3e25fb7eae9cb537e9141603486f810d1a
+        with:
+          lcov-file: ./coverage/lcov.info
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          delete-old-comments: true

@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 import { createNextApiHandler } from '@trpc/server/adapters/next';
 
 import { env } from '../../../env/server.mjs';

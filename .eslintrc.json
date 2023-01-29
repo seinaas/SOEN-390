@@ -2,9 +2,17 @@
   "overrides": [
     {
       "extends": ["plugin:@typescript-eslint/recommended-requiring-type-checking"],
-      "files": ["*.ts", "*.tsx"],
+      "files": ["./tests/cypress/**/*.{ts,tsx,js,jsx}"],
       "parserOptions": {
-        "project": "tsconfig.json"
+        "project": "./tests/cypress/tsconfig.json"
+      }
+    },
+    {
+      "extends": ["plugin:@typescript-eslint/recommended-requiring-type-checking"],
+      "files": ["*.ts", "*.tsx"],
+      "excludedFiles": ["./tests/cypress/**/*.{ts,tsx,js,jsx}"],
+      "parserOptions": {
+        "project": "./tsconfig.json"
       }
     }
   ],
@@ -16,6 +24,7 @@
   "extends": ["next/core-web-vitals", "plugin:@typescript-eslint/recommended", "prettier"],
   "rules": {
     "@typescript-eslint/consistent-type-imports": "warn",
-    "prettier/prettier": "error"
+    "prettier/prettier": "error",
+    "@typescript-eslint/no-var-requires": "off"
   }
 }
