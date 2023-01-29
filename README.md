@@ -183,64 +183,20 @@ When creating a pull request, please follow the following guidelines:
 
 You can run the following scripts with `npm run <script>`.
 
-<table>
-  <thead>
-    <tr>
-      <th>Script</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>`build`</td>
-      <td>Builds the project for production.</td>
-    </tr>
-    <tr>
-      <td>`dev`</td>
-      <td>Starts the development server.</td>
-    </tr>
-    <tr>
-      <td>`start`</td>
-      <td>Starts the production server.</td>
-    </tr>
-    <tr>
-      <td>`lint`</td>
-      <td>Runs ESLint on the project.</td>
-    </tr>
-    <tr>
-      <td>`prettier`</td>
-      <td>Runs Prettier on the project.</td>
-    </tr>
-    <tr>
-      <td>`cypress`</td>
-      <td>Runs Cypress in the GUI.</td>
-    </tr>
-    <tr>
-      <td>`cypress:headless`</td>
-      <td>Runs Cypress in headless mode.</td>
-    </tr>
-    <tr>
-      <td>`test:cypress:component`</td>
-      <td>Runs component tests with Cypress.</td>
-    </tr>
-    <tr>
-      <td>`test:cypress:e2e`</td>
-      <td>Runs E2E tests with Cypress.</td>
-    </tr>
-    <tr>
-      <td>`test:jest`</td>
-      <td>Runs unit tests with Jest.</td>
-    </tr>
-    <tr>
-      <td>`test`</td>
-      <td>Runs all tests.</td>
-    </tr>
-    <tr>
-      <td>`coverage`</td>
-      <td>Generates a coverage report.</td>
-    </tr>
-  </tbody>
-</table>
+| Script                   | Description                        |
+| ------------------------ | ---------------------------------- |
+| `build`                  | Builds the project for production. |
+| `dev`                    | Starts the development server.     |
+| `start`                  | Starts the production server.      |
+| `lint`                   | Runs ESLint on the project.        |
+| `prettier`               | Runs Prettier on the project.      |
+| `cypress`                | Runs Cypress in the GUI.           |
+| `cypress:headless`       | Runs Cypress in headless mode.     |
+| `test:cypress:component` | Runs component tests.              |
+| `test:cypress:e2e`       | Runs E2E tests.                    |
+| `test:jest`              | Runs unit tests.                   |
+| `test`                   | Runs all tests.                    |
+| `coverage`               | Generates a coverage report.       |
 
 ## 📦 Deployment
 
