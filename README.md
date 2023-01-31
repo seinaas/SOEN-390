@@ -34,7 +34,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 Before working on this project, ensure you have the following:
 
-#### **Node.js v16+**
+* #### **Node.js v16+**
 
 <table>
   <tr>
@@ -48,19 +48,19 @@ Before working on this project, ensure you have the following:
   </tr>
 </table>
 
-#### [**Git**](https://git-scm.com/downloads)
+* #### [**Git**](https://git-scm.com/downloads)
 
-#### [**VSCode (optional but recommended)**](https://code.visualstudio.com/download)
+* #### [**VSCode (optional but recommended)**](https://code.visualstudio.com/download)
+  Alongside VSCode, the following extensions will improve your development experience:
+  > **NOTE:** These are all optional, but recommended
 
-Alongside VSCode, the following extensions will improve your development experience:
-
-- [**ESLint**](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
-- [**Prettier**](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
-- [**Error Lens**](https://marketplace.visualstudio.com/items?itemName=usernamehw.errorlens)
-- [**GitLens**](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens)
-- [**Prisma**](https://marketplace.visualstudio.com/items?itemName=Prisma.prisma)
-- [**Tailwind CSS IntelliSense**](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss)
-- [**GitHub Copilot**](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot)
+  - [**ESLint**](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
+  - [**Prettier**](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+  - [**Error Lens**](https://marketplace.visualstudio.com/items?itemName=usernamehw.errorlens)
+  - [**GitLens**](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens)
+  - [**Prisma**](https://marketplace.visualstudio.com/items?itemName=Prisma.prisma)
+  - [**Tailwind CSS IntelliSense**](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss)
+  - [**GitHub Copilot**](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot)
 
 ### Installation
 
@@ -82,7 +82,7 @@ Alongside VSCode, the following extensions will improve your development experie
   npm install
 ```
 
-4. Create a `.env` (see [**Environment Variables**](#environment-variables) for more details)
+4. Create a `.env` (see [**🚧 Environment Variables**](#-environment-variables) for more details)
 
 5. Start the server
 
@@ -123,7 +123,7 @@ When writing unit tests, you can call tRPC routes by importing the `trpcRequest`
 To run unit tests, use
 
 ```bash
-  npm run test:Jest
+  npm run test:jest
 ```
 
 ### Component Tests
