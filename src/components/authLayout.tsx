@@ -3,7 +3,7 @@ import { signIn } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Button } from '../../components/button';
+import { Button } from './button';
 
 type AuthPageProps = {
   type: 'signIn' | 'register';
@@ -27,6 +27,9 @@ const AuthLayout: React.FC<AuthPageProps> = ({ type, children }) => {
             animate={{ opacity: 1, scale: 1 }}
             className='flex min-w-[400px] flex-col items-center gap-4 rounded-lg bg-white px-12 pt-12 pb-20 text-black backdrop-blur-sm'
           >
+            <Link href='/' className='relative mb-4 h-20 w-full'>
+              <Image alt='ProSpects Logo' src='/LogoAlt.png' fill className='object-contain' />
+            </Link>
             {children}
 
             <motion.div layout className='flex items-center justify-center gap-4'>
@@ -38,22 +41,22 @@ const AuthLayout: React.FC<AuthPageProps> = ({ type, children }) => {
             {/* third party login buttons */}
             <motion.div layout className='flex w-full justify-center gap-8'>
               <button
-                className='flex items-center justify-center rounded-lg border-2 border-primary-600 p-3'
+                className='flex items-center justify-center rounded-lg border-2 border-primary-600 p-2'
                 onClick={() => void signIn('google')}
               >
-                <Image alt='Google Logo' src='/logos/google-icon.svg' width={22} height={22} />
+                <Image alt='Google Logo' src='/logos/google.svg' width={32} height={32} />
               </button>
               <button
-                className='flex items-center justify-center rounded-lg border-2 border-primary-600 p-3'
-                onClick={() => void signIn('google')}
+                className='flex items-center justify-center rounded-lg border-2 border-primary-600 p-2'
+                onClick={() => void signIn('facebook')}
               >
-                <Image alt='Google Logo' src='/logos/google-icon.svg' width={22} height={22} />
+                <Image alt='Facebook Logo' src='/logos/facebook.svg' width={32} height={32} />
               </button>
               <button
-                className='flex items-center justify-center rounded-lg border-2 border-primary-600 p-3'
-                onClick={() => void signIn('google')}
+                className='flex items-center justify-center rounded-lg border-2 border-primary-600 p-2'
+                onClick={() => void signIn('microsoft')}
               >
-                <Image alt='Google Logo' src='/logos/google-icon.svg' width={22} height={22} />
+                <Image alt='Microsoft Logo' src='/logos/microsoft.svg' width={32} height={32} />
               </button>
             </motion.div>
 
