@@ -18,6 +18,9 @@ export const serverSchema = z.object({
   ),
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
+  AZURE_AD_CLIENT_ID: z.string(),
+  AZURE_AD_CLIENT_SECRET: z.string(),
+  AZURE_AD_TENANT_ID: z.string(),
 });
 
 /**
@@ -32,6 +35,9 @@ export const serverEnv = {
   NEXTAUTH_URL: process.env.NEXTAUTH_URL,
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+  AZURE_AD_CLIENT_ID: process.env.AZURE_AD_CLIENT_ID,
+  AZURE_AD_CLIENT_SECRET: process.env.AZURE_AD_CLIENT_SECRET,
+  AZURE_AD_TENANT_ID: process.env.AZURE_AD_TENANT_ID,
 };
 
 /**
