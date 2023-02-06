@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 
 import NextAuth, { type NextAuthOptions } from 'next-auth';
-import GoogleProvider, { GoogleProfile } from 'next-auth/providers/google';
+import GoogleProvider, { type GoogleProfile } from 'next-auth/providers/google';
 // Prisma adapter for NextAuth, optional and can be removed
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 

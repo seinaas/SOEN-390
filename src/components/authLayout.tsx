@@ -3,7 +3,6 @@ import { signIn } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Button } from './button';
 
 type AuthPageProps = {
   type: 'signIn' | 'register';
