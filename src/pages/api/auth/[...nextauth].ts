@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 
 import NextAuth, { type NextAuthOptions } from 'next-auth';
-import DiscordProvider from 'next-auth/providers/discord';
+import GoogleProvider, { type GoogleProfile } from 'next-auth/providers/google';
 // Prisma adapter for NextAuth, optional and can be removed
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 
@@ -14,6 +14,8 @@ export const authOptions: NextAuthOptions = {
     session({ session, user }) {
       if (session.user) {
         session.user.id = user.id;
+        session.user.firstName = user.firstName;
+        session.user.lastName = user.lastName;
       }
       return session;
     },
@@ -21,9 +23,18 @@ export const authOptions: NextAuthOptions = {
   // Configure one or more authentication providers
   adapter: PrismaAdapter(prisma),
   providers: [
-    DiscordProvider({
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
+    GoogleProvider({
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+      profile(profile: GoogleProfile) {
+        return {
+          id: profile.sub,
+          firstName: profile.given_name,
+          lastName: profile.family_name,
+          email: profile.email,
+          image: profile.picture,
+        };
+      },
     }),
     /**
      * ...add more providers here
@@ -35,6 +46,9 @@ export const authOptions: NextAuthOptions = {
      * @see https://next-auth.js.org/providers/github
      */
   ],
+  pages: {
+    signIn: '/auth/signin',
+  },
 };
 
 export default NextAuth(authOptions);
