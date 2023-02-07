@@ -3,31 +3,27 @@ import React from 'react';
 interface UserCardProps {
   name: string;
   occupation: string;
-  location: string;
-  bio: string;
-  experience?: string[];
 }
 //Card component
-const UserCard: React.FC<UserCardProps> = ({ name, occupation, location, bio, experience }) => {
+const UserCard: React.FC<UserCardProps> = ({ name, occupation }) => {
   return (
-    <div className='flex-auto rounded-lg bg-white p-6 shadow-lg'>
+    <div className='flex flex-col items-center rounded-lg bg-white p-6 shadow-lg'>
       <header className='text-2xl font-bold'>
         <h1>{name}</h1>
-        <p className='text-sm font-medium text-gray-600'>Occupation: {occupation}</p>
-        <p className='text-sm font-medium text-gray-600'>Location: {location}</p>
+        <p className='text-sm font-medium text-gray-600'>{occupation}</p>
       </header>
+
       <main>
-        <section>
-          <h2>About</h2>
-          <p>{bio}</p>
+        <section className='flex flex-col'>
+          <button className='text-sm font-medium text-black'>Connections</button>
+          <button className='text-sm font-medium text-black'>Saved Jobs</button>
+          <button className='text-sm font-medium text-black'>Events</button>
+          <button className='text-sm font-medium text-black'>Groups</button>
         </section>
         <section>
-          <h2>Experience</h2>
-          <ul>
-            {experience?.map((exp) => (
-              <li key={exp}>{exp}</li>
-            ))}
-          </ul>
+          <button className='text-slate rounded-2xl bg-primary-100 pt-4 pb-4 pr-2 pl-2 font-medium text-white'>
+            Edit Profile
+          </button>
         </section>
       </main>
     </div>
