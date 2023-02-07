@@ -1,22 +1,21 @@
 import { type NextPage } from 'next';
 import Head from 'next/head';
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 
 import { api } from '../utils/api';
+import { Button } from '../components/button';
+import Link from 'next/link';
 
 const Home: NextPage = () => {
-  const hello = api.example.hello.useQuery({ text: 'from tRPC' });
-
   return (
     <>
       <Head>
-        <title>SOEN390</title>
+        <title>ProSpects</title>
         <link rel='icon' href='/favicon.ico' />
       </Head>
-      <main className='flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]'>
+      <main className='flex min-h-screen flex-col items-center justify-center bg-primary-600'>
         <div className='container flex flex-col items-center justify-center gap-12 px-4 py-16 '>
           <div className='flex flex-col items-center gap-2'>
-            <p className='text-2xl text-white'>{hello.data ? hello.data.greeting : 'Loading tRPC query...'}</p>
             <AuthShowcase />
           </div>
         </div>
@@ -38,16 +37,31 @@ const AuthShowcase: React.FC = () => {
   return (
     <div className='flex flex-col items-center justify-center gap-4'>
       <p className='text-center text-2xl text-white'>
-        {sessionData && <span>Logged in as {sessionData.user?.name}</span>}
+        {sessionData && (
+          <span>
+            Logged in as {sessionData.user?.firstName} {sessionData.user?.lastName}
+          </span>
+        )}
         {secretMessage && <span> - {secretMessage}</span>}
       </p>
-      <button
-        data-cy='auth-button'
-        className='rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20'
-        onClick={sessionData ? () => void signOut() : () => void signIn()}
-      >
-        {sessionData ? 'Sign out' : 'Sign in'}
-      </button>
+      {sessionData ? (
+        <Button data-cy='signout-button' variant='secondary' reverse onClick={() => signOut()}>
+          Sign Out
+        </Button>
+      ) : (
+        <div className='flex items-center justify-center gap-4'>
+          <Link href='/auth/signin'>
+            <Button data-cy='signin-button' variant='secondary' reverse>
+              Sign In
+            </Button>
+          </Link>
+          <Link href='/auth/register'>
+            <Button data-cy='register-button' reverse>
+              Sign Up
+            </Button>
+          </Link>
+        </div>
+      )}
     </div>
   );
 };

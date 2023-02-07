@@ -50,7 +50,19 @@ model Session {
 
 model User {
     id            String    @id @default(cuid())
-    name          String?
+    firstName     String?
+    lastName      String?
+    education     String? // TODO: Change to education model
+    job           String? // TODO: Change to job model
+    connections   String? // TODO: Create connections table
+    bio           String?
+    volunteering  String? // TODO: Change to volunteering model
+    skills        String? // TODO: Create skills table
+    recommendations String? // TODO: Create recommendations table
+    courses       String? // TODO: Create courses table
+    projects      String? // TODO: Create projects table
+    awards        String? // TODO: Create awards table
+    languages     String? // TODO: Create languages table
     email         String?   @unique
     emailVerified DateTime?
     image         String?
