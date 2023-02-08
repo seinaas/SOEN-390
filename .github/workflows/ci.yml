@@ -50,11 +50,29 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
-      - name: Prettier
-        uses: creyD/prettier_action@v4.2
+      - name: Install Node.js
+        uses: actions/setup-node@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          prettier_options: --write **/*.{js,ts,tsx,json,md,yml,yaml}
+          node-version: 16
+
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        shell: bash
+        run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
+
+      - uses: actions/cache@v3
+        id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Prettier
+        run: npm run prettier
 
   test:
     name: Run Tests
