@@ -2,7 +2,6 @@
 
 import NextAuth, { type NextAuthOptions } from 'next-auth';
 import GoogleProvider, { type GoogleProfile } from 'next-auth/providers/google';
-import AzureADProvider from 'next-auth/providers/azure-ad';
 import AzureADB2CProvider, { type AzureB2CProfile } from 'next-auth/providers/azure-ad-b2c';
 // Prisma adapter for NextAuth, optional and can be removed
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
@@ -37,12 +36,6 @@ export const authOptions: NextAuthOptions = {
           image: profile.picture,
         };
       },
-    }),
-    //TODO: add azure ad provider
-    AzureADProvider({
-      clientId: env.AZURE_AD_CLIENT_ID,
-      clientSecret: env.AZURE_AD_CLIENT_SECRET,
-      tenantId: env.AZURE_AD_TENANT_ID,
     }),
     AzureADB2CProvider({
       tenantId: env.AZURE_AD_B2C_TENANT_NAME,
