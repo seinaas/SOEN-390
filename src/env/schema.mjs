@@ -21,6 +21,10 @@ export const serverSchema = z.object({
   AZURE_AD_CLIENT_ID: z.string(),
   AZURE_AD_CLIENT_SECRET: z.string(),
   AZURE_AD_TENANT_ID: z.string(),
+  AZURE_AD_B2C_TENANT_NAME: z.string(),
+  AZURE_AD_B2C_CLIENT_ID: z.string(),
+  AZURE_AD_B2C_CLIENT_SECRET: z.string(),
+  AZURE_AD_B2C_PRIMARY_USER_FLOW: z.string(),
 });
 
 /**
@@ -38,6 +42,10 @@ export const serverEnv = {
   AZURE_AD_CLIENT_ID: process.env.AZURE_AD_CLIENT_ID,
   AZURE_AD_CLIENT_SECRET: process.env.AZURE_AD_CLIENT_SECRET,
   AZURE_AD_TENANT_ID: process.env.AZURE_AD_TENANT_ID,
+  AZURE_AD_B2C_TENANT_NAME: process.env.AZURE_AD_B2C_TENANT_NAME,
+  AZURE_AD_B2C_CLIENT_ID: process.env.AZURE_AD_B2C_CLIENT_ID,
+  AZURE_AD_B2C_CLIENT_SECRET: process.env.AZURE_AD_B2C_CLIENT_SECRET,
+  AZURE_AD_B2C_PRIMARY_USER_FLOW: process.env.AZURE_AD_B2C_PRIMARY_USER_FLOW,
 };
 
 /**

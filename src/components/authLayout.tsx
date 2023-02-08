@@ -53,7 +53,7 @@ const AuthLayout: React.FC<AuthPageProps> = ({ type, children }) => {
               </button>
               <button
                 className='flex items-center justify-center rounded-lg border-2 border-primary-600 p-2'
-                onClick={() => void signIn('microsoft')}
+                onClick={() => void signIn('azure-ad-b2c')}
               >
                 <Image alt='Microsoft Logo' src='/logos/microsoft.svg' width={32} height={32} />
               </button>
