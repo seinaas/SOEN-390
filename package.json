@@ -8,7 +8,7 @@
     "postinstall": "prisma generate",
     "lint": "next lint",
     "start": "next start",
-    "prettier": "prettier --write .",
+    "prettier": "prettier --write **/*.{js,ts,tsx,json,md,yml,yaml}",
     "cypress": "cross-env NODE_ENV=test cypress open",
     "cypress:headless": "cross-env NODE_ENV=test cypress run",
     "test:cypress:component": "cross-env NODE_ENV=test cypress run --component",
