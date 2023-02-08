@@ -109,9 +109,11 @@ jobs:
         run: npm run test
 
       - name: Generate Coverage
+        if: ${{ github.event_name == 'pull_request' }}
         run: npm run coverage
 
       - name: Coverage Report
+        if: ${{ github.event_name == 'pull_request' }}
         uses: romeovs/lcov-reporter-action@2a28ec3e25fb7eae9cb537e9141603486f810d1a
         with:
           lcov-file: ./coverage/lcov.info
