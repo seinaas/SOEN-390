@@ -8,6 +8,9 @@ on:
     branches:
       - main
 
+env:
+  SKIP_ENV_VALIDATION: 1
+
 jobs:
   lint:
     name: Run ESLint
