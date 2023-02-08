@@ -1,27 +1,18 @@
-name: CI
+name: 🚧 CI
 
 on:
+  workflow_run:
+    workflows: ['🖊️ Validate PR Title']
+    types:
+      - completed
   push:
-    branches:
-      - main
-  pull_request:
     branches:
       - main
 
 jobs:
-  validate-pr:
-    name: Validate PR Title
-    permissions: write-all
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - uses: aslafy-z/conventional-pr-title-action@v3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   lint:
     name: Run ESLint
     runs-on: ubuntu-latest
-    needs: validate-pr
     steps:
       - uses: actions/checkout@v3
 
@@ -54,33 +45,17 @@ jobs:
   prettier:
     name: Run Prettier
     runs-on: ubuntu-latest
-    needs: validate-pr
     steps:
       - uses: actions/checkout@v3
-
-      - name: Install Node.js
-        uses: actions/setup-node@v3
         with:
-          node-version: 16
-
-      - name: Get npm cache directory
-        id: npm-cache-dir
-        shell: bash
-        run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
-
-      - uses: actions/cache@v3
-        id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
-        with:
-          path: ${{ steps.npm-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install Dependencies
-        run: npm ci
+          ref: ${{ github.head_ref }}
 
       - name: Prettier
-        run: npm run prettier
+        uses: creyD/prettier_action@v4.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prettier_options: --write **/*.{js,ts,tsx,json,md,yml,yaml}
+
   test:
     name: Run Tests
     runs-on: ubuntu-latest
