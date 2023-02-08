@@ -36,7 +36,10 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - run: mv .env.example .env
+      - name: Create .env
+        run: |
+          touch .env
+          echo SKIP_ENV_VALIDATION=1 >> .env
 
       - name: Lint
         run: npm run lint
