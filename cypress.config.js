@@ -6,6 +6,7 @@ module.exports = defineConfig({
   fixturesFolder: 'tests/cypress/fixtures',
   screenshotsFolder: 'tests/cypress/screenshots',
   video: false,
+  defaultCommandTimeout: 10000,
 
   e2e: {
     specPattern: 'tests/cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',

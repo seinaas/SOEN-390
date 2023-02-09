@@ -1,8 +1,8 @@
 /* istanbul ignore file */
 
-import NextAuth, { type NextAuthOptions } from 'next-auth';
+import NextAuth, { type NextAuthOptions, type AzureB2CProfile } from 'next-auth';
 import GoogleProvider, { type GoogleProfile } from 'next-auth/providers/google';
-import AzureADB2CProvider, { type AzureB2CProfile } from 'next-auth/providers/azure-ad-b2c';
+import AzureADB2CProvider from 'next-auth/providers/azure-ad-b2c';
 // Prisma adapter for NextAuth, optional and can be removed
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 
@@ -46,7 +46,8 @@ export const authOptions: NextAuthOptions = {
       profile(profile: AzureB2CProfile) {
         return {
           id: profile.sub,
-          firstName: profile.name,
+          firstName: profile.given_name,
+          lastName: profile.family_name,
           email: profile.emails.length ? profile.emails[0] : undefined,
         };
       },
