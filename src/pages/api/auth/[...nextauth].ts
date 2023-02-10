@@ -51,7 +51,6 @@ export const authOptions: NextAuthOptions = {
       requestTokenUrl: `https://login.microsoftonline.com/${env.AZURE_AD_B2C_TENANT_ID}/oauth2/v2.0/authorize`,
       profileUrl: 'https://graph.microsoft.com/oidc/userinfo',
       profile: (profile: MicrosoftProfile) => {
-        console.log(profile);
         return {
           id: profile.sub,
           firstName: profile.given_name,
@@ -67,7 +66,6 @@ export const authOptions: NextAuthOptions = {
       clientSecret: env.FACEBOOK_CLIENT_SECRET,
       userinfo: 'https://graph.facebook.com/me?fields=email,first_name,last_name,picture',
       profile(profile: FacebookProfile) {
-        console.log(profile);
         return {
           id: profile.id,
           firstName: profile.first_name,
