@@ -39,8 +39,9 @@ declare module 'next-auth' {
     image?: string;
   }
 
-  interface AzureB2CProfile extends DefaultAzureB2CProfile {
+  interface MicrosoftProfile extends DefaultAzureB2CProfile {
     given_name: string;
     family_name: string;
+    email: string;
   }
 }

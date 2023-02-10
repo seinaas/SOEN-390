@@ -38,6 +38,7 @@ model Account {
     refresh_token_expires_in Int?
     not_before        Int?
     id_token_expires_in Int?
+    ext_expires_in    Int?
     profile_info      String?
     user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
