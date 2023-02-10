@@ -1,4 +1,5 @@
 import { type DefaultSession } from 'next-auth';
+import { type AzureB2CProfile as DefaultAzureB2CProfile } from 'next-auth/providers/azure-ad-b2c';
 
 declare module 'next-auth' {
   /**
@@ -36,5 +37,11 @@ declare module 'next-auth' {
     languages?: string;
     email?: string;
     image?: string;
+  }
+
+  interface MicrosoftProfile extends DefaultAzureB2CProfile {
+    given_name: string;
+    family_name: string;
+    email: string;
   }
 }

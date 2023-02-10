@@ -1,6 +1,6 @@
 /* istanbul ignore file */
 
-import NextAuth, { type NextAuthOptions } from 'next-auth';
+import NextAuth, { type NextAuthOptions, type MicrosoftProfile } from 'next-auth';
 import GoogleProvider, { type GoogleProfile } from 'next-auth/providers/google';
 // Prisma adapter for NextAuth, optional and can be removed
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
@@ -36,6 +36,31 @@ export const authOptions: NextAuthOptions = {
         };
       },
     }),
+    {
+      id: 'microsoft',
+      name: env.AZURE_AD_B2C_TENANT_ID,
+      type: 'oauth',
+      version: '2.0',
+      authorization: {
+        params: { scope: 'openid profile email' },
+        url: `https://login.microsoftonline.com/${env.AZURE_AD_B2C_TENANT_ID}/oauth2/v2.0/authorize`,
+      },
+      wellKnown: `https://login.microsoftonline.com/${env.AZURE_AD_B2C_TENANT_ID}/v2.0/.well-known/openid-configuration`,
+      accessTokenUrl: `https://login.microsoftonline.com/${env.AZURE_AD_B2C_TENANT_ID}/oauth2/v2.0/token`,
+      requestTokenUrl: `https://login.microsoftonline.com/${env.AZURE_AD_B2C_TENANT_ID}/oauth2/v2.0/authorize`,
+      profileUrl: 'https://graph.microsoft.com/oidc/userinfo',
+      profile: (profile: MicrosoftProfile) => {
+        console.log(profile);
+        return {
+          id: profile.sub,
+          firstName: profile.given_name,
+          lastName: profile.family_name,
+          email: profile.email,
+        };
+      },
+      clientId: env.AZURE_AD_B2C_CLIENT_ID,
+      clientSecret: env.AZURE_AD_B2C_CLIENT_SECRET,
+    },
     /**
      * ...add more providers here
      *
