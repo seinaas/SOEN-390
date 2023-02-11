@@ -1,12 +1,12 @@
 import { GetServerSidePropsContext, type NextPage } from 'next';
 import Head from 'next/head';
 import { signOut, useSession } from 'next-auth/react';
-
 import { api } from '../utils/api';
 import Button from '../components/button';
 import Input from '../components/input';
 import Link from 'next/link';
 import { getServerAuthSession } from '../server/auth';
+import { reloadSession } from '../utils/reloadSession';
 
 const Home: NextPage = () => {
   return (
@@ -45,7 +45,8 @@ const AuthShowcase: React.FC = () => {
             Logged in as {sessionData.user?.firstName} {sessionData.user?.lastName}
           </span>
         )}
-        {secretMessage && <span> - {secretMessage}</span>}
+        {secretMessage && <span> - {secretMessage} </span>}
+        {sessionData && !sessionData?.user?.firstName && !sessionData?.user?.lastName ? reloadSession() : true}
       </div>
       {sessionData ? (
         <Button data-cy='signout-button' variant='secondary' reverse onClick={() => signOut()}>
