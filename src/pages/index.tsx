@@ -1,12 +1,12 @@
-import { GetServerSidePropsContext, type NextPage } from 'next';
+import { type GetServerSidePropsContext, type NextPage } from 'next';
 import Head from 'next/head';
 import { signOut, useSession } from 'next-auth/react';
 import { api } from '../utils/api';
 import Button from '../components/button';
-import Input from '../components/input';
 import Link from 'next/link';
 import { getServerAuthSession } from '../server/auth';
 import { reloadSession } from '../utils/reloadSession';
+import { useEffect } from 'react';
 
 const Home: NextPage = () => {
   return (
@@ -30,12 +30,15 @@ export default Home;
 
 const AuthShowcase: React.FC = () => {
   const { data: sessionData } = useSession();
-  console.log(sessionData);
 
   const { data: secretMessage } = api.example.getSecretMessage.useQuery(
     undefined, // no input
     { enabled: sessionData?.user !== undefined },
   );
+
+  useEffect(() => {
+    if (sessionData && !sessionData?.user?.firstName && !sessionData?.user?.lastName) reloadSession();
+  }, [sessionData]);
 
   return (
     <div className='flex flex-col items-center justify-center gap-4'>
@@ -46,7 +49,6 @@ const AuthShowcase: React.FC = () => {
           </span>
         )}
         {secretMessage && <span> - {secretMessage} </span>}
-        {sessionData && !sessionData?.user?.firstName && !sessionData?.user?.lastName ? reloadSession() : true}
       </div>
       {sessionData ? (
         <Button data-cy='signout-button' variant='secondary' reverse onClick={() => signOut()}>
