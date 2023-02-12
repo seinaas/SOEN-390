@@ -1,7 +1,8 @@
 /* istanbul ignore file */
 
-import NextAuth, { type NextAuthOptions, type MicrosoftProfile } from 'next-auth';
+import NextAuth, { type NextAuthOptions, type MicrosoftProfile, type FacebookProfile } from 'next-auth';
 import GoogleProvider, { type GoogleProfile } from 'next-auth/providers/google';
+import FacebookProvider from 'next-auth/providers/facebook';
 // Prisma adapter for NextAuth, optional and can be removed
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 
@@ -50,7 +51,6 @@ export const authOptions: NextAuthOptions = {
       requestTokenUrl: `https://login.microsoftonline.com/${env.AZURE_AD_B2C_TENANT_ID}/oauth2/v2.0/authorize`,
       profileUrl: 'https://graph.microsoft.com/oidc/userinfo',
       profile: (profile: MicrosoftProfile) => {
-        console.log(profile);
         return {
           id: profile.sub,
           firstName: profile.given_name,
@@ -61,6 +61,20 @@ export const authOptions: NextAuthOptions = {
       clientId: env.AZURE_AD_B2C_CLIENT_ID,
       clientSecret: env.AZURE_AD_B2C_CLIENT_SECRET,
     },
+    FacebookProvider({
+      clientId: env.FACEBOOK_CLIENT_ID,
+      clientSecret: env.FACEBOOK_CLIENT_SECRET,
+      userinfo: 'https://graph.facebook.com/me?fields=email,first_name,last_name,picture',
+      profile(profile: FacebookProfile) {
+        return {
+          id: profile.id,
+          firstName: profile.first_name,
+          lastName: profile.last_name,
+          email: profile.email,
+          image: profile.picture.data.url,
+        };
+      },
+    }),
     /**
      * ...add more providers here
      *

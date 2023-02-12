@@ -21,6 +21,8 @@ export const serverSchema = z.object({
   AZURE_AD_B2C_TENANT_ID: z.string(),
   AZURE_AD_B2C_CLIENT_ID: z.string(),
   AZURE_AD_B2C_CLIENT_SECRET: z.string(),
+  FACEBOOK_CLIENT_ID: z.string(),
+  FACEBOOK_CLIENT_SECRET: z.string(),
 });
 
 /**
@@ -38,6 +40,8 @@ export const serverEnv = {
   AZURE_AD_B2C_TENANT_ID: process.env.AZURE_AD_B2C_TENANT_ID,
   AZURE_AD_B2C_CLIENT_ID: process.env.AZURE_AD_B2C_CLIENT_ID,
   AZURE_AD_B2C_CLIENT_SECRET: process.env.AZURE_AD_B2C_CLIENT_SECRET,
+  FACEBOOK_CLIENT_ID: process.env.FACEBOOK_CLIENT_ID,
+  FACEBOOK_CLIENT_SECRET: process.env.FACEBOOK_CLIENT_SECRET,
 };
 
 /**

@@ -1,5 +1,6 @@
 import { type DefaultSession } from 'next-auth';
 import { type AzureB2CProfile as DefaultAzureB2CProfile } from 'next-auth/providers/azure-ad-b2c';
+import { type FacebookProfile as DefaultFacebookProfile } from 'next-auth/providers/facebook';
 
 declare module 'next-auth' {
   /**
@@ -43,5 +44,11 @@ declare module 'next-auth' {
     given_name: string;
     family_name: string;
     email: string;
+  }
+
+  interface FacebookProfile extends DefaultFacebookProfile {
+    email: string;
+    first_name: string;
+    last_name: string;
   }
 }
