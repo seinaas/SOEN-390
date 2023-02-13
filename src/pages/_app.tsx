@@ -21,10 +21,6 @@ export type MyAppProps = AppProps & {
 
 const MyApp = (({ Component, pageProps: { session, ...pageProps } }: MyAppProps) => {
   const getLayout = Component.getLayout ?? ((page) => page);
-  return getLayout(
-    <SessionProvider session={session as Session}>
-      <Component {...pageProps} />
-    </SessionProvider>,
-  );
+  return <SessionProvider session={session as Session}>{getLayout(<Component {...pageProps} />)}</SessionProvider>;
 }) as AppType;
 export default api.withTRPC(MyApp);
