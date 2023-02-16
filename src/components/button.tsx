@@ -9,11 +9,12 @@ type Props = {
   type?: 'button' | 'submit' | 'reset';
 } & HTMLProps<HTMLButtonElement>;
 
-export const Button: React.FC<Props> = ({ reverse, variant = 'primary', fullWidth, iconLeft, ...props }) => {
+export const Button: React.FC<Props> = ({ reverse, variant = 'primary', fullWidth, iconLeft, className, ...props }) => {
   return (
     <button
       type='submit'
-      className={`flex items-center justify-center gap-x-3 rounded-md border-2 px-5 py-3 font-bold uppercase disabled:opacity-75 ${
+      {...props}
+      className={`flex items-center justify-center gap-x-2 rounded-md border-2 text-sm font-semibold uppercase disabled:opacity-75 ${
         variant === 'primary'
           ? reverse
             ? 'border-white bg-white text-primary-600'
@@ -21,9 +22,7 @@ export const Button: React.FC<Props> = ({ reverse, variant = 'primary', fullWidt
           : reverse
           ? 'border-white bg-transparent text-white'
           : 'border-primary-600 bg-transparent text-primary-600'
-      } ${fullWidth ? 'w-full' : ''}
-      ${props.className || ''}`}
-      {...props}
+      } ${fullWidth ? 'w-full' : ''} ${className || 'px-4 py-3'}`}
     >
       {iconLeft}
       <div className='flex items-center justify-center gap-x-1 overflow-hidden leading-[0.8]'>{props.children}</div>
