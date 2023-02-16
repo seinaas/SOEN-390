@@ -23,7 +23,7 @@ export const connectionsRouter = createTRPCRouter({
       const user2ID = recipient.id < ctx.session.user.id ? ctx.session.user.id : recipient.id;
       const connection = await ctx.prisma.connection.findUnique({
         where: {
-          user_1_ID_user_2_ID: { user_1_ID: user1ID, user_2_ID: user2ID },
+          user1Id_user2Id: { user1Id: user1ID, user2Id: user2ID },
         },
       });
       if (connection) {
@@ -69,8 +69,8 @@ export const connectionsRouter = createTRPCRouter({
       const user2ID = recipient.id < ctx.session.user.id ? ctx.session.user.id : recipient.id;
       return await ctx.prisma.connection.create({
         data: {
-          user_1_ID: user1ID,
-          user_2_ID: user2ID,
+          user1Id: user1ID,
+          user2Id: user2ID,
           connectionStatus: ctx.session.user.id == user1ID ? 'Pending_1_To_2' : 'Pending_2_To_1',
         },
       });
@@ -99,7 +99,7 @@ export const connectionsRouter = createTRPCRouter({
           connectionStatus: 'Connected',
         },
         where: {
-          user_1_ID_user_2_ID: { user_1_ID: user1ID, user_2_ID: user2ID },
+          user1Id_user2Id: { user1Id: user1ID, user2Id: user2ID },
         },
       });
     }),
@@ -124,7 +124,7 @@ export const connectionsRouter = createTRPCRouter({
       const user2ID = recipient.id < ctx.session.user.id ? ctx.session.user.id : recipient.id;
       return await ctx.prisma.connection.delete({
         where: {
-          user_1_ID_user_2_ID: { user_1_ID: user1ID, user_2_ID: user2ID },
+          user1Id_user2Id: { user1Id: user1ID, user2Id: user2ID },
         },
       });
     }),

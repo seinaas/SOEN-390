@@ -99,7 +99,7 @@ const Profile: NextPageWithLayout = () => {
                   <div className='flex items-center gap-1 text-sm font-bold text-primary-100'>
                     <IoMdPeople size={20} />
                     {/* TODO: Use Real Data */}
-                    <span>{data?.connections} Connections</span>
+                    <span>{data?.numConnections} Connections</span>
                   </div>
                 </div>
               </div>

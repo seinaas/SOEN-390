@@ -75,13 +75,13 @@ model User {
 }
 
 model Connection {
-    user_1_ID         String
-    user_1            User              @relation("UserFriends", fields: [user_1_ID], references: [id])
-    user_2_ID         String
-    user_2            User              @relation("FriendsUser", fields: [user_2_ID], references: [id])
+    user1Id          String
+    user1            User              @relation("UserFriends", fields: [user1Id], references: [id])
+    user2Id          String
+    user2            User              @relation("FriendsUser", fields: [user2Id], references: [id])
     connectionStatus ConnectionStatus
 
-    @@id([user_1_ID, user_2_ID])
+    @@id([user1Id, user2Id])
 }
 
 model VerificationToken {
