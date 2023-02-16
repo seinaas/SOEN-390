@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 
 export const authRouter = createTRPCRouter({
   register: publicProcedure
-    .input(z.object({ email: z.string(), password: z.string(), confirmPassword: z.string() }))
+    .input(z.object({ email: z.string().email(), password: z.string(), confirmPassword: z.string() }))
     .mutation(async ({ input, ctx }) => {
       if (input.password !== input.confirmPassword) {
         throw new Error('Passwords do not match');

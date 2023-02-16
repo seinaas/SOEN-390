@@ -34,7 +34,6 @@ export const getAuthOptions = (req: NextApiRequest, res: NextApiResponse): NextA
   callbacks: {
     session({ session, user }) {
       if (session.user) {
-        console.log('session.user', user);
         session.user.id = user.id;
         session.user.firstName = user.firstName;
         session.user.lastName = user.lastName;
@@ -180,7 +179,6 @@ export const getAuthOptions = (req: NextApiRequest, res: NextApiResponse): NextA
       ) {
         const cookie = getCookie('next-auth.session-token', { req });
         if (cookie) {
-          console.log(cookie);
           return cookie as string;
         }
 
@@ -190,7 +188,6 @@ export const getAuthOptions = (req: NextApiRequest, res: NextApiResponse): NextA
       return encode({ secret, token, maxAge });
     },
     decode: async ({ token, secret }) => {
-      console.log(req.query);
       if (
         req.query.nextauth?.includes('callback') &&
         req.query.nextauth?.includes('credentials') &&
