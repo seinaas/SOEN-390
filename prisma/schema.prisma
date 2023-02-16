@@ -3,6 +3,7 @@
 
 generator client {
     provider = "prisma-client-js"
+    previewFeatures = ["filteredRelationCount"]
 }
 
 datasource db {
@@ -78,7 +79,7 @@ model Connection {
     user_1            User              @relation("UserFriends", fields: [user_1_ID], references: [id])
     user_2_ID         String
     user_2            User              @relation("FriendsUser", fields: [user_2_ID], references: [id])
-    connection_Status Connection_Status
+    connectionStatus ConnectionStatus
 
     @@id([user_1_ID, user_2_ID])
 }
@@ -91,7 +92,7 @@ model VerificationToken {
     @@unique([identifier, token])
 }
 
-enum Connection_Status {
+enum ConnectionStatus {
     Pending_1_To_2
     Pending_2_To_1
     Connected
