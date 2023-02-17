@@ -22,7 +22,7 @@ const Button: React.FC<Props> = ({ reverse, variant = 'primary', fullWidth, icon
             : 'border-primary-600 bg-primary-600 text-white transition-colors duration-200 hover:bg-primary-800'
           : reverse
           ? 'border-white bg-transparent text-white transition-colors duration-200 hover:bg-white hover:text-primary-600'
-          : 'border-primary-600 bg-transparent text-primary-600 transition-colors duration-200 hover:bg-primary-600 hover:text-white  disabled:bg-primary-100/20 disabled:opacity-50'
+          : 'border-primary-600 bg-transparent text-primary-600 transition-colors duration-200 hover:bg-primary-600 enabled:hover:text-white  disabled:bg-primary-100/20 disabled:opacity-50'
       } ${fullWidth ? 'w-full' : ''}
       ${className || 'px-4 py-3'}`}
       {...props}
