@@ -73,6 +73,7 @@ export const connectionsRouter = createTRPCRouter({
         });
       return [...connections, ...connectionsOf];
     }
+    return [];
   }),
   getConnectionStatus: protectedProcedure
     .input(
