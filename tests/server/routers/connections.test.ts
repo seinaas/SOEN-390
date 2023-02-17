@@ -1,15 +1,94 @@
-import { TRPCError } from '@trpc/server';
+import { type TRPCError } from '@trpc/server';
 import { createUser, trpcRequest } from '../../utils';
 
 describe('connections', () => {
-  describe('getConnection', () => {
+  describe('getUserConnections', () => {
+    it('should return empty array if user does not exist', async () => {
+      const request = trpcRequest({ user: { id: '' }, expires: '' });
+
+      request.ctx.prisma.user.findUnique.mockResolvedValueOnce(null);
+
+      const data = await request.caller.connections.getUserConnections({ userEmail: '' });
+      expect(data).toEqual([]);
+    });
+    it('should return empty array if user has no connections', async () => {
+      const request = trpcRequest({ user: { id: '' }, expires: '' });
+
+      const userBase = createUser();
+
+      request.ctx.prisma.user.findUnique.mockResolvedValueOnce({
+        ...userBase,
+        id: '1',
+        connections: [],
+        connectionOf: [],
+      } as any);
+
+      const data = await request.caller.connections.getUserConnections({ userEmail: '' });
+
+      expect(data).toEqual([]);
+    });
+    it('should merge connections and connectionsOf fields and return a list of connections', async () => {
+      const request = trpcRequest({ user: { id: '' }, expires: '' });
+
+      const userBase = createUser();
+
+      request.ctx.prisma.user.findUnique.mockResolvedValueOnce({
+        ...userBase,
+        id: '1',
+        connections: [
+          {
+            user1: { ...userBase, id: '2' },
+            user2: { id: '1' },
+            connectionStatus: 'Connected',
+          },
+          {
+            user1: { id: '1' },
+            user2: { ...userBase, id: '3' },
+            connectionStatus: 'Connected',
+          },
+        ],
+        connectionOf: [
+          {
+            user1: { ...userBase, id: '4' },
+            user2: { id: '1' },
+            connectionStatus: 'Connected',
+          },
+        ],
+      } as any);
+
+      const data = await request.caller.connections.getUserConnections({ userEmail: '' });
+
+      const expectedUser = {
+        job: userBase.job,
+        firstName: userBase.firstName,
+        lastName: userBase.lastName,
+        image: userBase.image,
+        email: userBase.email,
+      };
+      expect(data).toEqual([
+        {
+          id: '2',
+          ...expectedUser,
+        },
+        {
+          id: '3',
+          ...expectedUser,
+        },
+        {
+          id: '4',
+          ...expectedUser,
+        },
+      ]);
+    });
+  });
+  describe('getConnectionStatus', () => {
     it('should throw user not found if user does not exist', async () => {
       const request = trpcRequest({ user: { id: '' }, expires: '' });
 
       request.ctx.prisma.user.findUnique.mockResolvedValueOnce(null);
 
       try {
-        await request.caller.connections.getConnection({ userEmail: 'john@doe.com' });
+        await request.caller.connections.getConnectionStatus({ userEmail: 'john@doe.com' });
       } catch (e) {
         expect((e as TRPCError).message).toEqual('User not found');
       }
@@ -34,7 +113,7 @@ describe('connections', () => {
         connectionStatus: 'Pending_1_To_2',
       });
 
-      const data = await request.caller.connections.getConnection({ userEmail: '' });
+      const data = await request.caller.connections.getConnectionStatus({ userEmail: '' });
       expect(data).toEqual({ status: 'Sent' });
     });
     it('should return status Received if connection request was received', async () => {
@@ -57,7 +136,7 @@ describe('connections', () => {
         connectionStatus: 'Pending_2_To_1',
       });
 
-      const data = await request.caller.connections.getConnection({ userEmail: '' });
+      const data = await request.caller.connections.getConnectionStatus({ userEmail: '' });
       expect(data).toEqual({ status: 'Received' });
     });
     it('should return status Connected if connection request was accepted', async () => {
@@ -80,7 +159,7 @@ describe('connections', () => {
         connectionStatus: 'Connected',
       });
 
-      const data = await request.caller.connections.getConnection({ userEmail: '' });
+      const data = await request.caller.connections.getConnectionStatus({ userEmail: '' });
       expect(data).toEqual({ status: 'Connected' });
     });
     it('should return empty status if there is no connection', async () => {
@@ -99,7 +178,7 @@ describe('connections', () => {
       request.ctx.prisma.user.findUnique.mockResolvedValueOnce(userInput);
       request.ctx.prisma.connection.findUnique.mockResolvedValueOnce(null);
 
-      const data = await request.caller.connections.getConnection({ userEmail: '' });
+      const data = await request.caller.connections.getConnectionStatus({ userEmail: '' });
       expect(data).toEqual({ status: '' });
     });
   });
