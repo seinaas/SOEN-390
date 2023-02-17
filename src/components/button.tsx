@@ -24,7 +24,7 @@ const Button: React.FC<Props> = ({ reverse, variant = 'primary', fullWidth, icon
           ? 'border-white bg-transparent text-white transition-colors duration-200 hover:bg-white hover:text-primary-600'
           : 'border-primary-600 bg-transparent text-primary-600 transition-colors duration-200 hover:bg-primary-600 hover:text-white'
       } ${fullWidth ? 'w-full' : ''}
-      ${props.className || 'px-4 py-2'}`}
+      ${props.className || 'px-4 py-3'}`}
       {...props}
     >
       {iconLeft}
