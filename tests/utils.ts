@@ -30,6 +30,7 @@ export const createUser = (user: Partial<User> = {}) => {
     emailVerified: new Date(),
     phone: '',
     image: '',
+    password: '',
     ...user,
   };
 };

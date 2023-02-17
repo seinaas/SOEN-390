@@ -66,12 +66,13 @@ model User {
     projects        String? // TODO: Create projects table
     awards          String? // TODO: Create awards table
     languages       String? // TODO: Create languages table
-    email           String?      @unique
+    email           String       @unique
     emailVerified   DateTime?
     phone           String?      @unique
     image           String?      @db.Text
     accounts        Account[]
     sessions        Session[]
+    password        String?
 }
 
 model Connection {

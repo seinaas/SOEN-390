@@ -23,7 +23,7 @@ declare module 'next-auth' {
   // TODO: Update user type to match your database schema
   interface User {
     id: string;
-    firstName: string;
+    firstName?: string;
     lastName?: string;
     education?: string;
     job?: string;
@@ -36,7 +36,7 @@ declare module 'next-auth' {
     projects?: string;
     awards?: string;
     languages?: string;
-    email?: string;
+    email: string;
     image?: string;
   }
 

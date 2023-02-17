@@ -1,7 +1,7 @@
-import { type GetServerSidePropsContext } from 'next';
+import { type NextApiRequest, type NextApiResponse, type GetServerSidePropsContext } from 'next';
 import { unstable_getServerSession } from 'next-auth';
 
-import { authOptions } from '../pages/api/auth/[...nextauth]';
+import { getAuthOptions } from '../pages/api/auth/[...nextauth]';
 
 /**
  * Wrapper for unstable_getServerSession, used in trpc createContext and the
@@ -17,5 +17,9 @@ export const getServerAuthSession = async (ctx: {
   req: GetServerSidePropsContext['req'];
   res: GetServerSidePropsContext['res'];
 }) => {
-  return await unstable_getServerSession(ctx.req, ctx.res, authOptions);
+  return await unstable_getServerSession(
+    ctx.req,
+    ctx.res,
+    getAuthOptions(ctx.req as NextApiRequest, ctx.res as NextApiResponse),
+  );
 };
