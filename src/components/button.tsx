@@ -9,7 +9,7 @@ type Props = {
   type?: 'button' | 'submit' | 'reset';
 } & HTMLMotionProps<'button'>;
 
-const Button: React.FC<Props> = ({ reverse, variant = 'primary', fullWidth, iconLeft, ...props }) => {
+const Button: React.FC<Props> = ({ reverse, variant = 'primary', fullWidth, iconLeft, className, ...props }) => {
   return (
     <motion.button
       layout
@@ -18,17 +18,21 @@ const Button: React.FC<Props> = ({ reverse, variant = 'primary', fullWidth, icon
       className={`flex items-center justify-center gap-x-2 rounded-md border-2 text-sm font-semibold uppercase disabled:opacity-75 ${
         variant === 'primary'
           ? reverse
-            ? 'border-white bg-white text-primary-600 transition-colors duration-200 hover:bg-gray-200'
+            ? 'border-white bg-white text-primary-600 transition-colors duration-200 hover:border-transparent hover:bg-gray-100'
             : 'border-primary-600 bg-primary-600 text-white transition-colors duration-200 hover:bg-primary-800'
           : reverse
           ? 'border-white bg-transparent text-white transition-colors duration-200 hover:bg-white hover:text-primary-600'
-          : 'border-primary-600 bg-transparent text-primary-600 transition-colors duration-200 hover:bg-primary-600 hover:text-white'
+          : 'border-primary-600 bg-transparent text-primary-600 transition-colors duration-200 hover:bg-primary-600 hover:text-white  disabled:bg-primary-100/20 disabled:opacity-50'
       } ${fullWidth ? 'w-full' : ''}
-      ${props.className || 'px-4 py-3'}`}
+      ${className || 'px-4 py-3'}`}
       {...props}
     >
-      {iconLeft}
-      <div className='flex items-center justify-center gap-x-1 overflow-hidden leading-[0.8]'>{props.children}</div>
+      {iconLeft && <motion.span layout>{iconLeft}</motion.span>}
+      {props.children && (
+        <motion.div layout className='flex items-center justify-center gap-x-1 overflow-hidden leading-[0.8]'>
+          {props.children}
+        </motion.div>
+      )}
     </motion.button>
   );
 };

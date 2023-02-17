@@ -40,7 +40,7 @@ export const getAuthOptions = (req: NextApiRequest, res: NextApiResponse): NextA
       }
       return session;
     },
-    async signIn({ user, account, profile, email, credentials }) {
+    async signIn({ user }) {
       if (
         req.query.nextauth?.includes('callback') &&
         req.query.nextauth?.includes('credentials') &&
