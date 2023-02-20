@@ -5,7 +5,7 @@ import { type FacebookProfile as DefaultFacebookProfile } from 'next-auth/provid
 type Job = {
   title: string;
   company: string;
-  location: string;
+  location?: string;
   startDate: Date;
   endDate?: Date;
   description: string;
@@ -42,8 +42,9 @@ declare module 'next-auth' {
     id: string;
     firstName?: string;
     lastName?: string;
-    education?: string;
-    job?: string;
+    headline?: string;
+    education?: Education[];
+    jobs?: Job[];
     connections?: string;
     bio?: string;
     volunteering?: string;

@@ -50,6 +50,7 @@ model User {
     id              String       @id @default(cuid())
     firstName       String?
     lastName        String?
+    headline        String?
     education       Education[]
     jobs            Job[]
     connections     Connection[] @relation("UserFriends")
@@ -84,10 +85,10 @@ model Connection {
 model Job {
   jobId       String  @id @default(cuid())
   userId      String
-  title       String?
-  company     String?
+  title       String
+  company     String
   location    String?
-  startDate   DateTime?
+  startDate   DateTime
   endDate     DateTime?
   description String? @db.Text
   User        User    @relation(fields: [userId], references: [id])
@@ -96,10 +97,10 @@ model Job {
 model Education {
   educationId String  @id @default(cuid())
   userId      String
-  school      String?
+  school      String
   location    String?
-  degree      String?
-  startDate   DateTime?
+  degree      String
+  startDate   DateTime
   endDate     DateTime?
   description String? @db.Text
   User        User    @relation(fields: [userId], references: [id])

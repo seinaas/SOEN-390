@@ -35,6 +35,8 @@ describe('connections', () => {
       request.ctx.prisma.user.findUnique.mockResolvedValueOnce({
         ...userBase,
         id: '1',
+        jobs: [],
+        education: [],
         connections: [
           {
             user1: { ...userBase, id: '2' },
@@ -59,7 +61,9 @@ describe('connections', () => {
       const data = await request.caller.connections.getUserConnections({ userEmail: '' });
 
       const expectedUser = {
-        job: userBase.job,
+        jobs: userBase.jobs,
+        education: userBase.education,
+        headline: userBase.headline,
         firstName: userBase.firstName,
         lastName: userBase.lastName,
         image: userBase.image,
