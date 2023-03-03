@@ -112,10 +112,18 @@ const LandingPageBody: React.FC = () => {
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const session = await getServerAuthSession(ctx);
 
-  if (session && (!session.user?.firstName || !session.user?.lastName)) {
+  if (session) {
+    if (!session.user?.firstName || !session.user?.lastName) {
+      return {
+        redirect: {
+          destination: '/auth/final',
+          permanent: false,
+        },
+      };
+    }
     return {
       redirect: {
-        destination: '/auth/final',
+        destination: '/feed',
         permanent: false,
       },
     };
