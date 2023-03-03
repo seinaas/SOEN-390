@@ -1,59 +1,72 @@
-import { formatDistanceToNowStrict } from 'date-fns';
+import { formatDistance } from 'date-fns';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
-import React, { useState } from 'react';
-import { IoIosChatboxes, IoMdShare, IoMdThumbsUp, IoMdCreate, IoMdRemove } from 'react-icons/io';
+import { useState } from 'react';
+import { IoIosChatboxes, IoMdShare, IoMdThumbsUp } from 'react-icons/io';
 import MainLayout from '../components/mainLayout';
-import { type NextPageWithLayout } from './_app';
+import { NextPageWithLayout } from './_app';
 import { motion } from 'framer-motion';
-import { type GetServerSidePropsContext } from 'next';
+import { GetServerSidePropsContext } from 'next';
 import { getServerAuthSession } from '../server/auth';
-import { api } from '../utils/api';
-import { useEffect } from 'react';
 
-/* This file is responsible for showing all the posts for which the authors are connected with the logged user.
-This file also handles the likes on the posts, the comments (adding, editing, deleting) and the posts themselves (adding, editing,deleting) */
+type Post = {
+  poster: string;
+  logo: string;
+  time: Date;
+  likes: number;
+  text?: string;
+  padding?: boolean;
+};
+
+const posts: Post[] = [
+  {
+    poster: 'Apple',
+    logo: 'https://cdn.cdnlogo.com/logos/a/2/apple.svg',
+    time: new Date(Date.now() - 1000 * 60 * 60 * 4),
+    likes: 123102,
+    padding: true,
+  },
+  {
+    poster: 'Netflix',
+    logo: 'https://cdn.cdnlogo.com/logos/n/75/netflix.svg',
+    time: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2),
+    likes: 92000,
+    padding: true,
+  },
+  {
+    poster: 'Concordia',
+    logo: '/concordia.jpeg',
+    time: new Date(Date.now() - 1000 * 55),
+    likes: 201,
+  },
+];
 
 const Feed: NextPageWithLayout = () => {
   const { data } = useSession();
-  const [shareCount, setShareCount] = useState(0);
-  const [shared, setShared] = useState(false);
+
   const [newPost, setNewPost] = useState('');
-
-  const currentUser = data?.user;
-  const utils = api.useContext();
-
-  const createPost = api.post.createPost.useMutation();
-  const deletePost = api.post.deletePost.useMutation();
-  const editPost = api.post.editPost.useMutation();
-  const [editingPost, setEditingPost] = useState('');
-  const [isEditingPost, setIsEditingPost] = useState(false);
-  const [selectedEditPost, setSelectedEditPost] = useState('');
-  const [selectedPost, setSelectedPost] = useState('');
-
-  const posts = api.post.getPosts.useQuery().data;
-  const likes = api.post.getLikes.useQuery().data;
-  const comments = api.post.getComments.useQuery().data;
-
-  const createLike = api.post.createLike.useMutation();
-  const removeLike = api.post.removeLike.useMutation();
-  const [likedPosts, setLikedPosts] = useState({});
-
-  const createComment = api.post.createComment.useMutation();
-  const editComment = api.post.editComment.useMutation();
-  const deleteComment = api.post.deleteComment.useMutation();
-  const [newComment, setNewComment] = useState('');
-  const [editingComment, setEditingComment] = useState('');
-  const [isEditingComment, setIsEditingComment] = useState(false);
-  const [commentState, setCommentState] = useState(false);
-  const [selectedEditComment, setSelectedEditComment] = useState('');
-
-  const toggleLike = (postId, liked) => {
-    setLikedPosts((prevLikedPosts) => ({
-      ...prevLikedPosts,
-      [postId]: liked,
-    }));
-  };
+  const [posts, setPosts] = useState<Post[]>([
+    {
+      poster: 'Apple',
+      logo: 'https://cdn.cdnlogo.com/logos/a/2/apple.svg',
+      time: new Date(Date.now() - 1000 * 60 * 60 * 4),
+      likes: 123102,
+      padding: true,
+    },
+    {
+      poster: 'Netflix',
+      logo: 'https://cdn.cdnlogo.com/logos/n/75/netflix.svg',
+      time: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2),
+      likes: 92000,
+      padding: true,
+    },
+    {
+      poster: 'Concordia',
+      logo: '/concordia.jpeg',
+      time: new Date(Date.now() - 1000 * 55),
+      likes: 201,
+    },
+  ]);
 
   const addPost = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
