@@ -330,7 +330,7 @@ const Profile: NextPageWithLayout = () => {
               {data?.firstName}&apos;s Connections
             </motion.h1>
             {connections?.length ? (
-              <motion.div className='grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3'>
+              <motion.div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3'>
                 {connections.map((connection, index) => (
                   <Link key={connection.id} href={`/u/${connection.email}`} onClick={() => setViewConnections(false)}>
                     <motion.div
