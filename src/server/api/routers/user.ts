@@ -78,7 +78,7 @@ export const userRouter = createTRPCRouter({
         lastName: z.string().min(1).nullish(),
         bio: z.string().nullish(),
         skills: z.array(z.string()).nullish(),
-        languages: z.string().nullish(),
+        languages: z.array(z.string()).nullish(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
@@ -89,6 +89,7 @@ export const userRouter = createTRPCRouter({
         data: {
           ...input,
           skills: input.skills?.join(','),
+          languages: input.languages?.join(','),
         },
       });
 
@@ -139,9 +140,6 @@ export const userRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      console.log(ctx.session.user);
-      console.log(input);
-
       const job = await ctx.prisma.job.create({
         data: {
           ...input,
@@ -197,7 +195,6 @@ export const userRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      console.log(input);
       const education = await ctx.prisma.education.create({
         data: {
           ...input,

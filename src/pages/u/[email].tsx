@@ -20,7 +20,7 @@ import { getServerAuthSession } from '../../server/auth';
 import { format } from 'date-fns';
 import { useSession } from 'next-auth/react';
 import { AnimatePresence, motion, type Variants } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import EditButton from '../../components/profile/editButton';
 import EditSkillsModal from '../../components/profile/editSkillsModal';
@@ -28,60 +28,8 @@ import EditBioModal from '../../components/profile/editBioModal';
 import NewSectionButton from '../../components/profile/newSectionButton';
 import EditJobsModal from '../../components/profile/editJobsModal';
 import EditEducationModal from '../../components/profile/editEducationModal';
-
-// TODO: Replace with real data
-const fillerData = {
-  role: 'Software Engineering Student @ Concordia University',
-  languages: ['English', 'French'],
-  skills: [
-    'React',
-    'Next.js',
-    'TypeScript',
-    'tRPC',
-    'TailwindCSS',
-    'JavaScript',
-    'CSS',
-    'HTML',
-    'Java',
-    'C++',
-    'Python',
-    'C#',
-    'SQL',
-    'MongoDB',
-  ],
-  work: [
-    {
-      company: 'Google',
-      position: 'Software Engineering Intern',
-      logo: '/logos/google.svg',
-      startDate: new Date('2022-10-01'),
-      description: 'Worked on the Google Search team',
-    },
-    {
-      company: 'Facebook',
-      position: 'Software Engineering Intern',
-      logo: '/logos/facebook.svg',
-      startDate: new Date('2021-05-01'),
-      endDate: new Date('2021-08-01'),
-      description: 'Worked on the Facebook Messenger team',
-    },
-  ],
-  education: [
-    {
-      school: 'Concordia University',
-      degree: 'BSc. Software Engineering',
-      logo: '/concordia.jpeg',
-      startDate: new Date('2019-09-01'),
-    },
-    {
-      school: 'College de Bois-de-Boulogne',
-      degree: 'DEC Computer Science and Mathematics',
-      logo: '/bdeb.jpeg',
-      startDate: new Date('2017-09-01'),
-      endDate: new Date('2019-05-01'),
-    },
-  ],
-};
+import EditLanguagesModal from '../../components/profile/editLanguagesModal';
+import { langsByCode } from '../../utils/languages';
 
 const variants: Variants = {
   hidden: { opacity: 0, y: 10 },
@@ -92,11 +40,17 @@ const variants: Variants = {
 const Profile: NextPageWithLayout = () => {
   const [viewConnections, setViewConnections] = useState(false);
 
-  const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [showLanguagesModal, setShowLanguagesModal] = useState(false);
   const [showSkillsModal, setShowSkillsModal] = useState(false);
   const [showBioModal, setShowBioModal] = useState(false);
   const [edittingJobId, setEdittingJobId] = useState('');
   const [edittingEducationId, setEdittingEducationId] = useState('');
+
+  const updateQueries = async () => {
+    await utils.user.getByEmail.invalidate();
+    await utils.connections.getConnectionStatus.invalidate();
+    await utils.connections.getUserConnections.invalidate();
+  };
 
   const utils = api.useContext();
   const router = useRouter();
@@ -105,33 +59,21 @@ const Profile: NextPageWithLayout = () => {
   const { data } = api.user.getByEmail.useQuery({ email: email as string });
   const requestMutation = api.connections.sendConnectionRequest.useMutation({
     async onSuccess() {
-      await utils.user.getByEmail.invalidate();
-      await utils.connections.getConnectionStatus.invalidate();
+      await updateQueries();
     },
   });
   const acceptMutation = api.connections.acceptConnection.useMutation({
     async onSuccess() {
-      await utils.user.getByEmail.invalidate();
-      await utils.connections.getConnectionStatus.invalidate();
+      await updateQueries();
     },
   });
   const cancelMutation = api.connections.removeConnection.useMutation({
     async onSuccess() {
-      await utils.user.getByEmail.invalidate();
-      await utils.connections.getConnectionStatus.invalidate();
+      await updateQueries();
     },
   });
   const { data: connection } = api.connections.getConnectionStatus.useQuery({ userEmail: data?.email || '' });
-  const { data: connections } = api.connections.getUserConnections.useQuery(
-    { userEmail: (email as string) || '' },
-    { enabled: viewConnections },
-  );
-
-  useEffect(() => {
-    if (viewConnections) {
-      void utils.connections.getUserConnections.refetch();
-    }
-  }, [viewConnections, utils.connections.getUserConnections]);
+  const { data: connections } = api.connections.getUserConnections.useQuery({ userEmail: (email as string) || '' });
 
   const canEdit = sessionData?.user?.email === data?.email;
 
@@ -162,7 +104,9 @@ const Profile: NextPageWithLayout = () => {
                 <div className='my-2 h-px w-full bg-primary-100/20'></div>
 
                 <button
-                  onClick={() => setViewConnections(!viewConnections)}
+                  onClick={() => {
+                    setViewConnections(!viewConnections);
+                  }}
                   className='flex w-full items-center justify-between rounded-md border-b-2 bg-primary-100/20 px-3 py-3 text-sm font-bold text-primary-100 duration-100 hover:cursor-pointer hover:bg-primary-100/40 hover:transition-colors'
                 >
                   <div className='flex items-center gap-1'>
@@ -287,13 +231,13 @@ const Profile: NextPageWithLayout = () => {
             <div className='flex w-full flex-col gap-2'>
               <div className='flex justify-between'>
                 <h1 className='mb-2 font-semibold'>Languages</h1>
-                {canEdit && <EditButton onClick={() => setShowLanguageModal(true)} />}
+                {canEdit && <EditButton onClick={() => setShowLanguagesModal(true)} />}
               </div>
               <div className='flex flex-wrap gap-2 text-primary-100'>
                 {data?.languages &&
-                  data.languages.map((language) => (
-                    <div key={language} className='rounded-md bg-primary-100/20 px-2 py-1'>
-                      {language}
+                  data.languages.map((langCode) => (
+                    <div key={langCode} className='rounded-md bg-primary-100/20 px-2 py-1'>
+                      {langsByCode[langCode as keyof typeof langsByCode]}
                     </div>
                   ))}
               </div>
@@ -497,6 +441,15 @@ const Profile: NextPageWithLayout = () => {
             skills={data.skills}
             onCancel={async () => {
               setShowSkillsModal(false);
+              await utils.user.getByEmail.refetch();
+            }}
+          />
+        )}
+        {showLanguagesModal && data?.languages && (
+          <EditLanguagesModal
+            languages={data.languages}
+            onCancel={async () => {
+              setShowLanguagesModal(false);
               await utils.user.getByEmail.refetch();
             }}
           />
