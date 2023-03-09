@@ -9,6 +9,7 @@ import { reloadSession } from '../utils/reloadSession';
 import { useEffect } from 'react';
 import Header from '../components/header';
 import TopMenuBar from '../components/topMenuBar';
+import Image from 'next/image';
 
 const Home: NextPage = () => {
   return (
@@ -17,15 +18,10 @@ const Home: NextPage = () => {
         <title>ProSpects</title>
         <link rel='icon' href='/favicon.ico' />
       </Head>
-      {/* <main className='flex min-h-screen flex-col items-center justify-center bg-primary-600'>
-        <div className='container flex flex-col items-center justify-center gap-12 px-4 py-16 '>
-          <div className='flex flex-col items-center gap-2'>
-            <AuthShowcase />
-          
-          </div>
-        </div>
-      </main> */}
-      <TopMenuBar></TopMenuBar>
+      <main className='flex min-h-screen flex-col items-center justify-center bg-primary-600'>
+        <TopMenuBar></TopMenuBar>
+        <LandingPageBody></LandingPageBody>
+      </main>
     </>
   );
 };
@@ -73,6 +69,37 @@ const AuthShowcase: React.FC = () => {
         </div>
       )}
     </div>
+  );
+};
+
+const LandingPageBody: React.FC = () => {
+  return (
+    <>
+      <div className='flex w-full flex-grow flex-row justify-between'>
+        <div className='relative flex w-6/12 items-center justify-start bg-primary-600'>
+          <Image
+            alt='Landing Page Picture'
+            src='/LandingPagePicture.png'
+            fill
+            className='object-cover
+          '
+          ></Image>
+        </div>
+        <div className=' flex w-6/12 items-center justify-center justify-center bg-primary-600 text-white'>
+          <div className='flex w-7/12 flex-col items-center justify-center space-y-10 text-center'>
+            <p className='text-2xl font-semibold uppercase'>Welcome to ProSpect</p>
+            <p>
+              We make it easy to find your ideal job. Connect with people with similar interests and expand your
+              network!
+            </p>
+            <p>Join us for unlimited opportunites.</p>
+            <Link href='/auth/signin' className='text-primary-200 underline'>
+              Become a member
+            </Link>
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 
