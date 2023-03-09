@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { getServerAuthSession } from '../server/auth';
 import { reloadSession } from '../utils/reloadSession';
 import { useEffect } from 'react';
+import Header from '../components/header';
+import TopMenuBar from '../components/topMenuBar';
 
 const Home: NextPage = () => {
   return (
@@ -15,13 +17,15 @@ const Home: NextPage = () => {
         <title>ProSpects</title>
         <link rel='icon' href='/favicon.ico' />
       </Head>
-      <main className='flex min-h-screen flex-col items-center justify-center bg-primary-600'>
+      {/* <main className='flex min-h-screen flex-col items-center justify-center bg-primary-600'>
         <div className='container flex flex-col items-center justify-center gap-12 px-4 py-16 '>
           <div className='flex flex-col items-center gap-2'>
             <AuthShowcase />
+          
           </div>
         </div>
-      </main>
+      </main> */}
+      <TopMenuBar></TopMenuBar>
     </>
   );
 };
