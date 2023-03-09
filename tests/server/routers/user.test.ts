@@ -16,6 +16,8 @@ describe('user', () => {
       };
       const expectedUser = {
         ...userBase,
+        languages: [],
+        skills: [],
         numConnections: 0,
       };
 
@@ -38,6 +40,8 @@ describe('user', () => {
       };
       const expectedUser = {
         ...userBase,
+        languages: [],
+        skills: [],
         numConnections: 0,
       };
 

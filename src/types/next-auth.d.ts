@@ -2,6 +2,23 @@ import { type DefaultSession } from 'next-auth';
 import { type AzureB2CProfile as DefaultAzureB2CProfile } from 'next-auth/providers/azure-ad-b2c';
 import { type FacebookProfile as DefaultFacebookProfile } from 'next-auth/providers/facebook';
 
+type Job = {
+  title: string;
+  company: string;
+  location?: string;
+  startDate: Date;
+  endDate?: Date;
+  description: string;
+};
+
+type Education = {
+  school: string;
+  location: string;
+  degree: string;
+  startDate: Date;
+  endDate?: Date;
+  description: string;
+};
 declare module 'next-auth' {
   /**
    * Returned by `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
@@ -12,8 +29,8 @@ declare module 'next-auth' {
       id: string;
       firstName?: string;
       lastName?: string;
-      education?: string;
-      job?: string;
+      education?: Education[];
+      jobs?: Job[];
       bio?: string;
       email?: string;
       image?: string;
@@ -25,8 +42,9 @@ declare module 'next-auth' {
     id: string;
     firstName?: string;
     lastName?: string;
-    education?: string;
-    job?: string;
+    headline?: string;
+    education?: Education[];
+    jobs?: Job[];
     connections?: string;
     bio?: string;
     volunteering?: string;

@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { type PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 
 import { createTRPCRouter, protectedProcedure } from '../trpc';
@@ -30,15 +30,35 @@ export const connectionsRouter = createTRPCRouter({
         connections: {
           where: { connectionStatus: 'Connected' },
           include: {
-            user1: true,
-            user2: true,
+            user1: {
+              include: {
+                jobs: true,
+                education: true,
+              },
+            },
+            user2: {
+              include: {
+                jobs: true,
+                education: true,
+              },
+            },
           },
         },
         connectionOf: {
           where: { connectionStatus: 'Connected' },
           include: {
-            user1: true,
-            user2: true,
+            user1: {
+              include: {
+                jobs: true,
+                education: true,
+              },
+            },
+            user2: {
+              include: {
+                jobs: true,
+                education: true,
+              },
+            },
           },
         },
       },
@@ -51,7 +71,9 @@ export const connectionsRouter = createTRPCRouter({
           const otherUser = connection.user1.id === user.id ? connection.user2 : connection.user1;
           return {
             id: otherUser.id,
-            job: otherUser.job,
+            headline: otherUser.headline,
+            jobs: otherUser.jobs,
+            education: otherUser.education,
             firstName: otherUser.firstName,
             lastName: otherUser.lastName,
             image: otherUser.image,
@@ -64,7 +86,9 @@ export const connectionsRouter = createTRPCRouter({
           const otherUser = connection.user1.id === user.id ? connection.user2 : connection.user1;
           return {
             id: otherUser.id,
-            job: otherUser.job,
+            headline: otherUser.headline,
+            jobs: otherUser.jobs,
+            education: otherUser.education,
             firstName: otherUser.firstName,
             lastName: otherUser.lastName,
             image: otherUser.image,
