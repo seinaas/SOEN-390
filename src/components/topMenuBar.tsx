@@ -34,14 +34,15 @@ const TopMenuBar: React.FC = () => {
             <Button data-cy='signout-button' variant='secondary' reverse onClick={() => signOut()}>
               Sign Out
             </Button>
-            <Image
-              alt='Profile Picture'
-              loader={() => data?.user?.image || ''}
-              src={data.user?.image || ''}
-              width={48}
-              height={48}
-              className='rounded-full'
-            />
+            <div className='relative h-10 w-10'>
+              <Image
+                alt='Profile Picture'
+                loader={() => data?.user?.image || ''}
+                src={data.user?.image || ''}
+                fill
+                className='rounded-full object-contain '
+              />
+            </div>
           </div>
         ) : (
           <div className='flex justify-center space-x-5 whitespace-nowrap'>
