@@ -75,6 +75,16 @@ describe('Landing Page', () => {
     cy.visit('/');
     cy.get('[data-cy=topMenuBar-profile-picture]').should('be.visible');
   });
+
+  it('should display landing page picture and text', () => {
+    cy.get('[data-cy=landingPage-picture]').should('be.visible');
+    cy.get('[data-cy=landingPage-text-welcome]').should('be.visible');
+  });
+
+  it('should redirect to register page when clicking on become member link', () => {
+    cy.get('[data-cy=landingPage-link-becomeMember]').click();
+    cy.url().should('include', '/auth/register');
+  });
 });
 describe('Register Page', () => {
   it('should successfully register with email and password', () => {

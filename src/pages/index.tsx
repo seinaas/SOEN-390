@@ -81,19 +81,22 @@ const LandingPageBody: React.FC = () => {
             alt='Landing Page Picture'
             src='/LandingPagePicture.png'
             fill
-            className='object-cover
-          '
+            className='object-cover'
+            data-cy='landingPage-picture'
           ></Image>
         </div>
-        <div className=' flex w-6/12 items-center justify-center justify-center bg-primary-600 text-white'>
-          <div className='flex w-7/12 flex-col items-center justify-center space-y-10 text-center'>
+        <div className=' flex w-6/12 items-center justify-center bg-primary-600 text-white'>
+          <div
+            className='flex w-7/12 flex-col items-center justify-center space-y-10 text-center'
+            data-cy='landingPage-text-welcome'
+          >
             <p className='text-2xl font-semibold uppercase'>Welcome to ProSpect</p>
             <p>
               We make it easy to find your ideal job. Connect with people with similar interests and expand your
               network!
             </p>
             <p>Join us for unlimited opportunites.</p>
-            <Link href='/auth/signin' className='text-primary-200 underline'>
+            <Link href='/auth/register' className='text-primary-200 underline' data-cy='landingPage-link-becomeMember'>
               Become a member
             </Link>
           </div>
