@@ -8,6 +8,7 @@ import { NextPageWithLayout } from './_app';
 import { motion } from 'framer-motion';
 import { GetServerSidePropsContext } from 'next';
 import { getServerAuthSession } from '../server/auth';
+import { api } from '../utils/api';
 
 type Post = {
   poster: string;
@@ -67,6 +68,8 @@ const Feed: NextPageWithLayout = () => {
       likes: 201,
     },
   ]);
+
+  api.user.getPosts.useQuery();
 
   const addPost = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
