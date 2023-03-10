@@ -92,7 +92,8 @@ const LandingPageBody: React.FC = () => {
             data-cy='landingPage-text-welcome'
           >
             <p className='text-3xl font-semibold uppercase leading-10'>
-              We know you're a <span className='rounded-lg bg-white px-2 py-1 font-bold text-primary-500'>pro</span>
+              We know you&apos;re a{' '}
+              <span className='rounded-lg bg-white px-2 py-1 font-bold text-primary-500'>pro</span>
             </p>
             <p>
               Welcome to ProSpects! We make it easy to find your ideal job. Connect with people with similar interests
