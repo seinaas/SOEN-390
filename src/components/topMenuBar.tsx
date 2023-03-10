@@ -8,23 +8,31 @@ const TopMenuBar: React.FC = () => {
   const { data } = useSession();
 
   return (
-    <div className='flex w-full items-center justify-between bg-primary-600  pl-5 pr-10'>
+    <div className='flex w-full items-center justify-between bg-primary-600  pl-5 pr-10' data-cy='topMenuBar'>
       {/* Logo */}
-      <Link href='/' className='relative h-16 w-32'>
+      <Link href='/' className='relative h-16 w-32' data-cy='topMenuBar-logo'>
         <Image alt='ProSpect Logo' src='/Logo.png' fill className='object-contain' />
       </Link>
 
       {/* Links */}
       <div className='flex items-center space-x-10'>
         <div className=' flex w-full justify-end space-x-5 text-primary-200'>
-          <Link href='/'>ABOUT</Link>
+          <Link href='/' data-cy='topMenuBar-link-about'>
+            ABOUT
+          </Link>
           {!data && (
             <>
-              <Link href='/'>JOBS</Link>
-              <Link href='/'>PEOPLE</Link>
+              <Link href='/' data-cy='topMenuBar-link-jobs'>
+                JOBS
+              </Link>
+              <Link href='/' data-cy='topMenuBar-link-people'>
+                PEOPLE
+              </Link>
             </>
           )}
-          <Link href='/'>FR</Link>
+          <Link href='/' data-cy='topMenuBar-link-language'>
+            FR
+          </Link>
         </div>
 
         {/* Buttons */}
@@ -41,6 +49,7 @@ const TopMenuBar: React.FC = () => {
                 src={data.user?.image || ''}
                 fill
                 className='rounded-full object-contain '
+                data-cy='topMenuBar-profile-picture'
               />
             </div>
           </div>

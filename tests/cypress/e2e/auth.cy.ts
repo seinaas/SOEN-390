@@ -26,9 +26,54 @@ describe('Landing Page', () => {
     cy.dataCy('signin-button').click();
     cy.url().should('include', '/auth/signin');
   });
+
   it('should navigate to register page when clicking register button', () => {
     cy.dataCy('register-button').click();
     cy.url().should('include', '/auth/register');
+  });
+
+  it('should render the Top Menu Bar', () => {
+    cy.get('[data-cy=topMenuBar]').should('be.visible');
+  });
+
+  it('should render the links in the Top Menu Bar', () => {
+    cy.get('[data-cy=topMenuBar-link-about]').should('be.visible');
+    cy.get('[data-cy=topMenuBar-link-people]').should('be.visible');
+    cy.get('[data-cy=topMenuBar-link-jobs]').should('be.visible');
+    cy.get('[data-cy=topMenuBar-link-language]').should('be.visible');
+  });
+
+  it('should render the logo of the Top Menu Bar', () => {
+    cy.get('[data-cy=topMenuBar-logo]').should('be.visible');
+  });
+
+  it('should not render the jobs and people links when user is logged in', () => {
+    cy.intercept('GET', '/api/auth/session', {
+      body: {
+        user: {
+          id: '1',
+          name: 'John Doe',
+        },
+      },
+    });
+
+    cy.visit('/');
+    cy.get('[data-cy=topMenuBar-link-people]').should('not.be.visible');
+    cy.get('[data-cy=topMenuBar-link-jobs]').should('not.be.visible');
+  });
+
+  it('should render the user profile picture if logged in', () => {
+    cy.intercept('GET', '/api/auth/session', {
+      body: {
+        user: {
+          id: '1',
+          name: 'John Doe',
+        },
+      },
+    });
+
+    cy.visit('/');
+    cy.get('[data-cy=topMenuBar-profile-picture]').should('be.visible');
   });
 });
 describe('Register Page', () => {
