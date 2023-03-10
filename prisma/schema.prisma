@@ -1,5 +1,5 @@
 generator client {
-    provider = "prisma-client-js"
+    provider        = "prisma-client-js"
     previewFeatures = ["filteredRelationCount"]
 }
 
@@ -14,104 +14,129 @@ datasource db {
 }
 
 model Example {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-  ext_expires_in    Int?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    id                String  @id @default(cuid())
+    userId            String
+    type              String
+    provider          String
+    providerAccountId String
+    refresh_token     String? @db.Text
+    access_token      String? @db.Text
+    expires_at        Int?
+    token_type        String?
+    scope             String?
+    id_token          String? @db.Text
+    session_state     String?
+    ext_expires_in    Int?
+    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([provider, providerAccountId])
+    @@unique([provider, providerAccountId])
 }
 
 model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    id           String   @id @default(cuid())
+    sessionToken String   @unique
+    userId       String
+    expires      DateTime
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
-    id              String       @id @default(cuid())
-    firstName       String?
-    lastName        String?
-    headline        String?
-    education       Education[]
-    jobs            Job[]
-    connections     Connection[] @relation("UserFriends")
-    connectionOf    Connection[] @relation("FriendsUser")
-    bio             String?      @db.Text
-    volunteering    String? // TODO: Change to volunteering model
-    skills          String? // TODO: Create skills table
-    recommendations String? // TODO: Create recommendations table
-    courses         String? // TODO: Create courses table
-    projects        String? // TODO: Create projects table
-    awards          String? // TODO: Create awards table
-    languages       String? // TODO: Create languages table
-    email           String       @unique
-    emailVerified   DateTime?
-    phone           String?      @unique
-    image           String?      @db.Text
-    accounts        Account[]
-    sessions        Session[]
-    password        String?
+    id                 String           @id @default(cuid())
+    firstName          String?
+    lastName           String?
+    headline           String?
+    education          Education[]
+    jobs               Job[]
+    connections        Connection[]     @relation("UserFriends")
+    connectionOf       Connection[]     @relation("FriendsUser")
+    bio                String?          @db.Text
+    volunteering       String? // TODO: Change to volunteering model
+    skills             String? // TODO: Create skills table
+    recommendations    String? // TODO: Create recommendations table
+    courses            String? // TODO: Create courses table
+    projects           String? // TODO: Create projects table
+    awards             String? // TODO: Create awards table
+    languages          String? // TODO: Create languages table
+    email              String           @unique
+    emailVerified      DateTime?
+    phone              String?          @unique
+    image              String?          @db.Text
+    accounts           Account[]
+    sessions           Session[]
+    password           String?
+    DirectMessagesTo   DirectMessages[] @relation("Messenger1")
+    DirectMessagesFrom DirectMessages[] @relation("Messenger2")
+    MessagesTo         Messages[]       @relation("Sender")
+    MessagesFrom       Messages[]       @relation("Receiver")
 }
 
 model Connection {
     user1Id          String
-    user1            User              @relation("UserFriends", fields: [user1Id], references: [id])
+    user1            User             @relation("UserFriends", fields: [user1Id], references: [id])
     user2Id          String
-    user2            User              @relation("FriendsUser", fields: [user2Id], references: [id])
+    user2            User             @relation("FriendsUser", fields: [user2Id], references: [id])
     connectionStatus ConnectionStatus
 
     @@id([user1Id, user2Id])
 }
 
 model Job {
-  jobId       String  @id @default(cuid())
-  userId      String
-  title       String
-  company     String
-  location    String?
-  startDate   DateTime
-  endDate     DateTime?
-  description String? @db.Text
-  User        User    @relation(fields: [userId], references: [id])
+    jobId       String    @id @default(cuid())
+    userId      String
+    title       String
+    company     String
+    location    String?
+    startDate   DateTime
+    endDate     DateTime?
+    description String?   @db.Text
+    User        User      @relation(fields: [userId], references: [id])
+}
+
+model DirectMessages {
+    id       String     @id @default(uuid())
+    user1Id  String
+    user1    User       @relation("Messenger1", fields: [user1Id], references: [id])
+    user2Id  String
+    user2    User       @relation("Messenger2", fields: [user2Id], references: [id])
+    messages Messages[] @relation("Messages")
+}
+
+model Messages {
+    id             String         @id @default(uuid())
+    message        String
+    sender         User           @relation("Sender", fields: [senderId], references: [id])
+    senderId       String
+    receiver       User           @relation("Receiver", fields: [receiverId], references: [id])
+    receiverId     String
+    sentAt         String
+    conversationId String
+    DirectMessages DirectMessages @relation("Messages", fields: [conversationId], references: [id])
 }
 
 model Education {
-  educationId String  @id @default(cuid())
-  userId      String
-  school      String
-  location    String?
-  degree      String
-  startDate   DateTime
-  endDate     DateTime?
-  description String? @db.Text
-  User        User    @relation(fields: [userId], references: [id])
+    educationId String    @id @default(cuid())
+    userId      String
+    school      String
+    location    String?
+    degree      String
+    startDate   DateTime
+    endDate     DateTime?
+    description String?   @db.Text
+    User        User      @relation(fields: [userId], references: [id])
 }
 
 model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
+    identifier String
+    token      String   @unique
+    expires    DateTime
 
-  @@unique([identifier, token])
+    @@unique([identifier, token])
 }
 
 enum ConnectionStatus {
