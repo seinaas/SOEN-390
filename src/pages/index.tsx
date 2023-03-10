@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { getServerAuthSession } from '../server/auth';
 import { reloadSession } from '../utils/reloadSession';
 import { useEffect } from 'react';
-import Header from '../components/header';
 import TopMenuBar from '../components/topMenuBar';
 import Image from 'next/image';
 
