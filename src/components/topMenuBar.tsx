@@ -16,7 +16,7 @@ const TopMenuBar: React.FC = () => {
 
       {/* Links */}
       <div className='flex items-center space-x-10'>
-        <div className=' flex w-full justify-end space-x-5 text-primary-200'>
+        <div className=' flex w-full justify-end space-x-5 font-semibold text-white'>
           <Link href='/' data-cy='topMenuBar-link-about'>
             ABOUT
           </Link>
