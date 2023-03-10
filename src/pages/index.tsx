@@ -76,6 +76,7 @@ const LandingPageBody: React.FC = () => {
   return (
     <>
       <div className='flex w-full flex-grow flex-row justify-between'>
+        {/* Landing Page Picture */}
         <div className='relative flex w-6/12 items-center justify-start bg-primary-600'>
           <Image
             alt='Landing Page Picture'
@@ -85,18 +86,21 @@ const LandingPageBody: React.FC = () => {
             data-cy='landingPage-picture'
           ></Image>
         </div>
+        {/* Landing Page Text */}
         <div className=' flex w-6/12 items-center justify-center bg-primary-600 text-white'>
           <div
-            className='flex w-7/12 flex-col items-center justify-center space-y-10 text-center'
+            className='flex w-7/12 flex-col items-start justify-center space-y-10 text-left'
             data-cy='landingPage-text-welcome'
           >
-            <p className='text-2xl font-semibold uppercase'>Welcome to ProSpect</p>
+            <p className='text-3xl font-semibold uppercase leading-10'>
+              We know you're a <span className='rounded-lg bg-white px-2 py-1 font-bold text-primary-500'>pro</span>
+            </p>
             <p>
-              We make it easy to find your ideal job. Connect with people with similar interests and expand your
-              network!
+              Welcome to ProSpects! We make it easy to find your ideal job. Connect with people with similar interests
+              and expand your network!
             </p>
             <p>Join us for unlimited opportunites.</p>
-            <Link href='/auth/register' className='text-primary-200 underline' data-cy='landingPage-link-becomeMember'>
+            <Link href='/auth/register' className=' font-bold underline' data-cy='landingPage-link-becomeMember'>
               Become a member
             </Link>
           </div>
