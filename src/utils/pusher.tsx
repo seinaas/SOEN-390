@@ -59,6 +59,11 @@ export function initPusher() {
   }
 }
 
+// Disconnect the Pusher client
+export function disconnectPusher() {
+  pusherStore.getState().pusherClient.disconnect();
+}
+
 export function connectToChannel(userId: string) {
   if (!pusherStore || pusherStore.getState().channel?.name === userId) return;
   pusherStore.setState(() => ({
