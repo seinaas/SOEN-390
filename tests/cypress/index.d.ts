@@ -6,5 +6,6 @@ declare namespace Cypress {
      */
     dataCy(value: string): Chainable<JQuery<HTMLElement>>;
     mount(reactNode: React.ReactNode, options?: MountOptions): Chainable<ReactWrapper>;
+    uuid(): number;
   }
 }
