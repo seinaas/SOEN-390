@@ -8,7 +8,10 @@ const TopMenuBar: React.FC = () => {
   const { data } = useSession();
 
   return (
-    <div className='flex h-20 w-full items-center justify-between bg-primary-600 pl-5 pr-10' data-cy='topMenuBar'>
+    <div
+      className=' hidden h-20 w-full items-center justify-between bg-primary-600 pl-5 pr-10 md:flex'
+      data-cy='topMenuBar'
+    >
       {/* Logo */}
       <Link href='/' className='relative h-16 w-36' data-cy='topMenuBar-logo'>
         <Image alt='ProSpect Logo' src='/Logo.png' fill className='object-contain' />
