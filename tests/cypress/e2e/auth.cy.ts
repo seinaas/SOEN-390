@@ -32,7 +32,7 @@ describe('Landing Page', () => {
   });
 });
 describe('Register Page', () => {
-  it('should successfully register with username and password', () => {
+  it('should successfully register with email and password', () => {
     cy.intercept('POST', '/api/auth/callback/credentials*').as('credentials');
 
     cy.visit('/auth/register');
