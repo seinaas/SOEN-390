@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { IoIosChatbubbles, IoMdHome, IoMdLogOut, IoMdPeople, IoMdClose, IoMdArrowRoundForward } from 'react-icons/io';
+import { IoIosChatbubbles, IoMdHome, IoMdLogOut, IoMdPeople, IoMdClose } from 'react-icons/io';
 import { FiMenu } from 'react-icons/fi';
 import { useState } from 'react';
 
@@ -16,6 +16,7 @@ const Header: React.FC = () => {
       <div
         onClick={() => setIsOpen(!isOpen)}
         className={`${isOpen ? '' : 'invisible'} fixed z-10 float-left min-h-screen w-full justify-end  md:hidden`}
+        data-cy='header-sliding-mobile-menu'
       >
         <div
           className={`${
@@ -48,9 +49,12 @@ const Header: React.FC = () => {
         </div>
       </div>
       {/* Heading Menu */}
-      <div className='flex h-20 w-full items-center justify-between border-b-2 border-primary-100 py-4 px-8'>
+      <div
+        className='flex h-20 w-full items-center justify-between border-b-2 border-primary-100 py-4 px-8'
+        data-cy='header'
+      >
         <Link href='/feed' className='relative h-20 w-32'>
-          <Image alt='ProSpects Logo' src='/LogoAlt.png' fill className='object-contain' />
+          <Image alt='ProSpects Logo' src='/LogoAlt.png' fill className='object-contain' data-cy='header-logo' />
         </Link>
         <div className='flex items-center gap-6 md:gap-8'>
           <div className='hidden items-center gap-8 md:flex'>
@@ -83,6 +87,7 @@ const Header: React.FC = () => {
           <FiMenu
             onClick={() => setIsOpen(!isOpen)}
             className={`block h-8 w-8 cursor-pointer rounded-lg text-primary-500  md:hidden`}
+            data-cy='header-hamburger-button'
           ></FiMenu>
         </div>
       </div>
