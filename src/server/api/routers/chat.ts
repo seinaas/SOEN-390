@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { pusherServerClient } from '../../pusher';
 
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 
@@ -8,7 +7,7 @@ export const chatRouter = createTRPCRouter({
     const { message } = input;
     // const { user } = ctx.session;
 
-    await pusherServerClient.trigger('test', 'test-event', { message });
+    await ctx.pusher.trigger('test', 'test-event', { message });
     // TODO: Save chats to DB based on schema
     // const chat = await ctx.prisma.chat.create({
     //   data: {

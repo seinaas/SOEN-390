@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 const langsByCode = {
   aa: 'Afar',
   ab: 'Abkhazian',

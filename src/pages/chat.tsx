@@ -51,12 +51,17 @@ const Chat: NextPageWithLayout = () => {
     <main className='relative flex h-full w-full flex-col justify-center gap-4 xs:py-4 xs:px-4 md:flex-row lg:px-8'>
       <div>
         {/* Instead of a button, user's should be able to click on existing chats or start a chat with another user to join a channel */}
-        <h1>{channel?.name ? `Current Channel: ${channel?.name}` : 'Not currently in a channel'}</h1>
-        <Button onClick={() => connectToChannel('test')}>Join Test Channel</Button>
+        <h1 data-cy='channel-name'>
+          {channel?.name ? `Current Channel: ${channel?.name}` : 'Not currently in a channel'}
+        </h1>
+        <Button data-cy='join-channel-btn' onClick={() => connectToChannel('test')}>
+          Join Test Channel
+        </Button>
       </div>
       {channel && (
         <form onSubmit={onSubmit}>
           <input
+            data-cy='chat-input'
             type='text'
             className='flex-1 rounded-md border border-gray-300 py-2 px-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500'
             {...register('message')}
