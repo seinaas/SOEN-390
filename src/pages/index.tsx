@@ -92,22 +92,27 @@ const LandingPageBody: React.FC = () => {
           </div>
         </div>
         {/* Mobile buttons */}
-
         {data ? (
-          <div className='my-10 flex justify-center space-x-24 whitespace-nowrap md:hidden'>
-            <Button data-cy='signout-button' variant='secondary' reverse onClick={() => signOut()}>
+          <div className='my-10 flex justify-center  whitespace-nowrap md:hidden'>
+            <Button
+              data-cy='signout-button'
+              variant='secondary'
+              className='w-28 px-4 py-3'
+              reverse
+              onClick={() => signOut()}
+            >
               Sign Out
             </Button>
           </div>
         ) : (
-          <div className='my-10 flex justify-center space-x-24 whitespace-nowrap md:hidden'>
+          <div className='my-10 flex min-h-max justify-center space-x-16 whitespace-nowrap md:hidden'>
             <Link href='/auth/signin'>
-              <Button data-cy='mobile-signin-button' variant='secondary' reverse>
+              <Button data-cy='mobile-signin-button' variant='secondary' reverse className='w-28 px-4 py-3'>
                 Login
               </Button>
             </Link>
             <Link href='/auth/register'>
-              <Button data-cy='mobile-register-button' reverse>
+              <Button data-cy='mobile-register-button ' className='w-28 px-4 py-3' reverse>
                 Sign Up
               </Button>
             </Link>
