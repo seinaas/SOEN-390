@@ -102,12 +102,12 @@ const LandingPageBody: React.FC = () => {
         ) : (
           <div className='my-10 flex justify-center space-x-24 whitespace-nowrap md:hidden'>
             <Link href='/auth/signin'>
-              <Button data-cy='signin-button' variant='secondary' reverse>
+              <Button data-cy='mobile-signin-button' variant='secondary' reverse>
                 Login
               </Button>
             </Link>
             <Link href='/auth/register'>
-              <Button data-cy='register-button' reverse>
+              <Button data-cy='mobile-register-button' reverse>
                 Sign Up
               </Button>
             </Link>
