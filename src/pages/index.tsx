@@ -27,50 +27,6 @@ const Home: NextPage = () => {
 
 export default Home;
 
-const AuthShowcase: React.FC = () => {
-  const { data: sessionData } = useSession();
-
-  const { data: secretMessage } = api.example.getSecretMessage.useQuery(
-    undefined, // no input
-    { enabled: sessionData?.user !== undefined },
-  );
-
-  useEffect(() => {
-    if (sessionData && !sessionData?.user?.firstName && !sessionData?.user?.lastName) reloadSession();
-  }, [sessionData]);
-
-  return (
-    <div className='flex flex-col items-center justify-center gap-4'>
-      <div className='text-center text-2xl text-white'>
-        {sessionData?.user?.firstName && sessionData.user.lastName && (
-          <span>
-            Logged in as {sessionData.user?.firstName} {sessionData.user?.lastName}
-          </span>
-        )}
-        {secretMessage && <span> - {secretMessage} </span>}
-      </div>
-      {sessionData ? (
-        <Button data-cy='signout-button' variant='secondary' reverse onClick={() => signOut()}>
-          Sign Out
-        </Button>
-      ) : (
-        <div className='flex items-center justify-center gap-4'>
-          <Link href='/auth/signin'>
-            <Button data-cy='signin-button' variant='secondary' reverse>
-              Sign In
-            </Button>
-          </Link>
-          <Link href='/auth/register'>
-            <Button data-cy='register-button' reverse>
-              Sign Up
-            </Button>
-          </Link>
-        </div>
-      )}
-    </div>
-  );
-};
-
 const LandingPageBody: React.FC = () => {
   const { data } = useSession();
 
