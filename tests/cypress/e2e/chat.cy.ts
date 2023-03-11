@@ -11,7 +11,7 @@ describe('Chat Page', () => {
 
     cy.visit('/chat');
 
-    cy.dataCy('chat-input').should('not.exist');
+    cy.get('[data-cy=chat-input]').should('not.exist');
   });
   it('should show chat input if the user is in a channel', () => {
     // TODO: Update this test once chat channels are implemented
@@ -26,8 +26,8 @@ describe('Chat Page', () => {
 
     cy.visit('/chat');
 
-    cy.dataCy('join-channel-btn').click();
-    cy.dataCy('chat-input').should('exist');
+    cy.get('[data-cy=join-channel-btn]').click();
+    cy.get('[data-cy=chat-input]').should('exist');
   });
   it('should automatically join the last channel a user was in', () => {
     // TODO: Update this test once chat channels are implemented
@@ -43,6 +43,6 @@ describe('Chat Page', () => {
 
     cy.visit('/chat');
 
-    cy.dataCy('channel-name').should('have.text', 'Current Channel: test-channel');
+    cy.get('[data-cy=channel-name]').should('have.text', 'Current Channel: test-channel');
   });
 });
