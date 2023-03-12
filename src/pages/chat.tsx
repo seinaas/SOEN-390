@@ -205,7 +205,7 @@ const Chat: NextPageWithLayout = () => {
                               },
                             })
                             .catch((e) => console.log(e))
-                            .then(() => {});
+                            .then((res) => console.log(res));
                         }
 
                         setMessage('');
