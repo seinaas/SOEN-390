@@ -7,7 +7,7 @@ describe('chat', () => {
 
       const trigger = jest.spyOn(request.ctx.pusher, 'trigger');
 
-      await request.caller.chat.sendMessage({
+      await request.caller.chat.submit({
         message: 'Hello World',
         senderId: '1',
         receiverId: '2',
