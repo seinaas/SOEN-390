@@ -3,7 +3,7 @@ import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import MainLayout from '../components/mainLayout';
 import { api } from '../utils/api';
-import { Conversation, Message } from '../utils/Conversation-Service';
+import type { Conversation, Message } from '../utils/Conversation-Service';
 import { connectToChannel, useSubscribeToEvent } from '../utils/pusher';
 import { type NextPageWithLayout } from './_app';
 
