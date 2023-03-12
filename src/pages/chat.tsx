@@ -1,5 +1,6 @@
 import ListItemButton from '@mui/material/ListItemButton';
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import MainLayout from '../components/mainLayout';
 import { api } from '../utils/api';
@@ -101,18 +102,19 @@ const Chat: NextPageWithLayout = () => {
                     <ListItemButton
                       style={{ borderBottom: '1px solid', borderColor: 'lightgray' }}
                       className='flex items-center px-3'
-                      id={conversation.user1Id == session?.user?.id ? conversation.user2Id : conversation.user1Id}
+                      key={conversation.user1Id == session?.user?.id ? conversation.user2Id : conversation.user1Id}
                       onClick={() => handleClick(conversation)}
                       selected={selectedConversationId === conversation.id}
                     >
                       <div>
-                        <img
+                        <Image
                           className='h-12 w-12 rounded-full'
                           src={
                             (conversation.user1Id == session?.user?.id
                               ? conversation.user2?.image
                               : conversation.user1?.image) || '/istockphoto-1298261537-612x612.jpg'
                           }
+                          alt='None'
                         />
                       </div>
                       <div className='ml-4 flex-1'>
@@ -129,10 +131,10 @@ const Chat: NextPageWithLayout = () => {
                         <p className='text-grey-dark mt-1 text-sm' style={{ textOverflow: 'ellipsis' }}>
                           {conversation?.messages?.length > 0
                             ? (() => {
-                                let latestMessage = conversation?.messages?.sort((a, b) =>
+                                const latestMessage = conversation?.messages?.sort((a, b) =>
                                   a.sentAt > b.sentAt ? -1 : 1,
                                 )[0];
-                                let sender =
+                                const sender =
                                   conversation.user1Id == latestMessage?.senderId
                                     ? conversation.user1
                                     : conversation.user2;
@@ -156,9 +158,10 @@ const Chat: NextPageWithLayout = () => {
                   <div className='flex flex-row items-center justify-between bg-primary-500 py-2 px-3'>
                     <div className='flex items-center'>
                       <div>
-                        <img
+                        <Image
                           className='h-10 w-10 rounded-full'
                           src={receiver?.image != null ? receiver?.image : '/istockphoto-1298261537-612x612.jpg'}
+                          alt='None'
                         />
                       </div>
                       <div className='ml-4'>
@@ -173,14 +176,14 @@ const Chat: NextPageWithLayout = () => {
                   <div className='flex w-full flex-1 flex-col-reverse justify-between overflow-y-scroll bg-primary-100/20'>
                     <div className='w-full py-2 px-3'>
                       {mutatedMessages?.map((m) => (
-                        <MessageItem message={m} />
+                        <MessageItem message={m} key={m.id} />
                       ))}
                     </div>
                   </div>
                   <div className='bg-grey-lighter flex items-center px-4 py-4'>
                     <form
                       className='flex w-full flex-row'
-                      onSubmit={(e) => {
+                      onSubmit={async (e) => {
                         console.log('submitted');
                         e.preventDefault();
                         if (message !== '') {
@@ -194,12 +197,15 @@ const Chat: NextPageWithLayout = () => {
                             channelId: receiver?.id || 'errorReceiverId',
                             conversationId: selectedConversationId || ' ',
                           };
-                          newChatMutation.mutateAsync(newMessage, {
-                            onSuccess() {
-                              utils.conversation.invalidate();
-                              utils.chat.invalidate();
-                            },
-                          });
+                          await newChatMutation
+                            .mutateAsync(newMessage, {
+                              async onSuccess() {
+                                await utils.conversation.invalidate();
+                                await utils.chat.invalidate();
+                              },
+                            })
+                            .catch((e) => console.log(e))
+                            .then(() => {});
                         }
 
                         setMessage('');

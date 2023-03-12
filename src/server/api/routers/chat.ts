@@ -13,16 +13,19 @@ export const chatRouter = createTRPCRouter({
       await pusherServerClient.trigger('test', 'test-event', { message });
       const user1Id = senderId < receiverId ? senderId : receiverId;
       const user2Id = senderId < receiverId ? receiverId : senderId;
-      ctx.prisma.directMessages.upsert({
-        where: {
-          id: conversationId,
-        },
-        create: {
-          user1Id: user1Id,
-          user2Id: user2Id,
-        },
-        update: {},
-      });
+      await ctx.prisma.directMessages
+        .upsert({
+          where: {
+            id: conversationId,
+          },
+          create: {
+            user1Id: user1Id,
+            user2Id: user2Id,
+          },
+          update: {},
+        })
+        .catch(() => {})
+        .then(() => {});
 
       return ctx.prisma.messages.create({
         data: {
