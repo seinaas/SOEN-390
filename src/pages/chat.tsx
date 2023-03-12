@@ -139,8 +139,8 @@ const Chat: NextPageWithLayout = () => {
                                     ? conversation.user1
                                     : conversation.user2;
                                 return sender.id == session?.user?.id
-                                  ? 'You: ' + latestMessage?.message
-                                  : conversation.user2.email + ': ' + latestMessage?.message;
+                                  ? 'You: ' + String(latestMessage?.message)
+                                  : String(conversation.user2.email) + ': ' + String(latestMessage?.message);
                               })()
                             : ''}
                         </p>
@@ -205,7 +205,7 @@ const Chat: NextPageWithLayout = () => {
                               },
                             })
                             .catch((e) => console.log(e))
-                            .then(() => {});
+                            .then((res) => console.log(res));
                         }
 
                         setMessage('');
