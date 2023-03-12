@@ -5,8 +5,10 @@ module.exports = defineConfig({
   downloadsFolders: 'tests/cypress/downloads',
   fixturesFolder: 'tests/cypress/fixtures',
   screenshotsFolder: 'tests/cypress/screenshots',
+  supportFolder: 'tests/cypress/support',
   video: false,
   defaultCommandTimeout: 10000,
+  chromeWebSecurity: false,
 
   e2e: {
     specPattern: 'tests/cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',

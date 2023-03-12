@@ -25,7 +25,7 @@ export const userRouter = createTRPCRouter({
     });
 
     if (user) {
-      const res = (({ id: _id, _count: __count, ...u }) => u)(user);
+      const res = (({ id, _count, ...u }) => u)(user);
       return {
         ...res,
         languages: user.languages ? user.languages.split(',') : [],
@@ -62,7 +62,7 @@ export const userRouter = createTRPCRouter({
       });
 
       if (user) {
-        const res = (({ id: _id, _count: __count, ...u }) => u)(user);
+        const res = (({ id, _count, ...u }) => u)(user);
         return {
           ...res,
           languages: user.languages ? user.languages.split(',') : [],

@@ -53,20 +53,34 @@ export const Register: NextPageWithLayout = () => {
     <main className='relative z-0 flex h-screen justify-center overflow-hidden bg-primary-600'>
       <div className='flex w-full max-w-[1000px] flex-col items-start justify-center p-20'>
         <div className='mb-12 text-white'>
-          <h1 className='text-9xl font-thin'>One last step</h1>
-          <h2 className='text-4xl'>Let&apos;s finalize your profile! All we need is your name:</h2>
+          <h1 className='text-8xl font-thin'>One last step</h1>
+          <h2 className='text-4xl'>Let&apos;s finalize your profile! All we need is your name.</h2>
         </div>
         <div className='flex min-w-[400px] flex-col items-center gap-4 self-center rounded-lg bg-white px-12 pt-12 pb-14 text-black'>
           <motion.form layout className='flex w-full flex-col gap-4' onSubmit={onSubmit}>
-            <Input type='text' placeholder='John' autoComplete='given-name' {...register('firstName')} />
-            <Input type='text' placeholder='Doe' autoComplete='family-name' {...register('lastName')} />
+            <Input
+              data-cy='first-name-input'
+              type='text'
+              placeholder='John'
+              autoComplete='given-name'
+              {...register('firstName')}
+            />
+            <Input
+              data-cy='last-name-input'
+              type='text'
+              placeholder='Doe'
+              autoComplete='family-name'
+              {...register('lastName')}
+            />
             {isError && (
               <p className='text-center text-sm text-red-600'>
                 {error || errors.firstName?.message || errors.lastName?.message}
               </p>
             )}
 
-            <Button fullWidth>Get Started</Button>
+            <Button fullWidth data-cy='register-btn'>
+              Get Started
+            </Button>
           </motion.form>
         </div>
       </div>
