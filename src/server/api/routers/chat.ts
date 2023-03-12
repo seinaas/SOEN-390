@@ -24,8 +24,12 @@ export const chatRouter = createTRPCRouter({
           },
           update: {},
         })
-        .catch(() => {})
-        .then(() => {});
+        .catch((e) => {
+          console.log(e);
+        })
+        .then((res) => {
+          console.log(res);
+        });
 
       return ctx.prisma.messages.create({
         data: {
