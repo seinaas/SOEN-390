@@ -10,26 +10,19 @@ export const chatRouter = createTRPCRouter({
       const { message, senderId, receiverId, conversationId } = input;
       // const { user } = ctx.session;
 
-      await ctx.pusher.trigger('test', 'test-event', { message });
+      await pusherServerClient.trigger('test', 'test-event', { message });
       const user1Id = senderId < receiverId ? senderId : receiverId;
       const user2Id = senderId < receiverId ? receiverId : senderId;
-      await ctx.prisma.directMessages
-        .upsert({
-          where: {
-            id: conversationId,
-          },
-          create: {
-            user1Id: user1Id,
-            user2Id: user2Id,
-          },
-          update: {},
-        })
-        .catch((e) => {
-          console.log(e);
-        })
-        .then((res) => {
-          console.log(res);
-        });
+      ctx.prisma.directMessages.upsert({
+        where: {
+          id: conversationId,
+        },
+        create: {
+          user1Id: user1Id,
+          user2Id: user2Id,
+        },
+        update: {},
+      });
 
       return ctx.prisma.messages.create({
         data: {
@@ -40,13 +33,17 @@ export const chatRouter = createTRPCRouter({
           conversationId: conversationId,
         },
       });
-    }),
-  submit: protectedProcedure
-    .input(z.object({ message: z.string(), senderId: z.string(), receiverId: z.string(), conversationId: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      const { message } = input;
-      // const { user } = ctx.session;
-
-      await ctx.pusher.trigger('test', 'test-event', { message });
+      // TODO: Save chats to DB based on schema
+      // const chat = await ctx.prisma.chat.create({
+      //   data: {
+      //     message,
+      //     user: {
+      //       connect: {
+      //         id: user.id,
+      //       },
+      //     },
+      //   },
+      // });
+      // return chat;
     }),
 });

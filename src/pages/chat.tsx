@@ -197,15 +197,12 @@ const Chat: NextPageWithLayout = () => {
                             channelId: receiver?.id || 'errorReceiverId',
                             conversationId: selectedConversationId || ' ',
                           };
-                          await newChatMutation
-                            .mutateAsync(newMessage, {
-                              async onSuccess() {
-                                await utils.conversation.invalidate();
-                                await utils.chat.invalidate();
-                              },
-                            })
-                            .catch((e) => console.log(e))
-                            .then((res) => console.log(res));
+                          newChatMutation.mutateAsync(newMessage, {
+                            onSuccess() {
+                              utils.conversation.invalidate();
+                              utils.chat.invalidate();
+                            },
+                          });
                         }
 
                         setMessage('');
