@@ -1,6 +1,6 @@
 import ListItemButton from '@mui/material/ListItemButton';
 import { useSession } from 'next-auth/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import MainLayout from '../components/mainLayout';
 import { api } from '../utils/api';
 import { Conversation, Message } from '../utils/Conversation-Service';
