@@ -1,12 +1,11 @@
 
 import ListItemButton from '@mui/material/ListItemButton';
 import { useSession } from 'next-auth/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import MainLayout from '../components/mainLayout';
 import { api } from '../utils/api';
 import { Conversation, Message } from '../utils/Conversation-Service';
 import { connectToChannel, useSubscribeToEvent } from '../utils/pusher';
-import Trpc from './api/trpc/[trpc]';
 import { type NextPageWithLayout } from './_app';
 
 function MessageItem({
