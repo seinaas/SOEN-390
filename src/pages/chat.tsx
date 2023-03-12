@@ -107,7 +107,7 @@ const Chat: NextPageWithLayout = () => {
                       selected={selectedConversationId === conversation.id}
                     >
                       <div>
-                        <img
+                        <Image
                           className='h-12 w-12 rounded-full'
                           src={
                             (conversation.user1Id == session?.user?.id
@@ -158,7 +158,7 @@ const Chat: NextPageWithLayout = () => {
                   <div className='flex flex-row items-center justify-between bg-primary-500 py-2 px-3'>
                     <div className='flex items-center'>
                       <div>
-                        <img
+                        <Image
                           className='h-10 w-10 rounded-full'
                           src={receiver?.image != null ? receiver?.image : '/istockphoto-1298261537-612x612.jpg'}
                           alt='None'
@@ -197,12 +197,15 @@ const Chat: NextPageWithLayout = () => {
                             channelId: receiver?.id || 'errorReceiverId',
                             conversationId: selectedConversationId || ' ',
                           };
-                          newChatMutation.mutateAsync(newMessage, {
-                            onSuccess() {
-                              utils.conversation.invalidate();
-                              utils.chat.invalidate();
-                            },
-                          });
+                          await newChatMutation
+                            .mutateAsync(newMessage, {
+                              async onSuccess() {
+                                await utils.conversation.invalidate();
+                                await utils.chat.invalidate();
+                              },
+                            })
+                            .catch((e) => console.log(e))
+                            .then(() => {});
                         }
 
                         setMessage('');
