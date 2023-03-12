@@ -35,66 +35,67 @@ const Header: React.FC = () => {
 
   return (
     <div className='z-50 flex h-20 w-full items-center justify-between border-b-2 border-primary-100 py-4 px-12'>
-      <div className='h-full flex-grow basis-0'>
+      <div className='flex h-full flex-grow items-center gap-8'>
         <Link href='/feed' className='relative block h-full w-32'>
           <Image priority alt='ProSpects Logo' src='/LogoAlt.png' fill className='object-contain' />
         </Link>
+        {/* User Search Bar and Dropdown */}
+        <div className='relative'>
+          <input
+            onFocus={() => setIsFocused(true)}
+            onBlur={(e) => e.relatedTarget === null && setIsFocused(false)}
+            type='text'
+            placeholder='Search'
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className='relative h-10 w-96 rounded-md bg-primary-100/20 px-4 placeholder-primary-100 outline-none transition-colors duration-200 focus:bg-primary-100 focus:text-white focus:placeholder-white/50'
+          />
+          <AnimatePresence>
+            {searchRes && isFocused && (
+              <motion.div
+                layout
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className='absolute top-4 left-0 -z-10 max-h-96 w-96 overflow-auto rounded-lg bg-white pt-6 shadow-lg'
+              >
+                {searchRes.map((user) => (
+                  <motion.div layout key={user.email}>
+                    <Link
+                      href={`/u/${user.email}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSearchQuery('');
+                        setIsFocused(false);
+                      }}
+                      className='flex items-center gap-4 px-4 py-2 hover:bg-primary-100/20'
+                    >
+                      <div className='relative h-8 w-8'>
+                        <Image
+                          alt='User Avatar'
+                          loader={() => user.image || '/placeholder.jpeg'}
+                          src={user.image || '/placeholder.jpeg'}
+                          fill
+                          className='rounded-full object-cover'
+                          referrerPolicy='no-referrer'
+                        />
+                      </div>
+                      <div className='flex flex-col'>
+                        <span className='font-medium text-primary-100'>
+                          {user.firstName} {user.lastName}
+                        </span>
+                        <span className='text-sm text-primary-100/50'>{user.email}</span>
+                      </div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
-      {/* User Search Bar and Dropdown */}
-      <div className='relative'>
-        <input
-          onFocus={() => setIsFocused(true)}
-          onBlur={(e) => e.relatedTarget === null && setIsFocused(false)}
-          type='text'
-          placeholder='Search'
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className='relative h-10 w-96 rounded-md bg-primary-100/20 px-4 placeholder-primary-100 outline-none transition-colors duration-200 focus:bg-primary-100 focus:text-white focus:placeholder-white/50'
-        />
-        <AnimatePresence>
-          {searchRes && isFocused && (
-            <motion.div
-              layout
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className='absolute top-4 left-0 -z-10 max-h-96 w-96 overflow-auto rounded-lg bg-white pt-6 shadow-lg'
-            >
-              {searchRes.map((user) => (
-                <motion.div layout key={user.email}>
-                  <Link
-                    href={`/u/${user.email}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSearchQuery('');
-                      setIsFocused(false);
-                    }}
-                    className='flex items-center gap-4 px-4 py-2 hover:bg-primary-100/20'
-                  >
-                    <Image
-                      alt='User Avatar'
-                      loader={() => user.image || '/placeholder.jpeg'}
-                      src={user.image || '/placeholder.jpeg'}
-                      width={32}
-                      height={32}
-                      className='rounded-full'
-                      referrerPolicy='no-referrer'
-                    />
-                    <div className='flex flex-col'>
-                      <span className='font-medium text-primary-100'>
-                        {user.firstName} {user.lastName}
-                      </span>
-                      <span className='text-sm text-primary-100/50'>{user.email}</span>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-      <div className='flex flex-grow basis-0 items-center justify-end gap-8'>
+      <div className='flex flex-grow items-center justify-end gap-8'>
         <Link href='/feed' className='text-primary-500 hover:text-primary-600'>
           <IoMdHome size={28} />
         </Link>
