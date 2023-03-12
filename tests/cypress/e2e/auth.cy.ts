@@ -82,6 +82,7 @@ describe('Register Page', () => {
 
     // Try to create the second account
     cy.dataCy('signout-button').click();
+    cy.dataCy('signin-button').should('be.visible');
     cy.visit('/auth/register');
 
     cy.dataCy('email-input').type(email);
@@ -129,6 +130,7 @@ describe('Sign In Page', () => {
     cy.dataCy('register-btn').click();
 
     cy.dataCy('signout-button').click();
+    cy.dataCy('signin-button').should('be.visible');
 
     cy.visit('/auth/signin');
 
