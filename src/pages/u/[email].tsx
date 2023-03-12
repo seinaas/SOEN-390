@@ -72,7 +72,11 @@ const Profile: NextPageWithLayout = () => {
       await updateQueries();
     },
   });
-  const { data: connection } = api.connections.getConnectionStatus.useQuery({ userEmail: data?.email || '' });
+  const { data: connection } = api.connections.getConnectionStatus.useQuery(
+    { userEmail: data?.email || '' },
+    // Don't fetch connection status if the user is viewing their own profile
+    { enabled: !!sessionData?.user?.email && email != sessionData?.user?.email },
+  );
   const { data: connections } = api.connections.getUserConnections.useQuery({ userEmail: (email as string) || '' });
 
   const canEdit = sessionData?.user?.email === data?.email;
@@ -85,16 +89,15 @@ const Profile: NextPageWithLayout = () => {
           <div className='flex flex-col gap-4'>
             <div className='flex items-center gap-4'>
               <div className='relative h-32 min-h-[8rem] w-32 min-w-[8rem] overflow-hidden rounded-full bg-primary-100/20'>
-                {data?.image && (
-                  <Image
-                    loader={() => data?.image || ''}
-                    src={data.image || ''}
-                    alt='Profile'
-                    fill
-                    className='object-cover'
-                    referrerPolicy='no-referrer'
-                  />
-                )}
+                <Image
+                  loader={() => data?.image || '/placeholder.jpeg'}
+                  src={data?.image || '/placeholder.jpeg'}
+                  alt='Profile'
+                  fill
+                  className='object-cover'
+                  referrerPolicy='no-referrer'
+                  priority
+                />
               </div>
               <div>
                 <h1 className='text-2xl font-semibold'>
