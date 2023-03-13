@@ -65,7 +65,7 @@ const Header: React.FC = () => {
           <Link href='/' className='  hover:text-primary-100 '>
             <IoMdPeople size={28} />
           </Link>
-          <Link href='/' className='  hover:text-primary-100 '>
+          <Link href='/chat' className='  hover:text-primary-100 '>
             <IoIosChatbubbles size={28} />
           </Link>
           <button onClick={() => signOut()} className='  hover:text-primary-100 '>
@@ -74,7 +74,7 @@ const Header: React.FC = () => {
         </div>
       </div>
       {/* Heading Menu */}
-      <div className='z-40 flex h-20 w-full items-center justify-center gap-8 border-b-2 border-primary-100 px-8 py-4 md:px-12'>
+      <div className='z-40 flex h-20 w-full items-center justify-center gap-8 border-b-2 border-primary-100 px-6 py-4 md:px-12'>
         {/* User Search Bar, Dropdown and Logo */}
         <div className='flex h-full flex-grow items-center gap-8'>
           <Link href='/feed' className='relative block h-full w-32'>
