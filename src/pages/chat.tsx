@@ -1,84 +1,90 @@
-import ListItemButton from '@mui/material/ListItemButton';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import MainLayout from '../components/mainLayout';
+import Modal from '../components/modal';
+import EditButton from '../components/profile/editButton';
 import { api } from '../utils/api';
 import type { Conversation, Message } from '../utils/Conversation-Service';
 import { connectToChannel, useSubscribeToEvent } from '../utils/pusher';
 import { type NextPageWithLayout } from './_app';
 
-function MessageItem({ message }: { message: Message }) {
-  const isSender = message?.senderId === useSession().data?.user?.id;
+function MessageItem({ message, userId }: { message: Message; userId: string }) {
+  const isSender = message?.senderId === userId;
   return (
-    <>
-      <div className='flex flex-col'></div>
-      <div
-        className={
-          !isSender
-            ? 'mb-2 flex w-1/2 flex-col items-start break-all'
-            : 'mb-2 ml-auto flex w-1/2 flex-col items-end break-all'
-        }
-      >
-        <p className={isSender ? 'text-teal text-right text-sm' : 'text-teal text-sm'}>
-          {message?.sender?.email || 'NA'}
-        </p>
-        <p
-          className={
-            isSender
-              ? 'break-all rounded-bl-3xl rounded-tl-3xl rounded-tr-xl bg-white py-3 px-4 text-black'
-              : 'break-all rounded-br-3xl rounded-tr-3xl rounded-tl-xl bg-white py-3 px-4 text-black'
-          }
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 20 }}
+      animate={{
+        opacity: 1,
+        y: 0,
+        transition: {
+          type: 'spring',
+          damping: 20,
+          stiffness: 300,
+          delay: 0.1,
+        },
+      }}
+      className={`flex ${isSender ? 'justify-end' : 'justify-start'} mb-4`}
+    >
+      <div className={`flex flex-col gap-1 ${isSender ? 'items-end text-right' : 'items-start text-left'} max-w-[80%]`}>
+        <div
+          className={`rounded-md px-4 py-3 ${
+            isSender ? 'bg-primary-500 text-white' : 'bg-primary-100/10 text-primary-500'
+          }`}
         >
-          {message?.message}
-        </p>
-        <p className={isSender ? 'text-grey-dark mt-1 text-right text-xs' : 'text-grey-dark mt-1 text-xs'}>
-          {message?.sentAt}
-        </p>
+          {message.message}
+        </div>
+        <div className='text-xs text-gray-500'>{message.sentAt}</div>
       </div>
-    </>
+    </motion.div>
   );
 }
 
 const Chat: NextPageWithLayout = () => {
   const [selectedConversationId, setSelectedConversationId] = useState<string>();
-  const [image, setImage] = useState(null);
+  const [message, setMessage] = useState('');
+  const [openNewChatModal, setOpenNewChatModal] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  const messageEndRef = useRef<HTMLDivElement>(null);
+  const messagesRef = useRef<HTMLDivElement>(null);
+
   const { data: session } = useSession();
   const utils = api.useContext();
+  const connections = api.connections.getUserConnections.useQuery({ userEmail: session?.user?.email || '' }).data;
   const messagesToUse = api.conversation.getConversationMessages.useQuery({
-    id: selectedConversationId || 'error',
+    id: selectedConversationId || '',
   }).data;
-  const [message, setMessage] = useState('');
+  const createConversation = api.conversation.createConversation.useMutation();
   const newChatMutation = api.chat.sendMessage.useMutation();
-  const [messages, setMessages] = useState<Message[]>([]);
-  let email = undefined;
-  if (session) {
-    email = session?.user?.email;
-  }
+
   const conversations = api.conversation.getUserConversations.useQuery({
-    userEmail: email as string,
-  }).data as Conversation[];
+    userEmail: session?.user?.email || '',
+  }).data;
 
   useEffect(() => {
     if (messagesToUse) {
       setMessages(messagesToUse);
     }
   }, [messagesToUse]);
-  // Subscribe to a Pusher event
-  useSubscribeToEvent('message-sent', (data) => {
-    console.log(data);
-  });
-  const currentConversation = conversations?.find((convo) => convo.id === selectedConversationId);
-  const receiver =
-    currentConversation?.user1Id == session?.user?.id ? currentConversation?.user2 : currentConversation?.user1;
 
-  const mutatedMessages = (() => {
-    // if you want to mutate the data for some reason
-    return messages;
-  })();
+  useEffect(() => {
+    const lastChannel = localStorage.getItem('lastChannel');
+    if (lastChannel) {
+      connectToChannel(lastChannel);
+      setSelectedConversationId(lastChannel);
+    }
+  }, []);
+
+  // Subscribe to a Pusher event
+  useSubscribeToEvent('message-sent', () => {
+    void utils.conversation.getConversationMessages.invalidate();
+  });
 
   const handleClick = (conversation: Conversation) => {
-    connectToChannel(conversation.user1Id == session?.user?.id ? conversation.user2Id : conversation.user1Id);
+    connectToChannel(conversation.id);
     setSelectedConversationId(conversation.id);
   };
 
@@ -86,149 +92,143 @@ const Chat: NextPageWithLayout = () => {
   // TODO: Store the channel whenever it is changed
 
   return (
-    <>
-      <div className='h-32 w-full' style={{ backgroundColor: '#' }}></div>
-
-      <div className='container mx-auto' style={{ marginTop: '-128px' }}>
-        <div className='h-1 py-6'>
-          <div className='border-grey flex rounded border shadow-lg' style={{ height: '70vh' }}>
-            <div className='bg-grey-lighter flex w-2/5 flex-1 flex-col overflow-auto'>
-              <div className='flex items-center justify-between border-b-2 bg-white px-5 py-5'>
-                <div className='text-2xl font-semibold text-primary-500'>Your conversations</div>
+    <main className='flex h-full max-h-screen w-full overflow-hidden'>
+      <div className='flex h-full w-[350px] flex-col bg-primary-100/10'>
+        <div className='flex items-center justify-between bg-primary-500 p-4 text-2xl font-semibold text-white'>
+          <h1>Your Conversations</h1>
+          <EditButton name='chat' type='add' onClick={() => setOpenNewChatModal(true)} />
+        </div>
+        {!conversations?.length ? (
+          <div className='flex h-full flex-col items-center justify-center'>
+            <div className='text-2xl font-semibold text-primary-500'>No conversations yet</div>
+            <div className='text-lg font-semibold text-primary-500'>Create one to start chatting!</div>
+          </div>
+        ) : (
+          conversations?.map((conversation) => (
+            <button
+              className={`flex items-center gap-4 px-3 py-4 ${
+                conversation.id === selectedConversationId
+                  ? 'bg-primary-500 text-white'
+                  : 'text-primary-500 hover:bg-primary-100/10'
+              } transition-colors duration-200 `}
+              key={conversation.id}
+              onClick={() => handleClick(conversation)}
+            >
+              <div className='relative h-12 w-12'>
+                <Image
+                  fill
+                  className='rounded-full object-cover'
+                  loader={({ src }) => src}
+                  src={
+                    (conversation.user1Id == session?.user?.id
+                      ? conversation.user2?.image
+                      : conversation.user1?.image) || '/placeholder.jpeg'
+                  }
+                  alt='User Image'
+                />
               </div>
-              <div className='bg-grey-lighter flex-1 overflow-auto'>
-                {conversations?.length > 0 ? (
-                  conversations?.map((conversation) => (
-                    <ListItemButton
-                      style={{ borderBottom: '1px solid', borderColor: 'lightgray' }}
-                      className='flex items-center px-3'
-                      key={conversation.user1Id == session?.user?.id ? conversation.user2Id : conversation.user1Id}
-                      onClick={() => handleClick(conversation)}
-                      selected={selectedConversationId === conversation.id}
-                    >
-                      <div>
-                        <img
-                          className='h-12 w-12 rounded-full'
-                          src={
-                            (conversation.user1Id == session?.user?.id
-                              ? conversation.user2?.image
-                              : conversation.user1?.image) || '/istockphoto-1298261537-612x612.jpg'
-                          }
-                          alt='None'
-                        />
-                      </div>
-                      <div className='ml-4 flex-1'>
-                        <div className='items-bottom flex justify-between'>
-                          <p className='text-grey-darkest'>
-                            {conversation.user1Id == session?.user?.id
-                              ? conversation.user2?.email
-                              : conversation.user1?.email}
-                          </p>
-                          <p className='text-grey-darkest text-xs'>
-                            {conversation?.messages?.sort((a, b) => (a.sentAt > b.sentAt ? -1 : 1))[0]?.sentAt}
-                          </p>
-                        </div>
-                        <p className='text-grey-dark mt-1 text-sm' style={{ textOverflow: 'ellipsis' }}>
-                          {conversation?.messages?.length > 0
-                            ? (() => {
-                                const latestMessage = conversation?.messages?.sort((a, b) =>
-                                  a.sentAt > b.sentAt ? -1 : 1,
-                                )[0];
-                                const sender =
-                                  conversation.user1Id == latestMessage?.senderId
-                                    ? conversation.user1
-                                    : conversation.user2;
-                                return sender.id == session?.user?.id
-                                  ? 'You: ' + String(latestMessage?.message)
-                                  : String(conversation.user2.email) + ': ' + String(latestMessage?.message);
-                              })()
-                            : ''}
-                        </p>
-                      </div>
-                    </ListItemButton>
-                  ))
-                ) : (
-                  <p className='text-center align-bottom'>You do not have any conversations yet.</p>
-                )}
+              <div className='text-left'>
+                <div className='text-lg font-semibold'>
+                  {conversation.user1Id == session?.user?.id
+                    ? `${conversation.user2?.firstName || ''} ${conversation.user2?.lastName || ''}`
+                    : `${conversation.user1?.firstName || ''} ${conversation.user1?.lastName || ''}`}
+                </div>
+                <div className='text-sm'>
+                  {conversation.id === selectedConversationId
+                    ? messages[0]?.message || ''
+                    : conversation.messages[0]?.message}
+                </div>
               </div>
+            </button>
+          ))
+        )}
+      </div>
+      {selectedConversationId && (
+        <div className='flex h-full max-w-[800px] flex-1 flex-col p-4'>
+          <div className='relative h-full w-full'>
+            <div className='absolute inset-0 flex flex-col-reverse overflow-auto px-4' ref={messagesRef}>
+              {messages?.map((message) => (
+                <MessageItem key={message.id} message={message} userId={session?.user?.id || ''} />
+              ))}
+              <div className='float-left clear-both' ref={messageEndRef} />
             </div>
-            <div className='flex w-3/5 flex-col border'>
-              {selectedConversationId && (
-                <>
-                  <div className='flex flex-row items-center justify-between bg-primary-500 py-2 px-3'>
-                    <div className='flex items-center'>
-                      <div>
-                        <img
-                          className='h-10 w-10 rounded-full'
-                          src={receiver?.image != null ? receiver?.image : '/istockphoto-1298261537-612x612.jpg'}
-                          alt='None'
+          </div>
+          <form
+            className='mt-8'
+            onSubmit={(e) => {
+              e.preventDefault();
+              setMessage('');
+              newChatMutation.mutate({ message, conversationId: selectedConversationId });
+            }}
+          >
+            <input
+              type='text'
+              className='w-full rounded-md bg-primary-100/10 px-4 py-3 outline-none'
+              placeholder='Type a message...'
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+            />
+          </form>
+        </div>
+      )}
+
+      <AnimatePresence>
+        {openNewChatModal && (
+          <Modal onCancel={() => setOpenNewChatModal(false)}>
+            <h1 className='mb-4 text-2xl font-semibold'>New Chat</h1>
+            <div className='flex flex-col'>
+              {connections?.map(
+                (connection) =>
+                  // only show connections that don't already have a conversation
+                  !conversations?.find((convo) =>
+                    convo.user1Id == session?.user?.id
+                      ? convo.user2?.email == connection.email
+                      : convo.user1?.email == connection.email,
+                  ) && (
+                    <button
+                      className='flex items-center justify-start rounded-md px-4 py-3 transition-colors duration-200 hover:bg-primary-100/10'
+                      key={connection.id}
+                      onClick={() => {
+                        setOpenNewChatModal(false);
+                        createConversation.mutate(
+                          {
+                            userEmail: connection.email,
+                          },
+                          {
+                            onSuccess: (data) => {
+                              void utils.conversation.getUserConversations.invalidate();
+                              setSelectedConversationId(data?.id);
+
+                              if (data?.id) {
+                                localStorage.setItem('lastChannel', data.id);
+                              }
+                            },
+                          },
+                        );
+                      }}
+                    >
+                      <div className='relative h-12 w-12'>
+                        <Image
+                          fill
+                          className='rounded-full object-cover'
+                          loader={({ src }) => src}
+                          src={connection.image || '/placeholder.jpeg'}
+                          alt='User Image'
                         />
                       </div>
                       <div className='ml-4'>
-                        <p className='text-blue'>{receiver?.email}</p>
-                        {/* YOU WILL WANT TO ADD GROUP MEMBER NAMES HERE WHEN YOU IMPLM GROUPS
-                        <p className="text-grey-darker text-xs mt-1">
-                          Andrés, Tom, Harrison, Arnold, Sylvester
-                        </p> */}
+                        <div className='text-lg font-semibold text-primary-500'>
+                          {connection.firstName} {connection.lastName}
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                  <div className='flex w-full flex-1 flex-col-reverse justify-between overflow-y-scroll bg-primary-100/20'>
-                    <div className='w-full py-2 px-3'>
-                      {mutatedMessages?.map((m) => (
-                        <MessageItem message={m} key={m.id} />
-                      ))}
-                    </div>
-                  </div>
-                  <div className='bg-grey-lighter flex items-center px-4 py-4'>
-                    <form
-                      className='flex w-full flex-row'
-                      onSubmit={async (e) => {
-                        console.log('submitted');
-                        e.preventDefault();
-                        if (message !== '') {
-                          const newMessage = {
-                            message: message,
-                            senderId: session?.user?.id || 'errorSenderId',
-                            receiverId: receiver?.id || 'errorReceiverId',
-                            sender: session?.user,
-                            receiver: receiver,
-                            sentAt: ' ',
-                            channelId: receiver?.id || 'errorReceiverId',
-                            conversationId: selectedConversationId || ' ',
-                          };
-                          await newChatMutation
-                            .mutateAsync(newMessage, {
-                              async onSuccess() {
-                                await utils.conversation.invalidate();
-                                await utils.chat.invalidate();
-                              },
-                            })
-                            .catch((e) => console.log(e))
-                            .then((res) => console.log(res));
-                        }
-
-                        setMessage('');
-                      }}
-                    >
-                      <div className='bg-grey-lighter flex'>
-                        <input
-                          className='flex w-full rounded border px-2 py-2'
-                          placeholder='Aa'
-                          type='text'
-                          onChange={(e) => setMessage(e.target.value)}
-                          value={message}
-                        />
-                      </div>
-                    </form>
-                  </div>
-                </>
+                    </button>
+                  ),
               )}
             </div>
-          </div>
-        </div>
-      </div>
-    </>
+          </Modal>
+        )}
+      </AnimatePresence>
+    </main>
   );
 };
 
