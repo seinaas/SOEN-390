@@ -112,13 +112,22 @@ const LandingPageBody: React.FC = () => {
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const session = await getServerAuthSession(ctx);
 
-  if (session && (!session.user?.firstName || !session.user?.lastName)) {
-    return {
-      redirect: {
-        destination: '/auth/final',
-        permanent: false,
-      },
-    };
+  if (session) {
+    if (!session.user?.firstName || !session.user?.lastName) {
+      return {
+        redirect: {
+          destination: '/auth/final',
+          permanent: false,
+        },
+      };
+    } else if (session.user.email) {
+      return {
+        redirect: {
+          destination: `/u/${session.user.email}`,
+          permanent: false,
+        },
+      };
+    }
   }
 
   return { props: {} };
