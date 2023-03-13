@@ -42,6 +42,7 @@ const Header: React.FC = () => {
         {/* User Search Bar and Dropdown */}
         <div className='relative'>
           <input
+            data-cy='search-user-input'
             onFocus={() => setIsFocused(true)}
             onBlur={(e) => e.relatedTarget === null && setIsFocused(false)}
             type='text'
@@ -53,6 +54,7 @@ const Header: React.FC = () => {
           <AnimatePresence>
             {searchRes && isFocused && (
               <motion.div
+                data-cy='search-user-dropdown'
                 layout
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -120,6 +122,7 @@ const Header: React.FC = () => {
               width={32}
               height={32}
               className='rounded-full'
+              referrerPolicy='no-referrer'
             />
           </Link>
         )}
