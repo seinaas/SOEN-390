@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import { IoIosChatbubbles, IoMdHome, IoMdLogOut, IoMdPeople, IoMdClose } from 'react-icons/io';
 import { api } from '../utils/api';
 import { FiMenu } from 'react-icons/fi';
-import { useState } from 'react';
 
 const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,7 +40,7 @@ const Header: React.FC = () => {
       {/* Sliding Mobile Menu */}
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className={`${isOpen ? '' : 'invisible'} fixed z-10 float-left min-h-screen w-full justify-end  md:hidden`}
+        className={`${isOpen ? '' : 'invisible'} fixed z-50 float-left min-h-screen w-full justify-end  md:hidden`}
         data-cy='header-sliding-mobile-menu'
       >
         <div
@@ -58,7 +57,7 @@ const Header: React.FC = () => {
             onClick={() => {
               setIsOpen(!isOpen);
             }}
-            className={`z-20 block h-8 w-8 cursor-pointer rounded-lg hover:text-primary-100  md:hidden`}
+            className={`block h-8 w-8 cursor-pointer rounded-lg hover:text-primary-100  md:hidden`}
           ></IoMdClose>
           <Link href='/feed' className=' hover:text-primary-100'>
             <IoMdHome size={28} />
@@ -75,107 +74,109 @@ const Header: React.FC = () => {
         </div>
       </div>
       {/* Heading Menu */}
-      <div className='z-50 flex h-20 w-full items-center justify-between border-b-2 border-primary-100 py-4 px-12'>
-      <div className='flex h-full flex-grow items-center gap-8'>
-        <Link href='/feed' className='relative block h-full w-32'>
-          <Image priority alt='ProSpects Logo' src='/LogoAlt.png' fill className='object-contain' />
-        </Link>
-        {/* User Search Bar and Dropdown */}
-        <div className='relative'>
-          <input
-            data-cy='search-user-input'
-            onFocus={() => setIsFocused(true)}
-            onBlur={(e) => e.relatedTarget === null && setIsFocused(false)}
-            type='text'
-            placeholder='Search'
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className='relative h-10 w-96 rounded-md bg-primary-100/20 px-4 placeholder-primary-100 outline-none transition-colors duration-200 focus:bg-primary-100 focus:text-white focus:placeholder-white/50'
-          />
-          <AnimatePresence>
-            {searchRes && isFocused && (
-              <motion.div
-                data-cy='search-user-dropdown'
-                layout
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-                className='absolute top-4 left-0 -z-10 max-h-96 w-96 overflow-auto rounded-lg bg-white pt-6 shadow-lg'
-              >
-                {searchRes.map((user) => (
-                  <motion.div layout key={user.email}>
-                    <Link
-                      href={`/u/${user.email}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSearchQuery('');
-                        setIsFocused(false);
-                      }}
-                      className='flex items-center gap-4 px-4 py-2 hover:bg-primary-100/20'
-                    >
-                      <div className='relative h-8 w-8'>
-                        <Image
-                          alt='User Avatar'
-                          loader={() => user.image || '/placeholder.jpeg'}
-                          src={user.image || '/placeholder.jpeg'}
-                          fill
-                          className='rounded-full object-cover'
-                          referrerPolicy='no-referrer'
-                        />
-                      </div>
-                      <div className='flex flex-col'>
-                        <span className='font-medium text-primary-100'>
-                          {user.firstName} {user.lastName}
-                        </span>
-                        <span className='text-sm text-primary-100/50'>{user.email}</span>
-                      </div>
-                    </Link>
-                  </motion.div>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-      <div className='flex flex-grow items-center justify-end gap-8'>
-      <div className='hidden items-center gap-8 md:flex'>
-
-        <Link href='/feed' className='text-primary-500 hover:text-primary-600'>
-          <IoMdHome size={28} />
-        </Link>
-        <Link href='/' className='text-primary-500 hover:text-primary-600'>
-          <IoMdPeople size={28} />
-        </Link>
-        <Link href='/chat' className='text-primary-500 hover:text-primary-600'>
-          <IoIosChatbubbles size={28} />
-        </Link>
-        <button onClick={() => signOut()} className='text-primary-500 hover:text-primary-600'>
-          <IoMdLogOut size={28} />
-        </button>
-        </div>
-        {data?.user && (
-          <Link
-            href={`/u/${data.user.email || ''}`}
-            className='min-h-[32px] min-w-[32px] text-primary-500 hover:text-primary-600'
-          >
-            <Image
-              alt='User Avatar'
-              loader={() => data?.user?.image || '/placeholder.jpeg'}
-              src={data.user.image || '/placeholder.jpeg'}
-              width={32}
-              height={32}
-              className='rounded-full'
-              referrerPolicy='no-referrer'
-            />
+      <div className='z-40 flex h-20 w-full items-center justify-center gap-8 border-b-2 border-primary-100 px-8 py-4 md:px-12'>
+        {/* User Search Bar, Dropdown and Logo */}
+        <div className='flex h-full flex-grow items-center gap-8'>
+          <Link href='/feed' className='relative block h-full w-32'>
+            <Image priority alt='ProSpects Logo' src='/LogoAlt.png' fill className='object-contain' />
           </Link>
-        )}
-        {/* Hamburger Menu Button*/}
-        <FiMenu
+          {/* User Search Bar and Dropdown */}
+          <div className='relative flex flex-grow lg:inline-block lg:flex-grow-0'>
+            <input
+              data-cy='search-user-input'
+              onFocus={() => setIsFocused(true)}
+              onBlur={(e) => e.relatedTarget === null && setIsFocused(false)}
+              type='text'
+              placeholder='Search'
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className='relative h-10 w-full max-w-sm rounded-md bg-primary-100/20 px-4 placeholder-primary-100 outline-none transition-colors duration-200 focus:bg-primary-100 focus:text-white focus:placeholder-white/50 lg:w-96'
+            />
+            <AnimatePresence>
+              {searchRes && isFocused && (
+                <motion.div
+                  data-cy='search-user-dropdown'
+                  layout
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className='absolute top-4 left-0 -z-10 max-h-96 w-96 overflow-auto rounded-lg bg-white pt-6 shadow-lg'
+                >
+                  {searchRes.map((user) => (
+                    <motion.div layout key={user.email}>
+                      <Link
+                        href={`/u/${user.email}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSearchQuery('');
+                          setIsFocused(false);
+                        }}
+                        className='flex items-center gap-4 px-4 py-2 hover:bg-primary-100/20'
+                      >
+                        <div className='relative h-8 w-8'>
+                          <Image
+                            alt='User Avatar'
+                            loader={() => user.image || '/placeholder.jpeg'}
+                            src={user.image || '/placeholder.jpeg'}
+                            fill
+                            className='rounded-full object-cover'
+                            referrerPolicy='no-referrer'
+                          />
+                        </div>
+                        <div className='flex flex-col'>
+                          <span className='font-medium text-primary-100'>
+                            {user.firstName} {user.lastName}
+                          </span>
+                          <span className='text-sm text-primary-100/50'>{user.email}</span>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+        <div className='flex items-center justify-end gap-4 md:gap-8'>
+          {/* Desktop header icons/links */}
+          <div className='hidden items-center gap-8 md:flex'>
+            <Link href='/feed' className='text-primary-500 hover:text-primary-600'>
+              <IoMdHome size={28} />
+            </Link>
+            <Link href='/' className='text-primary-500 hover:text-primary-600'>
+              <IoMdPeople size={28} />
+            </Link>
+            <Link href='/chat' className='text-primary-500 hover:text-primary-600'>
+              <IoIosChatbubbles size={28} />
+            </Link>
+            <button onClick={() => signOut()} className='text-primary-500 hover:text-primary-600'>
+              <IoMdLogOut size={28} />
+            </button>
+          </div>
+          {data?.user && (
+            <Link
+              href={`/u/${data.user.email || ''}`}
+              className='min-h-[32px] min-w-[32px] text-primary-500 hover:text-primary-600'
+            >
+              <Image
+                alt='User Avatar'
+                loader={() => data?.user?.image || '/placeholder.jpeg'}
+                src={data.user.image || '/placeholder.jpeg'}
+                width={32}
+                height={32}
+                className='rounded-full'
+                referrerPolicy='no-referrer'
+              />
+            </Link>
+          )}
+          {/* Hamburger Menu Button*/}
+          <FiMenu
             onClick={() => setIsOpen(!isOpen)}
             className={`block h-8 w-8 cursor-pointer rounded-lg text-primary-500  md:hidden`}
             data-cy='header-hamburger-button'
           ></FiMenu>
+        </div>
       </div>
     </>
   );
