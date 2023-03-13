@@ -46,7 +46,9 @@ const Modal: React.FC<Props> = ({ children, confirmText = 'confirm', onConfirm, 
             <Button reverse onClick={onCancel}>
               Cancel
             </Button>
-            <Button onClick={onConfirm}>{confirmText}</Button>
+            <Button data-cy='modal-submit' onClick={onConfirm}>
+              {confirmText}
+            </Button>
           </div>
         </motion.div>
       </motion.div>

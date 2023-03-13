@@ -22,12 +22,72 @@ describe('Landing Page', () => {
     cy.dataCy('signout-button').should('be.visible');
   });
 
+  it('should redirect to register page when clicking on become member link', () => {
+    cy.get('[data-cy=landingPage-link-becomeMember]').click();
+    cy.url().should('include', '/auth/register');
+  });
+
   it('should navigate to sign in page when clicking sign in button', () => {
     cy.dataCy('signin-button').click();
     cy.url().should('include', '/auth/signin');
   });
+
   it('should navigate to register page when clicking register button', () => {
     cy.dataCy('register-button').click();
+    cy.url().should('include', '/auth/register');
+  });
+
+  it('should render the Top Menu Bar', () => {
+    cy.get('[data-cy=topMenuBar]').should('be.visible');
+  });
+
+  it('should render the links in the Top Menu Bar', () => {
+    cy.get('[data-cy=topMenuBar-link-about]').should('be.visible');
+    cy.get('[data-cy=topMenuBar-link-people]').should('be.visible');
+    cy.get('[data-cy=topMenuBar-link-jobs]').should('be.visible');
+    cy.get('[data-cy=topMenuBar-link-language]').should('be.visible');
+  });
+
+  it('should render the logo of the Top Menu Bar', () => {
+    cy.get('[data-cy=topMenuBar-logo]').should('be.visible');
+  });
+
+  it('should not render the jobs and people links when user is logged in', () => {
+    cy.intercept('GET', '/api/auth/session', {
+      body: {
+        user: {
+          id: '1',
+          name: 'John Doe',
+        },
+      },
+    });
+
+    cy.visit('/');
+    cy.get('[data-cy=topMenuBar-link-people]').should('not.be.visible');
+    cy.get('[data-cy=topMenuBar-link-jobs]').should('not.be.visible');
+  });
+
+  it('should render the user profile picture if logged in', () => {
+    cy.intercept('GET', '/api/auth/session', {
+      body: {
+        user: {
+          id: '1',
+          name: 'John Doe',
+        },
+      },
+    });
+
+    cy.visit('/');
+    cy.get('[data-cy=topMenuBar-profile-picture]').should('be.visible');
+  });
+
+  it('should display landing page picture and text', () => {
+    cy.get('[data-cy=landingPage-picture]').should('be.visible');
+    cy.get('[data-cy=landingPage-text-welcome]').should('be.visible');
+  });
+
+  it('should redirect to register page when clicking on become member link', () => {
+    cy.get('[data-cy=landingPage-link-becomeMember]').click();
     cy.url().should('include', '/auth/register');
   });
 });
@@ -35,17 +95,7 @@ describe('Register Page', () => {
   it('should successfully register with email and password', () => {
     cy.intercept('POST', '/api/auth/callback/credentials*').as('credentials');
 
-    cy.visit('/auth/register');
-    cy.dataCy('email-input').type(`testuser-${Cypress._.random(0, 1e6)}@test.com`);
-    cy.dataCy('password-input').type('testpassword');
-    cy.dataCy('confirm-password-input').type('testpassword');
-
-    cy.dataCy('register-btn').click();
-
-    cy.dataCy('first-name-input').type('Test');
-    cy.dataCy('last-name-input').type('User');
-
-    cy.dataCy('register-btn').click();
+    cy.register();
 
     cy.wait('@credentials').its('response.statusCode').should('eq', 200);
   });
@@ -64,36 +114,23 @@ describe('Register Page', () => {
   it('should fail to register if a user with the same email exists', () => {
     cy.intercept('POST', '/api/trpc/auth.register*').as('register');
 
-    const email = `testuser-${Cypress._.random(0, 1e6)}@test.com`;
-
     // Create the first account
-    cy.visit('/auth/register');
-    cy.dataCy('email-input').type(email);
+    cy.register().then(({ email }) => {
+      // Try to create the second account
+      cy.dataCy('signout-button').click();
+      cy.dataCy('signin-button').should('be.visible');
+      cy.visit('/auth/register');
 
-    cy.dataCy('password-input').type('testpassword');
-    cy.dataCy('confirm-password-input').type('testpassword');
+      cy.dataCy('email-input').type(email);
 
-    cy.dataCy('register-btn').click();
+      cy.dataCy('password-input').type('testpassword');
+      cy.dataCy('confirm-password-input').type('testpassword');
 
-    cy.dataCy('first-name-input').type('Test');
-    cy.dataCy('last-name-input').type('User');
+      cy.dataCy('register-btn').click();
 
-    cy.dataCy('register-btn').click();
-
-    // Try to create the second account
-    cy.dataCy('signout-button').click();
-    cy.dataCy('signin-button').should('be.visible');
-    cy.visit('/auth/register');
-
-    cy.dataCy('email-input').type(email);
-
-    cy.dataCy('password-input').type('testpassword');
-    cy.dataCy('confirm-password-input').type('testpassword');
-
-    cy.dataCy('register-btn').click();
-
-    cy.wait('@register');
-    cy.wait('@register').its('response.statusCode').should('eq', 500);
+      cy.wait('@register');
+      cy.wait('@register').its('response.statusCode').should('eq', 500);
+    });
   });
   it('should fail to register if passwords do not match', () => {
     cy.intercept('POST', '/api/trpc/auth.register*').as('register');
@@ -113,34 +150,20 @@ describe('Sign In Page', () => {
   it('should successfully sign in with email and password', () => {
     cy.intercept('POST', '/api/auth/callback/credentials*').as('credentials');
 
-    cy.visit('/auth/register');
+    cy.register().then(({ email, password }) => {
+      cy.dataCy('signout-button').click();
+      cy.dataCy('signin-button').should('be.visible');
 
-    const email = `testuser-${Cypress._.random(0, 1e6)}@test.com`;
-    const password = 'testpassword';
+      cy.visit('/auth/signin');
 
-    cy.dataCy('email-input').type(email);
-    cy.dataCy('password-input').type(password);
-    cy.dataCy('confirm-password-input').type(password);
+      cy.dataCy('email-input').type(email);
+      cy.dataCy('password-input').type(password);
 
-    cy.dataCy('register-btn').click();
+      cy.dataCy('signin-btn').click();
 
-    cy.dataCy('first-name-input').type('Test');
-    cy.dataCy('last-name-input').type('User');
-
-    cy.dataCy('register-btn').click();
-
-    cy.dataCy('signout-button').click();
-    cy.dataCy('signin-button').should('be.visible');
-
-    cy.visit('/auth/signin');
-
-    cy.dataCy('email-input').type(email);
-    cy.dataCy('password-input').type(password);
-
-    cy.dataCy('signin-btn').click();
-
-    cy.wait('@credentials');
-    cy.wait('@credentials').its('response.statusCode').should('eq', 200);
+      cy.wait('@credentials');
+      cy.wait('@credentials').its('response.statusCode').should('eq', 200);
+    });
   });
   it('should fail to sign in if user does not exist', () => {
     cy.intercept('POST', '/api/auth/callback/credentials*').as('credentials');
