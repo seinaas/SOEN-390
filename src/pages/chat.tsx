@@ -197,9 +197,9 @@ const Chat: NextPageWithLayout = () => {
                           {
                             onSuccess: (data) => {
                               void utils.conversation.getUserConversations.invalidate();
-                              setSelectedConversationId(data?.id);
-
                               if (data?.id) {
+                                setSelectedConversationId(data.id);
+                                connectToChannel(data.id);
                                 localStorage.setItem('lastChannel', data.id);
                               }
                             },
