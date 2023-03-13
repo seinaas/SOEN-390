@@ -44,18 +44,21 @@ const AuthLayout: React.FC<AuthPageProps> = ({ type, children }) => {
               {/* third party login buttons */}
               <motion.div layout className='flex w-full justify-center gap-8'>
                 <button
+                  data-cy='google-btn'
                   className='flex items-center justify-center rounded-lg border-2 border-primary-600 p-2 transition-colors duration-300 hover:bg-primary-600'
                   onClick={() => void signIn('google')}
                 >
                   <Image alt='Google Logo' src='/logos/google.svg' width={32} height={32} />
                 </button>
                 <button
+                  data-cy='facebook-btn'
                   className='flex items-center justify-center rounded-lg border-2 border-primary-600 p-2 transition-colors duration-300 hover:bg-primary-600'
                   onClick={() => void signIn('facebook')}
                 >
                   <Image alt='Facebook Logo' src='/logos/facebook.svg' width={32} height={32} />
                 </button>
                 <button
+                  data-cy='microsoft-btn'
                   className='flex items-center justify-center rounded-lg border-2 border-primary-600 p-2 transition-colors duration-300 hover:bg-primary-600'
                   onClick={() => void signIn('microsoft')}
                 >

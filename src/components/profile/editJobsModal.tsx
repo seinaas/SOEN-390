@@ -74,6 +74,7 @@ const EditJobsModal: React.FC<Props> = ({ job, onCancel }) => {
       <h1 className='mb-4 text-2xl font-semibold'>{job ? 'Edit Experience' : 'Add a Job'}</h1>
       <form className='flex w-full flex-col gap-2'>
         <input
+          data-cy='job-title-input'
           type='text'
           placeholder='Job Title'
           className='text-md block w-full rounded-lg border border-gray-300 p-3 shadow-inner outline-0 ring-0 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-75'
@@ -81,6 +82,7 @@ const EditJobsModal: React.FC<Props> = ({ job, onCancel }) => {
         />
 
         <input
+          data-cy='company-input'
           type='text'
           placeholder='Company Name'
           className='text-md block w-full rounded-lg border border-gray-300 p-3 shadow-inner outline-0 ring-0 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-75'
@@ -88,18 +90,21 @@ const EditJobsModal: React.FC<Props> = ({ job, onCancel }) => {
         />
 
         <textarea
+          data-cy='description-input'
           placeholder='Job Description'
           className='text-md block h-32 w-full rounded-lg border border-gray-300 p-3 shadow-inner outline-0 ring-0 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-75'
           {...register('description')}
         />
         <div className='flex gap-2'>
           <input
+            data-cy='start-date-input'
             type='date'
             placeholder='Starting Date'
             className='text-md block w-full rounded-lg border border-gray-300 p-3 shadow-inner outline-0 ring-0 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-75'
             {...register('startDate')}
           />
           <input
+            data-cy='end-date-input'
             type='date'
             placeholder='Ending Date'
             className='text-md block w-full rounded-lg border border-gray-300 p-3 shadow-inner outline-0 ring-0 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-75'

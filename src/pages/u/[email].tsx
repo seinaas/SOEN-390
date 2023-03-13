@@ -72,7 +72,11 @@ const Profile: NextPageWithLayout = () => {
       await updateQueries();
     },
   });
-  const { data: connection } = api.connections.getConnectionStatus.useQuery({ userEmail: data?.email || '' });
+  const { data: connection } = api.connections.getConnectionStatus.useQuery(
+    { userEmail: data?.email || '' },
+    // Don't fetch connection status if the user is viewing their own profile
+    { enabled: !!sessionData?.user?.email && email != sessionData?.user?.email },
+  );
   const { data: connections } = api.connections.getUserConnections.useQuery({ userEmail: (email as string) || '' });
 
   const canEdit = sessionData?.user?.email === data?.email;
@@ -85,16 +89,15 @@ const Profile: NextPageWithLayout = () => {
           <div className='flex flex-col gap-4'>
             <div className='flex items-center gap-4'>
               <div className='relative h-32 min-h-[8rem] w-32 min-w-[8rem] overflow-hidden rounded-full bg-primary-100/20'>
-                {data?.image && (
-                  <Image
-                    loader={() => data?.image || ''}
-                    src={data.image || ''}
-                    alt='Profile'
-                    fill
-                    className='object-cover'
-                    referrerPolicy='no-referrer'
-                  />
-                )}
+                <Image
+                  loader={() => data?.image || '/placeholder.jpeg'}
+                  src={data?.image || '/placeholder.jpeg'}
+                  alt='Profile'
+                  fill
+                  className='object-cover'
+                  referrerPolicy='no-referrer'
+                  priority
+                />
               </div>
               <div>
                 <h1 className='text-2xl font-semibold'>
@@ -231,9 +234,11 @@ const Profile: NextPageWithLayout = () => {
             <div className='flex w-full flex-col gap-2'>
               <div className='flex justify-between'>
                 <h1 className='mb-2 font-semibold'>Languages</h1>
-                {canEdit && <EditButton onClick={() => setShowLanguagesModal(true)} />}
+                {canEdit && (
+                  <EditButton name='langs' data-cy='edit-langs-btn' onClick={() => setShowLanguagesModal(true)} />
+                )}
               </div>
-              <div className='flex flex-wrap gap-2 text-primary-100'>
+              <div data-cy='languages' className='flex flex-wrap gap-2 text-primary-100'>
                 {data?.languages &&
                   data.languages.map((langCode) => (
                     <div key={langCode} className='rounded-md bg-primary-100/20 px-2 py-1'>
@@ -249,9 +254,9 @@ const Profile: NextPageWithLayout = () => {
             <div className='flex w-full flex-col gap-2'>
               <div className='flex justify-between'>
                 <h1 className='mb-2 font-semibold'>Skills</h1>
-                {canEdit && <EditButton onClick={() => setShowSkillsModal(true)} />}
+                {canEdit && <EditButton name='skills' onClick={() => setShowSkillsModal(true)} />}
               </div>
-              <div className='flex flex-wrap gap-2 text-primary-100'>
+              <div data-cy='skills' className='flex flex-wrap gap-2 text-primary-100'>
                 {data?.skills.map((skill) => (
                   <div key={skill} className='rounded-md bg-primary-100/20 px-2 py-1'>
                     {skill}
@@ -335,12 +340,16 @@ const Profile: NextPageWithLayout = () => {
               >
                 <div className='flex justify-between'>
                   <h1 className='mb-2 text-2xl font-semibold'>About</h1>
-                  {canEdit && <EditButton onClick={() => setShowBioModal(true)} />}
+                  {canEdit && <EditButton name='bio' onClick={() => setShowBioModal(true)} />}
                 </div>
-                <p>{`${data?.bio || ''} `}</p>
+                <p data-cy='bio'>{`${data?.bio || ''} `}</p>
               </motion.div>
             ) : (
-              <>{canEdit && <NewSectionButton text='About' onClick={() => setShowBioModal(true)} />}</>
+              <>
+                {canEdit && (
+                  <NewSectionButton data-cy='new-bio-btn' text='About' onClick={() => setShowBioModal(true)} />
+                )}
+              </>
             )}
             {!!data?.jobs.length ? (
               <motion.div
@@ -354,9 +363,9 @@ const Profile: NextPageWithLayout = () => {
               >
                 <div className='flex justify-between'>
                   <h1 className='mb-4 text-2xl font-semibold'>Work Experience</h1>
-                  {canEdit && <EditButton type='add' onClick={() => setEdittingJobId('new')} />}
+                  {canEdit && <EditButton name='job' type='add' onClick={() => setEdittingJobId('new')} />}
                 </div>
-                <div className='flex flex-col'>
+                <div className='flex flex-col' data-cy='work-experience'>
                   {data.jobs.map((job, i) => (
                     <motion.div key={job.company}>
                       <div className='flex gap-2'>
@@ -367,7 +376,7 @@ const Profile: NextPageWithLayout = () => {
                         <div className='flex flex-1 flex-col'>
                           <div className='flex justify-between'>
                             <h1 className='text-lg font-semibold'>{job.title}</h1>
-                            {canEdit && <EditButton onClick={() => setEdittingJobId(job.jobId)} />}
+                            {canEdit && <EditButton name='job' onClick={() => setEdittingJobId(job.jobId)} />}
                           </div>
                           <p className='text-sm font-semibold leading-[0.8] text-primary-100'>
                             {job.startDate && format(job.startDate, 'MMM yyyy')} -{' '}
@@ -392,7 +401,15 @@ const Profile: NextPageWithLayout = () => {
                 </div>
               </motion.div>
             ) : (
-              <>{canEdit && <NewSectionButton text='Work Experience' onClick={() => setEdittingJobId('new')} />}</>
+              <>
+                {canEdit && (
+                  <NewSectionButton
+                    data-cy='new-job-btn'
+                    text='Work Experience'
+                    onClick={() => setEdittingJobId('new')}
+                  />
+                )}
+              </>
             )}
             {!!data?.education.length ? (
               <motion.div
@@ -406,9 +423,9 @@ const Profile: NextPageWithLayout = () => {
               >
                 <div className='flex justify-between'>
                   <h1 className='mb-4 text-2xl font-semibold'>Education</h1>
-                  {canEdit && <EditButton type='add' onClick={() => setEdittingEducationId('new')} />}
+                  {canEdit && <EditButton name='edu' type='add' onClick={() => setEdittingEducationId('new')} />}
                 </div>
-                <div className='flex flex-wrap gap-4'>
+                <div className='flex flex-wrap gap-4' data-cy='education'>
                   {data.education.map((education) => (
                     <div key={education.school} className='flex overflow-hidden rounded-lg'>
                       <div className='relative flex aspect-square h-20 w-20'>
@@ -418,7 +435,9 @@ const Profile: NextPageWithLayout = () => {
                       <div className='flex flex-col whitespace-nowrap bg-white p-4 pr-6'>
                         <div className='flex items-center justify-between'>
                           <h1 className='text-lg font-semibold'>{education.school}</h1>
-                          {canEdit && <EditButton onClick={() => setEdittingEducationId(education.educationId)} />}
+                          {canEdit && (
+                            <EditButton name='edu' onClick={() => setEdittingEducationId(education.educationId)} />
+                          )}
                         </div>
                         <p className='text-sm font-semibold leading-[0.8] text-primary-100'>
                           {education.startDate && format(education.startDate, 'MMM yyyy')} -{' '}
@@ -430,7 +449,15 @@ const Profile: NextPageWithLayout = () => {
                 </div>
               </motion.div>
             ) : (
-              <>{canEdit && <NewSectionButton text='Education' onClick={() => setEdittingEducationId('new')} />}</>
+              <>
+                {canEdit && (
+                  <NewSectionButton
+                    data-cy='new-edu-btn'
+                    text='Education'
+                    onClick={() => setEdittingEducationId('new')}
+                  />
+                )}
+              </>
             )}
           </motion.div>
         )}

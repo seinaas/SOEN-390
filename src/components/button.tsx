@@ -29,7 +29,7 @@ const Button: React.FC<Props> = ({ reverse, variant = 'primary', fullWidth, icon
     >
       {iconLeft && <motion.span layout>{iconLeft}</motion.span>}
       {props.children && (
-        <motion.div layout className='flex items-center justify-center gap-x-1 overflow-hidden leading-[0.8]'>
+        <motion.div layout className='flex items-center justify-center gap-x-1 leading-[0.8]'>
           {props.children}
         </motion.div>
       )}
