@@ -84,7 +84,7 @@ const LandingPageBody: React.FC = () => {
         {/* Mobile buttons */}
         {data ? (
           <div className='my-10 flex max-w-sm whitespace-nowrap px-4 md:hidden'>
-            <Button fullWidth data-cy='signout-button' variant='secondary' reverse onClick={() => signOut()}>
+            <Button fullWidth data-cy='signout-button-mobile' variant='secondary' reverse onClick={() => signOut()}>
               Sign Out
             </Button>
           </div>

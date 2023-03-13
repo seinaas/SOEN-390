@@ -22,6 +22,11 @@ describe('Landing Page', () => {
     cy.dataCy('signout-button').should('be.visible');
   });
 
+  it('should redirect to register page when clicking on become member link', () => {
+    cy.get('[data-cy=landingPage-link-becomeMember]').click();
+    cy.url().should('include', '/auth/register');
+  });
+
   it('should navigate to sign in page when clicking sign in button', () => {
     cy.dataCy('signin-button').click();
     cy.url().should('include', '/auth/signin');
