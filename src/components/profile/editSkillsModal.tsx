@@ -49,11 +49,12 @@ const EditSkillsModal: React.FC<Props> = ({ skills, onCancel }) => {
       <h1 className='mb-4 text-2xl font-semibold'>Skills</h1>
       <form onSubmit={onSubmit} className='flex flex-col items-center justify-between gap-2 p-2 py-4 xs:flex-row'>
         <input
+          data-cy='skill-input'
           type='text'
           className='flex-1 rounded-md border border-gray-300 py-2 px-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500'
           {...register('skill')}
         />
-        <Button>Add Skill</Button>
+        <Button data-cy='skill-submit'>Add Skill</Button>
       </form>
       <div className='h-screen max-h-[65vh] overflow-y-auto xs:h-[50vh] xs:max-h-[50vh]'>
         <AnimatePresence mode='popLayout'>

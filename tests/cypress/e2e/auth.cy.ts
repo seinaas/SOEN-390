@@ -95,17 +95,7 @@ describe('Register Page', () => {
   it('should successfully register with email and password', () => {
     cy.intercept('POST', '/api/auth/callback/credentials*').as('credentials');
 
-    cy.visit('/auth/register');
-    cy.dataCy('email-input').type(`testuser-${Cypress._.random(0, 1e6)}@test.com`);
-    cy.dataCy('password-input').type('testpassword');
-    cy.dataCy('confirm-password-input').type('testpassword');
-
-    cy.dataCy('register-btn').click();
-
-    cy.dataCy('first-name-input').type('Test');
-    cy.dataCy('last-name-input').type('User');
-
-    cy.dataCy('register-btn').click();
+    cy.register();
 
     cy.wait('@credentials').its('response.statusCode').should('eq', 200);
   });
@@ -124,36 +114,23 @@ describe('Register Page', () => {
   it('should fail to register if a user with the same email exists', () => {
     cy.intercept('POST', '/api/trpc/auth.register*').as('register');
 
-    const email = `testuser-${Cypress._.random(0, 1e6)}@test.com`;
-
     // Create the first account
-    cy.visit('/auth/register');
-    cy.dataCy('email-input').type(email);
+    cy.register().then(({ email }) => {
+      // Try to create the second account
+      cy.dataCy('signout-button').click();
+      cy.dataCy('signin-button').should('be.visible');
+      cy.visit('/auth/register');
 
-    cy.dataCy('password-input').type('testpassword');
-    cy.dataCy('confirm-password-input').type('testpassword');
+      cy.dataCy('email-input').type(email);
 
-    cy.dataCy('register-btn').click();
+      cy.dataCy('password-input').type('testpassword');
+      cy.dataCy('confirm-password-input').type('testpassword');
 
-    cy.dataCy('first-name-input').type('Test');
-    cy.dataCy('last-name-input').type('User');
+      cy.dataCy('register-btn').click();
 
-    cy.dataCy('register-btn').click();
-
-    // Try to create the second account
-    cy.dataCy('signout-button').click();
-    cy.dataCy('signin-button').should('be.visible');
-    cy.visit('/auth/register');
-
-    cy.dataCy('email-input').type(email);
-
-    cy.dataCy('password-input').type('testpassword');
-    cy.dataCy('confirm-password-input').type('testpassword');
-
-    cy.dataCy('register-btn').click();
-
-    cy.wait('@register');
-    cy.wait('@register').its('response.statusCode').should('eq', 500);
+      cy.wait('@register');
+      cy.wait('@register').its('response.statusCode').should('eq', 500);
+    });
   });
   it('should fail to register if passwords do not match', () => {
     cy.intercept('POST', '/api/trpc/auth.register*').as('register');
@@ -173,34 +150,20 @@ describe('Sign In Page', () => {
   it('should successfully sign in with email and password', () => {
     cy.intercept('POST', '/api/auth/callback/credentials*').as('credentials');
 
-    cy.visit('/auth/register');
+    cy.register().then(({ email, password }) => {
+      cy.dataCy('signout-button').click();
+      cy.dataCy('signin-button').should('be.visible');
 
-    const email = `testuser-${Cypress._.random(0, 1e6)}@test.com`;
-    const password = 'testpassword';
+      cy.visit('/auth/signin');
 
-    cy.dataCy('email-input').type(email);
-    cy.dataCy('password-input').type(password);
-    cy.dataCy('confirm-password-input').type(password);
+      cy.dataCy('email-input').type(email);
+      cy.dataCy('password-input').type(password);
 
-    cy.dataCy('register-btn').click();
+      cy.dataCy('signin-btn').click();
 
-    cy.dataCy('first-name-input').type('Test');
-    cy.dataCy('last-name-input').type('User');
-
-    cy.dataCy('register-btn').click();
-
-    cy.dataCy('signout-button').click();
-    cy.dataCy('signin-button').should('be.visible');
-
-    cy.visit('/auth/signin');
-
-    cy.dataCy('email-input').type(email);
-    cy.dataCy('password-input').type(password);
-
-    cy.dataCy('signin-btn').click();
-
-    cy.wait('@credentials');
-    cy.wait('@credentials').its('response.statusCode').should('eq', 200);
+      cy.wait('@credentials');
+      cy.wait('@credentials').its('response.statusCode').should('eq', 200);
+    });
   });
   it('should fail to sign in if user does not exist', () => {
     cy.intercept('POST', '/api/auth/callback/credentials*').as('credentials');
