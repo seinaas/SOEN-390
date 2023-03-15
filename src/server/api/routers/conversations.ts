@@ -2,6 +2,24 @@ import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 
 export const conversationsRouter = createTRPCRouter({
+  createConversation: protectedProcedure.input(z.object({ userEmail: z.string() })).mutation(async ({ ctx, input }) => {
+    const { userEmail } = input;
+    const user = await ctx.prisma.user.findUnique({
+      where: {
+        email: userEmail,
+      },
+    });
+    if (user) {
+      const conversation = await ctx.prisma.directMessages.create({
+        data: {
+          user1Id: ctx.session.user.id < user.id ? ctx.session.user.id : user.id,
+          user2Id: ctx.session.user.id < user.id ? user.id : ctx.session.user.id,
+        },
+      });
+      return conversation;
+    }
+    return null;
+  }),
   getUserConversations: protectedProcedure.input(z.object({ userEmail: z.string() })).query(async ({ input, ctx }) => {
     const user = await ctx.prisma.user.findUnique({
       where: {
@@ -44,7 +62,7 @@ export const conversationsRouter = createTRPCRouter({
           conversationId: input.id,
         },
         orderBy: {
-          sentAt: 'asc',
+          sentAt: 'desc',
         },
         include: {
           sender: true,

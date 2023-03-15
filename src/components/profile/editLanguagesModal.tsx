@@ -50,6 +50,7 @@ const EditLanguagesModal: React.FC<Props> = ({ languages, onCancel }) => {
       <h1 className='mb-4 text-2xl font-semibold'>Languages</h1>
       <form onSubmit={onSubmit} className='flex flex-col items-center justify-between gap-2 p-2 py-4 xs:flex-row'>
         <input
+          data-cy='lang-input'
           {...register('language')}
           list='languages'
           placeholder='Add a language'
@@ -60,7 +61,7 @@ const EditLanguagesModal: React.FC<Props> = ({ languages, onCancel }) => {
             <option key={code} value={name} />
           ))}
         </datalist>
-        <Button>Add</Button>
+        <Button data-cy='lang-submit'>Add</Button>
       </form>
       <div className='h-screen max-h-[65vh] overflow-y-auto xs:h-[50vh] xs:max-h-[50vh]'>
         <AnimatePresence mode='popLayout'>

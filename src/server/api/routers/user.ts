@@ -1,8 +1,38 @@
+import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
 
 export const userRouter = createTRPCRouter({
+  search: publicProcedure.input(z.object({ query: z.string() })).query(async ({ ctx, input }) => {
+    if (input.query.length < 3) {
+      return null;
+    }
+    // Split query into array of words
+    const searchArray = input.query
+      .toLowerCase()
+      .trim()
+      .split(' ')
+      .map((s) => `%${s}%`);
+
+    // Raw query to search for users
+    const users = await ctx.prisma.$queryRaw`
+      SELECT firstName, lastName, email, image, headline
+      FROM User
+      WHERE lower(concat(firstName, lastName))
+      LIKE ${Prisma.join(searchArray, ' AND lower(concat(firstName, lastName)) LIKE ')}
+    `;
+
+    // Need to cast type because of raw query
+    return users as {
+      firstName: string;
+      lastName: string;
+      email: string;
+      image: string;
+      headline: string;
+    }[];
+  }),
+  // Query a user by email
   getByEmail: publicProcedure.input(z.object({ email: z.string() })).query(async ({ ctx, input }) => {
     const user = await ctx.prisma.user.findUnique({
       where: {
@@ -34,6 +64,7 @@ export const userRouter = createTRPCRouter({
       };
     }
   }),
+  // Query a user by ID
   getByID: protectedProcedure
     .input(
       z.object({
@@ -71,6 +102,7 @@ export const userRouter = createTRPCRouter({
         };
       }
     }),
+  // Update user data
   update: protectedProcedure
     .input(
       z.object({
@@ -95,6 +127,7 @@ export const userRouter = createTRPCRouter({
 
       return user;
     }),
+  // Update user job data
   updateJob: protectedProcedure
     .input(
       z.object({
@@ -127,7 +160,7 @@ export const userRouter = createTRPCRouter({
 
       return job;
     }),
-
+  // Add a job to a user
   addJob: protectedProcedure
     .input(
       z.object({
@@ -149,7 +182,7 @@ export const userRouter = createTRPCRouter({
 
       return job;
     }),
-
+  // Update user education data
   updateEducation: protectedProcedure
     .input(
       z.object({
@@ -182,7 +215,7 @@ export const userRouter = createTRPCRouter({
 
       return education;
     }),
-
+  // Add education to a user
   addEducation: protectedProcedure
     .input(
       z.object({
