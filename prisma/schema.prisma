@@ -118,8 +118,8 @@ model VerificationToken {
 }
 
 model Post {
-    id    String   @id @default(cuid())
-    userId    String @unique
+    id        String   @id @default(cuid())
+    userId    String
     createdAt DateTime @default(now())
     content   String?  @db.Text
     comments  Comments[]
@@ -129,7 +129,7 @@ model Post {
 
 model Comments {    
     commentId String @id @default(cuid())
-    userId    String @unique
+    userId    String
     postId    String
     content   String? @db.Text
     Post      Post    @relation(fields: [postId], references: [id])
@@ -138,10 +138,10 @@ model Comments {
 
 model Likes {
     likeId String @id @default(cuid())
-    userId String @unique
+    userId String
     postId String
     Post   Post   @relation(fields: [postId], references: [id])
-    User      User    @relation(fields: [userId], references: [id])
+    User   User    @relation(fields: [userId], references: [id])
     
 }
 

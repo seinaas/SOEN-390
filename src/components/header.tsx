@@ -37,7 +37,14 @@ const Header: React.FC = () => {
     <div className='z-50 flex h-20 w-full items-center justify-between border-b-2 border-primary-100 py-4 px-12'>
       <div className='flex h-full flex-grow items-center gap-8'>
         <Link href='/feed' className='relative block h-full w-32'>
-          <Image priority alt='ProSpects Logo' src='/LogoAlt.png' fill className='object-contain' />
+          <Image
+            priority
+            alt='ProSpects Logo'
+            src='/LogoAlt.png'
+            fill
+            className='object-contain'
+            referrerPolicy='no-referrer'
+          />
         </Link>
         {/* User Search Bar and Dropdown */}
         <div className='relative'>
