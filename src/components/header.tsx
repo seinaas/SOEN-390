@@ -47,6 +47,7 @@ const Header: React.FC = () => {
           className={`${
             isOpen ? 'opacity-50' : 'opacity-0'
           }  min-h-screen bg-gray-900  transition-all duration-300 ease-out`}
+          data-cy='header-sliding-mobile-menu-grey-area'
         ></div>
         <div
           className={`${
@@ -57,6 +58,7 @@ const Header: React.FC = () => {
             onClick={() => {
               setIsOpen(!isOpen);
             }}
+            data-cy='header-mobile-sliding-menu-close-btn'
             className={`block h-8 w-8 cursor-pointer rounded-lg hover:text-primary-100  md:hidden`}
           ></IoMdClose>
           <Link href='/feed' className=' hover:text-primary-100'>
@@ -140,7 +142,7 @@ const Header: React.FC = () => {
         </div>
         <div className='flex items-center justify-end gap-4 md:gap-8'>
           {/* Desktop header icons/links */}
-          <div className='hidden items-center gap-8 md:flex'>
+          <div className='hidden items-center gap-8 md:flex' data-cy='header-desktop-links'>
             <Link href='/feed' className='text-primary-500 hover:text-primary-600'>
               <IoMdHome size={28} />
             </Link>
