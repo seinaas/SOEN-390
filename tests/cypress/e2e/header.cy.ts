@@ -1,7 +1,7 @@
 describe('Header', () => {
   let email = '';
   //Before you run all the test, register the test user in the database.
-  beforeEach(() => {
+  before(() => {
     email = `testuser-${Cypress._.random(0, 1e6)}@test.com`;
     cy.visit('/auth/register');
     cy.dataCy('email-input').type(email);
@@ -14,6 +14,15 @@ describe('Header', () => {
     cy.dataCy('last-name-input').type('User');
 
     cy.dataCy('register-btn').click();
+    cy.visit(`/`);
+    cy.dataCy('signout-button').click();
+  });
+  beforeEach(() => {
+    cy.visit('/auth/signin');
+    cy.dataCy('email-input').type(email);
+    cy.dataCy('password-input').type('testpassword');
+    cy.intercept('GET', '/api/auth/session').as('getUserSession');
+    cy.dataCy('signin-btn').click().wait('@getUserSession');
     cy.visit(`/u/${email}`);
   });
   it('should successfully search for a user by part of first name', () => {
