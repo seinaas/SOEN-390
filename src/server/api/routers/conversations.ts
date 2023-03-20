@@ -128,6 +128,11 @@ export const conversationsRouter = createTRPCRouter({
             users: true,
           },
         });
+        await ctx.prisma.messages.deleteMany({
+          where: {
+            conversationId: input.conversationId,
+          },
+        });
         await ctx.prisma.directMessages.delete({
           where: {
             id: input.conversationId,
