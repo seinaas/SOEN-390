@@ -7,13 +7,21 @@ describe('chat', () => {
 
       const trigger = jest.spyOn(request.ctx.pusher, 'trigger');
 
-      await request.caller.chat.submit({
+      await request.caller.chat.sendMessage({
         message: 'Hello World',
         senderId: '1',
-        receiverId: '2',
-        conversationId: '1',
+        conversationId: 'test',
+        sender: {
+          firstName: 'Unknown',
+          lastName: 'User',
+        },
       });
-      expect(trigger).toHaveBeenCalledWith('test', 'test-event', { message: 'Hello World' });
+      expect(trigger).toHaveBeenCalledWith('test', 'message-sent', {
+        sender: {
+          firstName: 'Unknown',
+          lastName: 'User',
+        },
+      });
     });
   });
 });

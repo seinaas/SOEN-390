@@ -6,4 +6,5 @@ module.exports = {
   printWidth: 120,
   jsxSingleQuote: true,
   tabWidth: 2,
+  endOfLine: 'lf',
 };

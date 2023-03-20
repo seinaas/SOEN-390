@@ -79,7 +79,6 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 import { initTRPC, TRPCError } from '@trpc/server';
 import superjson from 'superjson';
 import { type PrismaClient } from '@prisma/client';
-import { env } from '../../env/server.mjs';
 import { pusherServerClient } from '../pusher';
 
 const t = initTRPC.context<typeof createTRPCContext>().create({

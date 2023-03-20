@@ -47,33 +47,32 @@ model Session {
 }
 
 model User {
-    id                 String           @id @default(cuid())
-    firstName          String?
-    lastName           String?
-    headline           String?
-    education          Education[]
-    jobs               Job[]
-    connections        Connection[]     @relation("UserFriends")
-    connectionOf       Connection[]     @relation("FriendsUser")
-    bio                String?          @db.Text
-    volunteering       String? // TODO: Change to volunteering model
-    skills             String? // TODO: Create skills table
-    recommendations    String? // TODO: Create recommendations table
-    courses            String? // TODO: Create courses table
-    projects           String? // TODO: Create projects table
-    awards             String? // TODO: Create awards table
-    languages          String? // TODO: Create languages table
-    email              String           @unique
-    emailVerified      DateTime?
-    phone              String?          @unique
-    image              String?          @db.Text
-    accounts           Account[]
-    sessions           Session[]
-    password           String?
-    DirectMessagesTo   DirectMessages[] @relation("Messenger1")
-    DirectMessagesFrom DirectMessages[] @relation("Messenger2")
-    MessagesTo         Messages[]       @relation("Sender")
-    MessagesFrom       Messages[]       @relation("Receiver")
+    id               String           @id @default(cuid())
+    firstName        String?
+    lastName         String?
+    headline         String?
+    education        Education[]
+    jobs             Job[]
+    connections      Connection[]     @relation("UserFriends")
+    connectionOf     Connection[]     @relation("FriendsUser")
+    bio              String?          @db.Text
+    volunteering     String? // TODO: Change to volunteering model
+    skills           String? // TODO: Create skills table
+    recommendations  String? // TODO: Create recommendations table
+    courses          String? // TODO: Create courses table
+    projects         String? // TODO: Create projects table
+    awards           String? // TODO: Create awards table
+    languages        String? // TODO: Create languages table
+    email            String           @unique
+    emailVerified    DateTime?
+    phone            String?          @unique
+    image            String?          @db.Text
+    accounts         Account[]
+    sessions         Session[]
+    password         String?
+    DirectMessages   DirectMessages[]
+    MessagesTo       Messages[]       @relation("Sender")
+    directMessagesId String?
 }
 
 model Connection {
@@ -100,10 +99,7 @@ model Job {
 
 model DirectMessages {
     id       String     @id @default(uuid())
-    user1Id  String
-    user1    User       @relation("Messenger1", fields: [user1Id], references: [id])
-    user2Id  String
-    user2    User       @relation("Messenger2", fields: [user2Id], references: [id])
+    users    User[]
     messages Messages[] @relation("Messages")
 }
 
@@ -112,9 +108,7 @@ model Messages {
     message        String
     sender         User           @relation("Sender", fields: [senderId], references: [id])
     senderId       String
-    receiver       User           @relation("Receiver", fields: [receiverId], references: [id])
-    receiverId     String
-    sentAt         String
+    createdAt      DateTime       @default(now())
     conversationId String
     DirectMessages DirectMessages @relation("Messages", fields: [conversationId], references: [id])
 }
