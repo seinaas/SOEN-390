@@ -6,9 +6,10 @@ type Props = {
   onConfirm?: () => unknown;
   confirmText?: string;
   children?: React.ReactNode;
+  showCancel?: unknown;
 };
 
-const Modal: React.FC<Props> = ({ children, confirmText = 'confirm', onConfirm, onCancel }) => {
+const Modal: React.FC<Props> = ({ showCancel = 'true', children, confirmText = 'confirm', onConfirm, onCancel }) => {
   return (
     <>
       <motion.div
@@ -43,9 +44,11 @@ const Modal: React.FC<Props> = ({ children, confirmText = 'confirm', onConfirm, 
         >
           <div className='px-4 pt-5 pb-4 sm:p-6 sm:pb-4'>{children}</div>
           <div className='flex justify-end gap-2 bg-primary-100/20 p-4'>
-            <Button reverse onClick={onCancel}>
-              Cancel
-            </Button>
+            {showCancel && (
+              <Button reverse onClick={onCancel}>
+                Cancel
+              </Button>
+            )}
             <Button data-cy='modal-submit' onClick={onConfirm}>
               {confirmText}
             </Button>

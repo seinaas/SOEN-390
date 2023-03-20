@@ -1,3 +1,4 @@
+import type { User } from '@prisma/client';
 import { z } from 'zod';
 
 import { createTRPCRouter, protectedProcedure } from '../trpc';
@@ -8,6 +9,26 @@ export const chatRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { message, conversationId } = input;
       // const { user } = ctx.session;
+      // We could allow the user to send a message before having to create a convo
+      // await ctx.prisma.directMessages
+      //   .upsert({
+      //     where: {
+      //       id: conversationId,
+      //     },
+      //     create: {
+      //       users: {
+      //         connect: [ctx.session.user].map((participant) => ({ id: participant.id })),
+      //       },
+      //       id: conversationId,
+      //     },
+      //     update: {},
+      //   })
+      //   .catch((e) => {
+      //     console.log(e);
+      //   })
+      //   .then((res) => {
+      //     console.log(res);
+      //   });
 
       const conversation = await ctx.prisma.directMessages.findUnique({
         where: {
@@ -25,21 +46,14 @@ export const chatRouter = createTRPCRouter({
       await ctx.prisma.messages.create({
         data: {
           senderId: senderId,
-          receiverId: receiverId,
-          sentAt: new Date().toLocaleString(),
           message: message,
           conversationId: conversationId,
         },
       });
-
-      await ctx.pusher.trigger(conversationId, 'message-sent', {});
-    }),
-  submit: protectedProcedure
-    .input(z.object({ message: z.string(), senderId: z.string(), receiverId: z.string(), conversationId: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      const { message } = input;
-      // const { user } = ctx.session;
-
-      await ctx.pusher.trigger('test', 'test-event', { message });
+      await ctx.pusher.trigger(conversationId, 'message-sent', {
+        ...messageToSend,
+        sender: { firstName: sender.firstName, lastName: sender.lastName },
+      });
+      return messageToSend;
     }),
 });

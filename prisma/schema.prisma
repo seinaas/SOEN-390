@@ -76,6 +76,8 @@ model User {
     notifications   Notification[]
     sentNotifications Notification[] @relation("Sender")
     mutedNotifTypes MutedNotificationTypes[]
+    DirectMessages   DirectMessages[]
+    MessagesTo       Messages[]       @relation("Sender")
 }
 
 model Connection {
@@ -102,10 +104,7 @@ model Job {
 
 model DirectMessages {
     id       String     @id @default(uuid())
-    user1Id  String
-    user1    User       @relation("Messenger1", fields: [user1Id], references: [id])
-    user2Id  String
-    user2    User       @relation("Messenger2", fields: [user2Id], references: [id])
+    users    User[]
     messages Messages[] @relation("Messages")
 }
 
@@ -114,9 +113,7 @@ model Messages {
     message        String
     sender         User           @relation("Sender", fields: [senderId], references: [id])
     senderId       String
-    receiver       User           @relation("Receiver", fields: [receiverId], references: [id])
-    receiverId     String
-    sentAt         String
+    createdAt      DateTime       @default(now())
     conversationId String
     DirectMessages DirectMessages @relation("Messages", fields: [conversationId], references: [id])
 }
