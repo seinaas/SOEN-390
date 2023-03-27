@@ -1,14 +1,22 @@
+import Image from 'next/image';
 import { useSession } from 'next-auth/react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 const Upload: React.FC = () => {
+  // TODO: add multi-upload capabilities
   const { data } = useSession();
   const [file, setFile] = useState<File>();
+  const [imgPreview, setImgPreview] = useState<string>();
+
+  const inputRef = useRef();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     //Loads the file as a state
     if (e.target.files?.[0]) {
       setFile(e.target.files?.[0]);
+      e.target.files?.[0].type.includes('image')
+        ? setImgPreview(URL.createObjectURL(e.target.files[0]))
+        : setImgPreview(undefined);
     }
   };
 
@@ -38,7 +46,10 @@ const Upload: React.FC = () => {
 
     if (upload.ok) {
       console.log('Uploaded successfully!');
+      //Clears the input, file and image preview
       setFile(undefined);
+      setImgPreview(undefined);
+      inputRef.current.value = '';
     } else {
       console.error('Upload failed.');
     }
@@ -47,7 +58,18 @@ const Upload: React.FC = () => {
   return (
     <div>
       <p>Upload a file</p>
-      <input type='file' onChange={handleInputChange} />
+      {file?.type.includes('image') && (
+        <Image
+          alt='image'
+          src={imgPreview || ''}
+          width={128}
+          height={32}
+          className='object-contain'
+          referrerPolicy='no-referrer'
+        />
+      )}
+      <input ref={inputRef} type='file' onChange={handleInputChange} />
+
       <button onClick={uploadFile}> Upload </button>
     </div>
   );
