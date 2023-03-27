@@ -25,6 +25,10 @@ export const serverSchema = z.object({
   FACEBOOK_CLIENT_SECRET: z.string(),
   PUSHER_SECRET: z.string(),
   PUSHER_APP_ID: z.string(),
+  CLOUDFLARE_ACCOUNT_ID: z.string(),
+  CLOUDFLARE_ACCESS_KEY_ID: z.string(),
+  CLOUDFLARE_SECRET_ACCESS_KEY: z.string(),
+  CLOUDFLARE_BUCKET_NAME: z.string(),
 });
 
 /**
@@ -46,6 +50,10 @@ export const serverEnv = {
   FACEBOOK_CLIENT_SECRET: process.env.FACEBOOK_CLIENT_SECRET,
   PUSHER_SECRET: process.env.PUSHER_SECRET,
   PUSHER_APP_ID: process.env.PUSHER_APP_ID,
+  CLOUDFLARE_ACCOUNT_ID: process.env.CLOUDFLARE_ACCOUNT_ID,
+  CLOUDFLARE_ACCESS_KEY_ID: process.env.CLOUDFLARE_ACCESS_KEY_ID,
+  CLOUDFLARE_SECRET_ACCESS_KEY: process.env.CLOUDFLARE_SECRET_ACCESS_KEY,
+  CLOUDFLARE_BUCKET_NAME: process.env.CLOUDFLARE_BUCKET_NAME,
 };
 
 /**
