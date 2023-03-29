@@ -6,10 +6,10 @@ type Props = {
   onConfirm?: () => unknown;
   confirmText?: string;
   children?: React.ReactNode;
-  showCancel?: unknown;
+  showCancel?: boolean;
 };
 
-const Modal: React.FC<Props> = ({ showCancel = 'true', children, confirmText = 'confirm', onConfirm, onCancel }) => {
+const Modal: React.FC<Props> = ({ showCancel = true, children, confirmText = 'confirm', onConfirm, onCancel }) => {
   return (
     <>
       <motion.div
