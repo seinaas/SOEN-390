@@ -85,7 +85,7 @@ export const conversationsRouter = createTRPCRouter({
   addToConversation: protectedProcedure
     .input(z.object({ usersEmail: z.array(z.string()), conversationId: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      await ctx.prisma.directMessages.update({
+      return await ctx.prisma.directMessages.update({
         where: {
           id: input.conversationId,
         },
@@ -113,7 +113,7 @@ export const conversationsRouter = createTRPCRouter({
           users: true,
         },
       });
-      const newConvoUsers = convo?.users.filter((user) => user.id !== input.userId);
+      const newConvoUsers = convo?.users?.filter((user) => user.id !== input.userId);
       if (newConvoUsers?.length && newConvoUsers.length <= 1) {
         await ctx.prisma.directMessages.update({
           where: {
