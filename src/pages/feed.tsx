@@ -12,7 +12,12 @@ import { api } from '../utils/api';
 
 const Feed: NextPageWithLayout = () => {
   const { data } = useSession();
-
+  const [likes, setLikes] = useState(0),
+    [isLike, setIsLike] = useState(false);
+  const [shareCount, setShareCount] = useState(0);
+  const [shared, setShared] = useState(false);
+  const [popup, setPop] = useState(false);
+  const [comment, setComment] = useState('');
   const [newPost, setNewPost] = useState('');
 
   const utils = api.useContext();
@@ -34,6 +39,27 @@ const Feed: NextPageWithLayout = () => {
         },
       );
     }
+  };
+
+  const handleLike = () => {
+    setLikes(likes + (isLike ? -1 : 1));
+    setIsLike(!isLike);
+  };
+
+  const handleComment = () => {
+    setPop(!popup);
+  };
+
+  const closePopup = () => {
+    setPop(false);
+  };
+  const handleShare = () => {
+    setShareCount(shareCount + 1);
+    setShared(true);
+  };
+  const handleSubmit = (event: { preventDefault: () => void }) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    event.preventDefault();
   };
 
   return (
@@ -105,17 +131,50 @@ const Feed: NextPageWithLayout = () => {
                 </div>
               </div>
               <div className='mt-2 flex items-center gap-2 border-t-2 border-t-primary-100/20 pt-2'>
-                <button className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'>
-                  <IoMdThumbsUp />
-                  <p>Like</p>
-                </button>
-                <button className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'>
+                <p className='{"" +(isLike ? "text-primary" : "")}'>
+                  <button
+                    onClick={handleLike}
+                    style={{
+                      backgroundColor: isLike ? 'rgb(5 84 66)' : 'white',
+                      color: isLike ? 'white' : 'rgb(5 84 66',
+                    }}
+                    className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'
+                  >
+                    <IoMdThumbsUp />
+                    <p>Like {likes}</p>
+                  </button>
+                </p>
+                <button
+                  className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'
+                  onClick={handleComment}
+                >
                   <IoIosChatboxes />
                   <p>Comment</p>
                 </button>
-                <button className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'>
+                {popup ? (
+                  <div className='main'>
+                    <div className='popup'>
+                      <div className='popup-header'>
+                        <h1>Comment</h1>
+                        <h1 onClick={closePopup}>X</h1>
+                      </div>
+                      <form onSubmit={handleSubmit}>
+                        <label>
+                          <input type='text' value={comment} onChange={(e) => setComment(e.target.value)} />
+                        </label>
+                        <input type='submit' />
+                      </form>
+                    </div>
+                  </div>
+                ) : (
+                  ''
+                )}
+                <button
+                  onClick={handleShare}
+                  className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'
+                >
                   <IoMdShare />
-                  <p>Share</p>
+                  <p> {shared ? 'Shared' : 'Share'}</p>
                 </button>
               </div>
             </motion.div>
