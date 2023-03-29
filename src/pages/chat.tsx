@@ -1,6 +1,5 @@
-import type { Messages, User } from '@prisma/client';
+import type { Messages } from '@prisma/client';
 import { differenceInMinutes, format } from 'date-fns';
-import { id } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
@@ -62,7 +61,7 @@ function MessageItem({
       className={`flex ${isSender ? 'justify-end' : 'justify-start'} mb-4`}
     >
       <div className={`flex flex-col gap-1 ${isSender ? 'items-end text-right' : 'items-start text-left'} max-w-[80%]`}>
-        <div>{`${message?.sender?.firstName} ${message?.sender?.lastName}`}</div>
+        <div>{`${message?.sender?.firstName || ''} ${message?.sender?.lastName || ''}`}</div>
         <div
           className={`rounded-md px-4 py-3 ${
             isSender ? 'bg-primary-500 text-white' : 'bg-primary-100/10 text-primary-500'
@@ -183,7 +182,7 @@ const Chat: NextPageWithLayout = () => {
     setOpenNewChatModal(false);
     createConversation.mutate([...tags, session?.user?.email || ''], {
       onSuccess: (data) => {
-        if (data?.id) {
+        if (data != 'Already exists' && data?.id) {
           setSelectedConversationId(data.id);
           void utils.conversation.getUserConversations.invalidate();
           connectToChannel(data.id);
