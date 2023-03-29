@@ -87,6 +87,7 @@ const Chat: NextPageWithLayout = () => {
   >([]);
   const [showAlreadyExists, setShowAlreadyExists] = useState(false);
   const [showLeaveGroup, setShowLeaveGroup] = useState(false);
+  const [showAddUsers, setShowAddUsers] = useState(false);
 
   const messageEndRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef<HTMLDivElement>(null);
@@ -105,6 +106,7 @@ const Chat: NextPageWithLayout = () => {
     id: selectedConversationId || '',
   }).data;
   const createConversation = api.conversation.createConversationFromEmails.useMutation();
+  const addToConversation = api.conversation.addToConversation.useMutation();
   const leaveConversation = api.conversation.removeFromConversation.useMutation();
   const newChatMutation = api.chat.sendMessage.useMutation();
 
@@ -156,6 +158,22 @@ const Chat: NextPageWithLayout = () => {
           setShowLeaveGroup(false);
           void utils.conversation.getUserConversations.invalidate();
           setSelectedConversationId(undefined);
+        },
+      },
+    );
+  };
+
+  const confirmAddUsers = (conversationId: string) => {
+    addToConversation.mutate(
+      {
+        conversationId: conversationId,
+        usersEmail: tags,
+      },
+      {
+        onSuccess: () => {
+          void utils.conversation.getUserConversations.invalidate();
+          setShowAddUsers(false);
+          setTags([]);
         },
       },
     );
@@ -231,9 +249,12 @@ const Chat: NextPageWithLayout = () => {
       </div>
       {selectedConversationId && (
         <div className='flex h-full max-w-[800px] flex-1 flex-col p-4'>
-          <div className='flex items-center justify-between bg-primary-500 p-4 text-2xl font-semibold text-white'>
+          <div className='items-right flex justify-between bg-primary-500 p-4 text-2xl font-semibold text-white'>
             <h1>Messages</h1>
-            <EditButton name='chat' type='remove' onClick={() => setShowLeaveGroup(true)} />
+            <div className='flex'>
+              <EditButton name='chat' type='remove' onClick={() => setShowLeaveGroup(true)} />
+              <EditButton name='chat' type='addUsers' onClick={() => setShowAddUsers(true)} />
+            </div>
           </div>
           <div className='relative h-full w-full'>
             <div className='absolute inset-0 flex flex-col-reverse overflow-auto px-4' ref={messagesRef}>
@@ -319,6 +340,58 @@ const Chat: NextPageWithLayout = () => {
         {showAlreadyExists && (
           <Modal onConfirm={() => setShowAlreadyExists(false)} confirmText='OK' showCancel={false}>
             <h1 className='mb-4 text-2xl font-semibold'>You already have a similar conversation!</h1>
+          </Modal>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {showAddUsers && (
+          <Modal
+            onConfirm={() => confirmAddUsers(selectedConversationId || '')}
+            onCancel={() => setShowAddUsers(false)}
+            confirmText='Yes'
+          >
+            <h1 className='mb-4 text-2xl font-semibold'>Add users to conversation</h1>
+            <div className='flex flex-col'>
+              {connections
+                ?.filter(
+                  (connection) =>
+                    !conversations
+                      ?.find((convo) => convo.id == selectedConversationId)
+                      ?.users.map((user) => user.email)
+                      .includes(connection.email),
+                )
+                ?.map((connection) => (
+                  <button
+                    className='flex items-center justify-start rounded-md px-4 py-3 transition-colors duration-200 hover:bg-primary-100/10'
+                    key={connection.id}
+                    onClick={() => {
+                      if (tags.find((tag) => connection.email == tag) == undefined) {
+                        setTags([...tags, connection.email]);
+                      }
+                    }}
+                  >
+                    <div className='relative h-12 w-12'>
+                      <Image
+                        fill
+                        className='rounded-full object-cover'
+                        loader={({ src }) => src}
+                        src={connection.image || '/placeholder.jpeg'}
+                        alt='User Image'
+                      />
+                    </div>
+                    <div className='ml-4'>
+                      <div className='text-lg font-semibold text-primary-500'>
+                        {connection.firstName} {connection.lastName}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+            </div>
+            {tags && (
+              <div>
+                <TagsInput tagList={tags} setTagList={setTags}></TagsInput>
+              </div>
+            )}
           </Modal>
         )}
       </AnimatePresence>
