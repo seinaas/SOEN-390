@@ -4,9 +4,9 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { IoIosChatboxes, IoMdShare, IoMdThumbsUp } from 'react-icons/io';
 import MainLayout from '../components/mainLayout';
-import { NextPageWithLayout } from './_app';
+import type { NextPageWithLayout } from './_app';
 import { motion } from 'framer-motion';
-import { GetServerSidePropsContext } from 'next';
+import type { GetServerSidePropsContext } from 'next';
 import { getServerAuthSession } from '../server/auth';
 
 type Post = {
@@ -43,7 +43,12 @@ const posts: Post[] = [
 
 const Feed: NextPageWithLayout = () => {
   const { data } = useSession();
-
+  const [likes, setLikes] = useState(0),
+    [isLike, setIsLike] = useState(false);
+  const [shareCount, setShareCount] = useState(0);
+  const [shared, setShared] = useState(false);
+  const [popup, setPop] = useState(false);
+  const [comment, setComment] = useState('');
   const [newPost, setNewPost] = useState('');
   const [posts, setPosts] = useState<Post[]>([
     {
@@ -85,6 +90,7 @@ const Feed: NextPageWithLayout = () => {
     }
   };
 
+<<<<<<< HEAD
   const removePost = (e: React.MouseEvent, postId: string) => {
     e.preventDefault();
 
@@ -183,10 +189,31 @@ const Feed: NextPageWithLayout = () => {
     }
   };
 
+=======
+  const handleLike = () => {
+    setLikes(likes + (isLike ? -1 : 1));
+    setIsLike(!isLike);
+  };
+
+  const handleComment = () => {
+    setPop(!popup);
+  };
+
+  const closePopup = () => {
+    setPop(false);
+  };
+>>>>>>> 83868bc (Implemented like & share interactions)
   const handleShare = () => {
     setShareCount(shareCount + 1);
     setShared(true);
   };
+<<<<<<< HEAD
+=======
+  const handleSubmit = (event: { preventDefault: () => void }) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    event.preventDefault();
+  };
+>>>>>>> 83868bc (Implemented like & share interactions)
 
   return (
     <div className='flex h-full w-full justify-center p-2 md:p-8'>
@@ -298,6 +325,7 @@ const Feed: NextPageWithLayout = () => {
                         : `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget consectetur lacinia,
                 nisl nisl aliquam nisl, eget ultricies nisl nisl sit amet nisl. Suspendisse potenti. Nulla facilisi.
                 Nulla facilisi. Nulla facilisi. Nulla facilisi.`}
+<<<<<<< HEAD
                     </p>
                   )}
 
@@ -451,6 +479,56 @@ const Feed: NextPageWithLayout = () => {
                   </motion.div>
                 );
               })}
+=======
+              </p>
+              <div className='mt-2 flex items-center gap-2 border-t-2 border-t-primary-100/20 pt-2'>
+                <p className='{"" +(isLike ? "text-primary" : "")}'>
+                  <button
+                    onClick={handleLike}
+                    style={{
+                      backgroundColor: isLike ? 'rgb(5 84 66)' : 'white',
+                      color: isLike ? 'white' : 'rgb(5 84 66',
+                    }}
+                    className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'
+                  >
+                    <IoMdThumbsUp />
+                    <p>Like {likes}</p>
+                  </button>
+                </p>
+                <button
+                  className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'
+                  onClick={handleComment}
+                >
+                  <IoIosChatboxes />
+                  <p>Comment</p>
+                </button>
+                {popup ? (
+                  <div className='main'>
+                    <div className='popup'>
+                      <div className='popup-header'>
+                        <h1>Comment</h1>
+                        <h1 onClick={closePopup}>X</h1>
+                      </div>
+                      <form onSubmit={handleSubmit}>
+                        <label>
+                          <input type='text' value={comment} onChange={(e) => setComment(e.target.value)} />
+                        </label>
+                        <input type='submit' />
+                      </form>
+                    </div>
+                  </div>
+                ) : (
+                  ''
+                )}
+                <button
+                  onClick={handleShare}
+                  className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'
+                >
+                  <IoMdShare />
+                  <p> {shared ? 'Shared' : 'Share'}</p>
+                </button>
+              </div>
+>>>>>>> 83868bc (Implemented like & share interactions)
             </div>
           );
         })}
