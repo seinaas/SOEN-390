@@ -1,10 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Job } from '@prisma/client';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { api } from '../../utils/api';
-import Button from '../button';
 import Modal from '../modal';
 
 const formSchema = z.object({

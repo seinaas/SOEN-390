@@ -3,7 +3,13 @@ import { z } from 'zod';
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
 
+/**
+ * This is the user router.
+ * It contains all the procedures related to users.
+ * This includes searching for users, getting a user by ID, and getting a user by email.
+ */
 export const userRouter = createTRPCRouter({
+  // Search for users by name
   search: publicProcedure.input(z.object({ query: z.string() })).query(async ({ ctx, input }) => {
     if (input.query.length < 3) {
       return null;
@@ -127,6 +133,28 @@ export const userRouter = createTRPCRouter({
 
       return user;
     }),
+  // Add a job to a user
+  addJob: protectedProcedure
+    .input(
+      z.object({
+        title: z.string().min(1),
+        company: z.string().min(1),
+        location: z.string().nullish(),
+        startDate: z.date(),
+        endDate: z.date().nullish(),
+        description: z.string().nullish(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const job = await ctx.prisma.job.create({
+        data: {
+          ...input,
+          userId: ctx.session.user.id,
+        },
+      });
+
+      return job;
+    }),
   // Update user job data
   updateJob: protectedProcedure
     .input(
@@ -160,12 +188,12 @@ export const userRouter = createTRPCRouter({
 
       return job;
     }),
-  // Add a job to a user
-  addJob: protectedProcedure
+  // Add education to a user
+  addEducation: protectedProcedure
     .input(
       z.object({
-        title: z.string().min(1),
-        company: z.string().min(1),
+        degree: z.string().min(1),
+        school: z.string().min(1),
         location: z.string().nullish(),
         startDate: z.date(),
         endDate: z.date().nullish(),
@@ -173,14 +201,13 @@ export const userRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const job = await ctx.prisma.job.create({
+      const education = await ctx.prisma.education.create({
         data: {
           ...input,
           userId: ctx.session.user.id,
         },
       });
-
-      return job;
+      return education;
     }),
   // Update user education data
   updateEducation: protectedProcedure
@@ -210,28 +237,6 @@ export const userRouter = createTRPCRouter({
           school: updateInput.school ?? undefined,
           degree: updateInput.degree ?? undefined,
           startDate: updateInput.startDate ?? undefined,
-        },
-      });
-
-      return education;
-    }),
-  // Add education to a user
-  addEducation: protectedProcedure
-    .input(
-      z.object({
-        degree: z.string().min(1),
-        school: z.string().min(1),
-        location: z.string().nullish(),
-        startDate: z.date(),
-        endDate: z.date().nullish(),
-        description: z.string().nullish(),
-      }),
-    )
-    .mutation(async ({ input, ctx }) => {
-      const education = await ctx.prisma.education.create({
-        data: {
-          ...input,
-          userId: ctx.session.user.id,
         },
       });
 

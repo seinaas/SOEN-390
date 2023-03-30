@@ -47,32 +47,32 @@ model Session {
 }
 
 model User {
-    id               String           @id @default(cuid())
-    firstName        String?
-    lastName         String?
-    headline         String?
-    education        Education[]
-    jobs             Job[]
-    connections      Connection[]     @relation("UserFriends")
-    connectionOf     Connection[]     @relation("FriendsUser")
-    bio              String?          @db.Text
-    volunteering     String? // TODO: Change to volunteering model
-    skills           String? // TODO: Create skills table
-    recommendations  String? // TODO: Create recommendations table
-    courses          String? // TODO: Create courses table
-    projects         String? // TODO: Create projects table
-    awards           String? // TODO: Create awards table
-    languages        String? // TODO: Create languages table
-    email            String           @unique
-    emailVerified    DateTime?
-    phone            String?          @unique
-    image            String?          @db.Text
-    accounts         Account[]
-    sessions         Session[]
-    password         String?
-    DirectMessages   DirectMessages[]
-    MessagesTo       Messages[]       @relation("Sender")
-    directMessagesId String?
+    id              String       @id @default(cuid())
+    firstName       String?
+    lastName        String?
+    headline        String?
+    education       Education[]
+    jobs            Job[]
+    connections     Connection[] @relation("UserFriends")
+    connectionOf    Connection[] @relation("FriendsUser")
+    posts           Post[]
+    commments       Comments[]
+    likes           Likes[]
+    bio             String?      @db.Text
+    volunteering    String? // TODO: Change to volunteering model
+    skills          String? // TODO: Create skills table
+    recommendations String? // TODO: Create recommendations table
+    courses         String? // TODO: Create courses table
+    projects        String? // TODO: Create projects table
+    awards          String? // TODO: Create awards table
+    languages       String? // TODO: Create languages table
+    email           String       @unique
+    emailVerified   DateTime?
+    phone           String?      @unique
+    image           String?      @db.Text
+    accounts        Account[]
+    sessions        Session[]
+    password        String?
 }
 
 model Connection {
@@ -133,9 +133,39 @@ model VerificationToken {
     @@unique([identifier, token])
 }
 
+model Post {
+    id        String   @id @default(cuid())
+    userId    String
+    createdAt DateTime @default(now())
+    content   String?  @db.Text
+    comments  Comments[]
+    likes     Likes[]
+    User      User     @relation(fields: [userId], references: [id])
+}
+
+model Comments {    
+    commentId String @id @default(cuid())
+    userId    String
+    postId    String
+    content   String? @db.Text
+    Post      Post    @relation(fields: [postId], references: [id])
+    User      User    @relation(fields: [userId], references: [id])
+}
+
+model Likes {
+    likeId String @id @default(cuid())
+    userId String
+    postId String
+    Post   Post   @relation(fields: [postId], references: [id])
+    User   User    @relation(fields: [userId], references: [id])
+    
+}
+
 enum ConnectionStatus {
     Pending_1_To_2
     Pending_2_To_1
     Connected
     Blocked
 }
+
+

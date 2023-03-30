@@ -1,4 +1,5 @@
-import { type Variants, motion, HTMLMotionProps, AnimatePresence } from 'framer-motion';
+import type { HTMLMotionProps } from 'framer-motion';
+import { type Variants, motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { IoMdAdd } from 'react-icons/io';
 

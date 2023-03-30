@@ -2,6 +2,11 @@ import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import bcrypt from 'bcryptjs';
 
+/**
+ * This is the authentication router.
+ * It only contains one procedure, which handles email/password registration.
+ * This is required because next-auth does not natively support email/password registration.
+ */
 export const authRouter = createTRPCRouter({
   register: publicProcedure
     .input(z.object({ email: z.string().email(), password: z.string(), confirmPassword: z.string() }))
