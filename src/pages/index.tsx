@@ -33,14 +33,14 @@ const LandingPageBody: React.FC = () => {
     <>
       <div className='flex h-screen w-full flex-col bg-primary-600 py-8 px-4 md:h-auto md:flex-grow md:flex-row md:gap-10 md:px-16'>
         {/* Landing Page Picture */}
-        <div className='relative h-72 flex-1 md:h-auto'>
+        <div className='relative flex h-72 flex-1 justify-center md:h-auto'>
           <Image
             alt='Landing Page Picture'
             src='/prospects-landing.png'
             fill
-            className='rounded-b-2xl object-contain drop-shadow-lg md:rounded-none'
+            className='mx-auto block max-w-[500px] object-contain'
             data-cy='landingPage-picture'
-          ></Image>
+          />
         </div>
         {/* Mobile Logo & User Icon */}
         <div className='my-2 flex w-full items-center justify-between px-5 md:hidden'>
@@ -112,10 +112,18 @@ const LandingPageBody: React.FC = () => {
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const session = await getServerAuthSession(ctx);
 
-  if (session && (!session.user?.firstName || !session.user?.lastName)) {
+  if (session) {
+    if (!session.user?.firstName || !session.user?.lastName) {
+      return {
+        redirect: {
+          destination: '/auth/final',
+          permanent: false,
+        },
+      };
+    }
     return {
       redirect: {
-        destination: '/auth/final',
+        destination: '/feed',
         permanent: false,
       },
     };

@@ -152,7 +152,11 @@ const Header: React.FC = () => {
             <Link href='/chat' className='text-primary-500 hover:text-primary-600'>
               <IoIosChatbubbles size={28} />
             </Link>
-            <button onClick={() => signOut()} className='text-primary-500 hover:text-primary-600'>
+            <button
+              onClick={() => signOut()}
+              className='text-primary-500 hover:text-primary-600'
+              data-cy='signout-button'
+            >
               <IoMdLogOut size={28} />
             </button>
           </div>

@@ -3,6 +3,13 @@ import { z } from 'zod';
 
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 
+/**
+ * This is the connections router.
+ * It contains all the procedures related to connections.
+ * This includes sending a connection request, accepting a connection request, and getting all connections for a user.
+ */
+
+// Retrieve the recipient of a connection request
 const getRecipient = async ({ prisma, email }: { prisma: PrismaClient; email: string }) => {
   const recipient = await prisma.user.findUnique({
     where: {
@@ -16,6 +23,7 @@ const getRecipient = async ({ prisma, email }: { prisma: PrismaClient; email: st
   return recipient;
 };
 
+// Return the smaller ID first
 const getCorrectUserOrder = (user1ID: string, user2ID: string) => {
   return user1ID < user2ID ? { user1ID, user2ID } : { user1ID: user2ID, user2ID: user1ID };
 };
