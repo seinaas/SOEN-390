@@ -9,6 +9,94 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
  * This includes searching for users, getting a user by ID, and getting a user by email.
  */
 export const userRouter = createTRPCRouter({
+  // Update user job data
+  updateJob: protectedProcedure
+    .input(
+      z.object({
+        jobId: z.string().min(1),
+        title: z.string().min(1).nullish(),
+        company: z.string().min(1).nullish(),
+        location: z.string().nullish(),
+        startDate: z.date().nullish(),
+        endDate: z.date().nullish(),
+        description: z.string().nullish(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const updateInput: Omit<typeof input, 'jobId'> & Partial<Pick<typeof input, 'jobId'>> = {
+        ...input,
+      };
+      delete updateInput.jobId;
+
+      const job = await ctx.prisma.job.update({
+        where: {
+          jobId: input.jobId,
+        },
+        data: {
+          ...updateInput,
+          title: updateInput.title ?? undefined,
+          company: updateInput.company ?? undefined,
+          startDate: updateInput.startDate ?? undefined,
+        },
+      });
+
+      return job;
+    }),
+  // Add a job to a user
+  addJob: protectedProcedure
+    .input(
+      z.object({
+        title: z.string().min(1),
+        company: z.string().min(1),
+        location: z.string().nullish(),
+        startDate: z.date(),
+        endDate: z.date().nullish(),
+        description: z.string().nullish(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const job = await ctx.prisma.job.create({
+        data: {
+          ...input,
+          userId: ctx.session.user.id,
+        },
+      });
+
+      return job;
+    }),
+  // Update user education data
+  updateEducation: protectedProcedure
+    .input(
+      z.object({
+        educationId: z.string().min(1),
+        school: z.string().min(1).nullish(),
+        degree: z.string().min(1).nullish(),
+        location: z.string().nullish(),
+        startDate: z.date().nullish(),
+        endDate: z.date().nullish(),
+        description: z.string().nullish(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const updateInput: Omit<typeof input, 'educationId'> & Partial<Pick<typeof input, 'educationId'>> = {
+        ...input,
+      };
+      delete updateInput.educationId;
+
+      const education = await ctx.prisma.education.update({
+        where: {
+          educationId: input.educationId,
+        },
+        data: {
+          ...updateInput,
+          school: updateInput.school ?? undefined,
+          degree: updateInput.degree ?? undefined,
+          startDate: updateInput.startDate ?? undefined,
+        },
+      });
+
+      return education;
+    }),
   // Search for users by name
   search: publicProcedure.input(z.object({ query: z.string() })).query(async ({ ctx, input }) => {
     if (input.query.length < 3) {
@@ -235,7 +323,6 @@ export const userRouter = createTRPCRouter({
         },
         where: {
           id: input.postId,
-          userId: ctx.session.user.id,
         },
         data: updateInput,
       });
@@ -253,7 +340,6 @@ export const userRouter = createTRPCRouter({
       const post = await ctx.prisma.post.delete({
         where: {
           id: input.postId,
-          userId: ctx.session.user.id,
         },
       });
 
@@ -318,8 +404,6 @@ export const userRouter = createTRPCRouter({
       const comment = await ctx.prisma.comments.update({
         where: {
           commentId: input.commentId,
-          postId: input.postId,
-          userId: ctx.session.user.id,
         },
         data: updateInput,
       });
@@ -337,7 +421,6 @@ export const userRouter = createTRPCRouter({
       const comment = await ctx.prisma.comments.delete({
         where: {
           commentId: input.commentId,
-          userId: ctx.session.user.id,
         },
       });
 
@@ -367,15 +450,13 @@ export const userRouter = createTRPCRouter({
       z.object({
         postId: z.string().min(1),
         userId: z.string().min(1).nullish(),
-        likeId: z.string().min(1).nullish(),
+        likeId: z.string().min(1),
       }),
     )
     .mutation(async ({ input, ctx }) => {
       const like = await ctx.prisma.likes.delete({
         where: {
           likeId: input.likeId,
-          userId: ctx.session.user.id, //needs to be the user who likes the post
-          postId: input.postId,
         },
       });
       return like;
