@@ -7,7 +7,7 @@ type Props = {
 const MainLayout: React.FC<Props> = ({ children }) => {
   return (
     <>
-      <main className='flex flex-grow flex-col'>
+      <main className='flex h-full flex-grow flex-col'>
         <Header />
         {children}
       </main>

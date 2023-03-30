@@ -1,154 +1,13 @@
-import { Prisma } from '@prisma/client';
 import { z } from 'zod';
-
-import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
+import { createTRPCRouter, protectedProcedure } from '../trpc';
 
 /**
- * This is the user router.
- * It contains all the procedures related to users.
- * This includes searching for users, getting a user by ID, and getting a user by email.
+ * This is the post router.
+ * It contains all the procedures related to posts.
+ * This includes getting all posts, creating a post, updating a post, and deleting a post.
  */
-export const userRouter = createTRPCRouter({
-  // Search for users by name
-  search: publicProcedure.input(z.object({ query: z.string() })).query(async ({ ctx, input }) => {
-    if (input.query.length < 3) {
-      return null;
-    }
-    // Split query into array of words
-    const searchArray = input.query
-      .toLowerCase()
-      .trim()
-      .split(' ')
-      .map((s) => `%${s}%`);
-
-    // Raw query to search for users
-    const users = await ctx.prisma.$queryRaw`
-      SELECT firstName, lastName, email, image, headline
-      FROM User
-      WHERE lower(concat(firstName, lastName))
-      LIKE ${Prisma.join(searchArray, ' AND lower(concat(firstName, lastName)) LIKE ')}
-    `;
-
-    // Need to cast type because of raw query
-    return users as {
-      firstName: string;
-      lastName: string;
-      email: string;
-      image: string;
-      headline: string;
-    }[];
-  }),
-  // Query a user by email
-  getByEmail: publicProcedure.input(z.object({ email: z.string() })).query(async ({ ctx, input }) => {
-    const user = await ctx.prisma.user.findUnique({
-      where: {
-        email: input.email,
-      },
-      include: {
-        jobs: true,
-        education: true,
-        _count: {
-          select: {
-            connections: {
-              where: { connectionStatus: 'Connected' },
-            },
-            connectionOf: {
-              where: { connectionStatus: 'Connected' },
-            },
-          },
-        },
-      },
-    });
-
-    if (user) {
-      const res = (({ id, _count, ...u }) => u)(user);
-      return {
-        ...res,
-        languages: user.languages ? user.languages.split(',') : [],
-        skills: user.skills ? user.skills.split(',') : [],
-        numConnections: user._count.connections + user._count.connectionOf,
-      };
-    }
-  }),
-  // Query a user by ID
-  getByID: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-      }),
-    )
-    .query(async ({ ctx, input }) => {
-      const user = await ctx.prisma.user.findUnique({
-        where: {
-          id: input.id,
-        },
-        include: {
-          jobs: true,
-          education: true,
-          _count: {
-            select: {
-              connections: {
-                where: { connectionStatus: 'Connected' },
-              },
-              connectionOf: {
-                where: { connectionStatus: 'Connected' },
-              },
-            },
-          },
-        },
-      });
-
-      if (user) {
-        const res = (({ id, _count, ...u }) => u)(user);
-        return {
-          ...res,
-          languages: user.languages ? user.languages.split(',') : [],
-          skills: user.skills ? user.skills.split(',') : [],
-          numConnections: user._count.connections + user._count.connectionOf,
-        };
-      }
-    }),
-  // Update user data
-  update: protectedProcedure
-    .input(
-      z.object({
-        firstName: z.string().min(1).nullish(),
-        lastName: z.string().min(1).nullish(),
-        bio: z.string().nullish(),
-        skills: z.array(z.string()).nullish(),
-        languages: z.array(z.string()).nullish(),
-      }),
-    )
-    .mutation(async ({ input, ctx }) => {
-      const user = await ctx.prisma.user.update({
-        where: {
-          id: ctx.session.user.id,
-        },
-        data: {
-          ...input,
-          skills: input.skills?.join(','),
-          languages: input.languages?.join(','),
-        },
-      });
-
-      return user;
-    }),
-
-  /**
-   * Routes Mohsen worked on for the feed feature. These API routes will achieve th following:
-   * 1. Get all posts for a user
-   * 2. Create a post for a user
-   * 3. Update a post for a user
-   * 4. Delete a post for a user
-   * 5. Create a comment for a post
-   * 6. Update a comment for a post
-   * 7. Delete a comment for a post
-   * 8. Get all comments for a post
-   * 8. Like a post
-   * 9. Unlike a post
-   * 10. Get all likes for a post
-   */
-
+export const postRouter = createTRPCRouter({
+  // Get all posts made by a user
   getUserPosts: protectedProcedure
     .input(
       z.object({
@@ -168,6 +27,7 @@ export const userRouter = createTRPCRouter({
       return posts;
     }),
 
+  // Get all posts made by a user's connections
   getPosts: protectedProcedure.query(async ({ ctx }) => {
     console.log('\n Get post api \n ');
     const user = await ctx.prisma.user.findUnique({
@@ -179,20 +39,33 @@ export const userRouter = createTRPCRouter({
       },
     });
 
+    // Search for posts where the poster's userId is in the list of connections
     const posts = await ctx.prisma.post.findMany({
       where: {
         userId: {
-          in: user?.connections.map((c) => (c.user1Id === ctx.session.user.id ? c.user2Id : c.user1Id)) || [],
+          in: [
+            ctx.session.user.id,
+            ...(user?.connections.map((c) => (c.user1Id === ctx.session.user.id ? c.user2Id : c.user1Id)) || []),
+          ] || [ctx.session.user.id],
         },
       },
       include: {
         comments: true,
         likes: true,
+        User: {
+          select: {
+            firstName: true,
+            lastName: true,
+            image: true,
+          },
+        },
       },
     });
-    console.log(posts);
+
+    return posts;
   }),
 
+  // Create a post for a user
   createPost: protectedProcedure
     .input(
       z.object({
@@ -212,6 +85,7 @@ export const userRouter = createTRPCRouter({
       return post;
     }),
 
+  // Update a post for a user
   editPost: protectedProcedure
     .input(
       z.object({
@@ -235,7 +109,6 @@ export const userRouter = createTRPCRouter({
         },
         where: {
           id: input.postId,
-          userId: ctx.session.user.id,
         },
         data: updateInput,
       });
@@ -243,6 +116,7 @@ export const userRouter = createTRPCRouter({
       return post;
     }),
 
+  // Delete a post for a user
   deletePost: protectedProcedure
     .input(
       z.object({
@@ -253,13 +127,13 @@ export const userRouter = createTRPCRouter({
       const post = await ctx.prisma.post.delete({
         where: {
           id: input.postId,
-          userId: ctx.session.user.id,
         },
       });
 
       return post;
     }),
 
+  // Create a comment on a post
   createComment: protectedProcedure
     .input(
       z.object({
@@ -277,6 +151,7 @@ export const userRouter = createTRPCRouter({
       return comment;
     }),
 
+  // Get all comments for a post
   getCommentsPerPost: protectedProcedure
     .input(
       z.object({
@@ -301,6 +176,7 @@ export const userRouter = createTRPCRouter({
       return comments;
     }),
 
+  // Edit a comment on a post
   editComment: protectedProcedure
     .input(
       z.object({
@@ -318,8 +194,6 @@ export const userRouter = createTRPCRouter({
       const comment = await ctx.prisma.comments.update({
         where: {
           commentId: input.commentId,
-          postId: input.postId,
-          userId: ctx.session.user.id,
         },
         data: updateInput,
       });
@@ -327,6 +201,7 @@ export const userRouter = createTRPCRouter({
       return comment;
     }),
 
+  // Delete a comment on a post
   deleteComment: protectedProcedure
     .input(
       z.object({
@@ -337,13 +212,13 @@ export const userRouter = createTRPCRouter({
       const comment = await ctx.prisma.comments.delete({
         where: {
           commentId: input.commentId,
-          userId: ctx.session.user.id,
         },
       });
 
       return comment;
     }),
 
+  // Like a post
   createLike: protectedProcedure
     .input(
       z.object({
@@ -362,25 +237,24 @@ export const userRouter = createTRPCRouter({
       return like;
     }),
 
+  // Unlike a post
   removeLike: protectedProcedure
     .input(
       z.object({
         postId: z.string().min(1),
-        userId: z.string().min(1).nullish(),
-        likeId: z.string().min(1).nullish(),
+        likeId: z.string().min(1),
       }),
     )
     .mutation(async ({ input, ctx }) => {
       const like = await ctx.prisma.likes.delete({
         where: {
           likeId: input.likeId,
-          userId: ctx.session.user.id, //needs to be the user who likes the post
-          postId: input.postId,
         },
       });
       return like;
     }),
 
+  // Get all likes for a post
   getLikesPerPost: protectedProcedure
     .input(
       z.object({

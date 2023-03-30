@@ -1,4 +1,4 @@
-import { User } from '@prisma/client';
+import { type User } from '@prisma/client';
 import { type Session } from 'next-auth';
 import { appRouter } from '../src/server/api/root';
 import { createMockTRPCContext } from '../src/server/api/trpc';
@@ -17,8 +17,9 @@ export const createUser = (user: Partial<User> = {}) => {
     firstName: 'John',
     lastName: 'Doe',
     email: 'john@doe.com',
+    headline: '',
     education: '',
-    job: '',
+    jobs: '',
     bio: '',
     volunteering: '',
     skills: '',

@@ -4,87 +4,35 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { IoIosChatboxes, IoMdShare, IoMdThumbsUp } from 'react-icons/io';
 import MainLayout from '../components/mainLayout';
-import { NextPageWithLayout } from './_app';
+import { type NextPageWithLayout } from './_app';
 import { motion } from 'framer-motion';
-import { GetServerSidePropsContext } from 'next';
+import { type GetServerSidePropsContext } from 'next';
 import { getServerAuthSession } from '../server/auth';
 import { api } from '../utils/api';
-
-type Post = {
-  poster: string;
-  logo: string;
-  time: Date;
-  likes: number;
-  text?: string;
-  padding?: boolean;
-};
-
-const posts: Post[] = [
-  {
-    poster: 'Apple',
-    logo: 'https://cdn.cdnlogo.com/logos/a/2/apple.svg',
-    time: new Date(Date.now() - 1000 * 60 * 60 * 4),
-    likes: 123102,
-    padding: true,
-  },
-  {
-    poster: 'Netflix',
-    logo: 'https://cdn.cdnlogo.com/logos/n/75/netflix.svg',
-    time: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2),
-    likes: 92000,
-    padding: true,
-  },
-  {
-    poster: 'Concordia',
-    logo: '/concordia.jpeg',
-    time: new Date(Date.now() - 1000 * 55),
-    likes: 201,
-  },
-];
 
 const Feed: NextPageWithLayout = () => {
   const { data } = useSession();
 
   const [newPost, setNewPost] = useState('');
-  const [posts, setPosts] = useState<Post[]>([
-    {
-      poster: 'Apple',
-      logo: 'https://cdn.cdnlogo.com/logos/a/2/apple.svg',
-      time: new Date(Date.now() - 1000 * 60 * 60 * 4),
-      likes: 123102,
-      padding: true,
-    },
-    {
-      poster: 'Netflix',
-      logo: 'https://cdn.cdnlogo.com/logos/n/75/netflix.svg',
-      time: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2),
-      likes: 92000,
-      padding: true,
-    },
-    {
-      poster: 'Concordia',
-      logo: '/concordia.jpeg',
-      time: new Date(Date.now() - 1000 * 55),
-      likes: 201,
-    },
-  ]);
 
-  api.user.getPosts.useQuery();
+  const utils = api.useContext();
+  const createPost = api.post.createPost.useMutation();
+  const posts = api.post.getPosts.useQuery().data;
 
   const addPost = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (newPost) {
-      setPosts([
+      createPost.mutate(
         {
-          poster: `${data?.user?.firstName || ''} ${data?.user?.lastName || ''}`,
-          logo: data?.user?.image || '',
-          time: new Date(),
-          text: newPost,
-          likes: 0,
+          content: newPost,
         },
-        ...posts,
-      ]);
-      setNewPost('');
+        {
+          onSuccess: () => {
+            void utils.post.getPosts.invalidate();
+            setNewPost('');
+          },
+        },
+      );
     }
   };
 
@@ -100,6 +48,7 @@ const Feed: NextPageWithLayout = () => {
               width={48}
               height={48}
               className='rounded-full'
+              referrerPolicy='no-referrer'
             />
             <form onSubmit={addPost} className='w-full'>
               <input
@@ -115,31 +64,31 @@ const Feed: NextPageWithLayout = () => {
 
         <div className='my-2 h-px w-full bg-primary-100/20' />
 
-        {posts.map((post) => (
+        {posts?.map((post) => (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            key={`${post.poster} - ${post.time.getTime()}`}
+            key={`${post.User.firstName || ''} ${post.User.lastName || ''} - ${post.createdAt.getTime()}`}
             className='flex items-start gap-4 rounded-xl bg-primary-100/10 p-4 pr-8'
           >
             <div className='relative h-12 min-h-[48px] w-12 min-w-[48px]'>
               <Image
                 alt='Logo'
-                loader={() => post.logo || ''}
-                src={post.logo || ''}
+                loader={() => post.User.image || '/placeholder.jpeg'}
+                src={post.User.image || 'placeholder.jpeg'}
                 fill
                 className='rounded-md bg-white object-contain'
-                style={{
-                  padding: post.padding ? '0.5rem' : '0',
-                }}
+                referrerPolicy='no-referrer'
               />
             </div>
             <div className='flex flex-1 flex-col'>
               <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-2'>
-                  <p className='font-bold text-primary-500'>{post.poster}</p>
+                  <p className='font-bold text-primary-500'>
+                    {post.User.firstName} {post.User.lastName}
+                  </p>
                   <p className='text-primary-400'>•</p>
-                  <p className='text-primary-400'>{formatDistance(post.time, new Date(), { addSuffix: true })}</p>
+                  <p className='text-primary-400'>{formatDistance(post.createdAt, new Date(), { addSuffix: true })}</p>
                 </div>
                 <div className='flex items-center gap-1'>
                   <span className='h-[2px] w-[2px] rounded-full bg-primary-600' />
@@ -148,8 +97,8 @@ const Feed: NextPageWithLayout = () => {
                 </div>
               </div>
               <p className='text-primary-500'>
-                {post.text
-                  ? post.text
+                {post.content
+                  ? post.content
                   : `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget consectetur lacinia,
                 nisl nisl aliquam nisl, eget ultricies nisl nisl sit amet nisl. Suspendisse potenti. Nulla facilisi.
                 Nulla facilisi. Nulla facilisi. Nulla facilisi.`}

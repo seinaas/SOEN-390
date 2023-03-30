@@ -67,9 +67,16 @@ export const Register: NextPageWithLayout = () => {
 
   return (
     <motion.form layout className='flex w-full flex-col gap-4' onSubmit={onSubmit}>
-      <Input type='email' placeholder='Email' autoComplete='email' {...register('email')} />
-      <Input type='password' placeholder='Password' autoComplete='new-password' {...register('password')} />
+      <Input data-cy='email-input' type='email' placeholder='Email' autoComplete='email' {...register('email')} />
       <Input
+        data-cy='password-input'
+        type='password'
+        placeholder='Password'
+        autoComplete='new-password'
+        {...register('password')}
+      />
+      <Input
+        data-cy='confirm-password-input'
         type='password'
         placeholder='Confirm Password'
         autoComplete='new-password'
@@ -79,7 +86,7 @@ export const Register: NextPageWithLayout = () => {
         <p className='text-center text-sm text-red-600'>{error || errors.email?.message || errors.password?.message}</p>
       )}
 
-      <Button layoutId='auth-btn' fullWidth>
+      <Button layoutId='auth-btn' fullWidth data-cy='register-btn'>
         Register
       </Button>
     </motion.form>

@@ -1,8 +1,15 @@
-import { PrismaClient } from '@prisma/client';
+import { type PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 
+/**
+ * This is the connections router.
+ * It contains all the procedures related to connections.
+ * This includes sending a connection request, accepting a connection request, and getting all connections for a user.
+ */
+
+// Retrieve the recipient of a connection request
 const getRecipient = async ({ prisma, email }: { prisma: PrismaClient; email: string }) => {
   const recipient = await prisma.user.findUnique({
     where: {
@@ -16,6 +23,7 @@ const getRecipient = async ({ prisma, email }: { prisma: PrismaClient; email: st
   return recipient;
 };
 
+// Return the smaller ID first
 const getCorrectUserOrder = (user1ID: string, user2ID: string) => {
   return user1ID < user2ID ? { user1ID, user2ID } : { user1ID: user2ID, user2ID: user1ID };
 };
@@ -30,15 +38,35 @@ export const connectionsRouter = createTRPCRouter({
         connections: {
           where: { connectionStatus: 'Connected' },
           include: {
-            user1: true,
-            user2: true,
+            user1: {
+              include: {
+                jobs: true,
+                education: true,
+              },
+            },
+            user2: {
+              include: {
+                jobs: true,
+                education: true,
+              },
+            },
           },
         },
         connectionOf: {
           where: { connectionStatus: 'Connected' },
           include: {
-            user1: true,
-            user2: true,
+            user1: {
+              include: {
+                jobs: true,
+                education: true,
+              },
+            },
+            user2: {
+              include: {
+                jobs: true,
+                education: true,
+              },
+            },
           },
         },
       },
@@ -51,7 +79,9 @@ export const connectionsRouter = createTRPCRouter({
           const otherUser = connection.user1.id === user.id ? connection.user2 : connection.user1;
           return {
             id: otherUser.id,
-            job: otherUser.job,
+            headline: otherUser.headline,
+            jobs: otherUser.jobs,
+            education: otherUser.education,
             firstName: otherUser.firstName,
             lastName: otherUser.lastName,
             image: otherUser.image,
@@ -64,7 +94,9 @@ export const connectionsRouter = createTRPCRouter({
           const otherUser = connection.user1.id === user.id ? connection.user2 : connection.user1;
           return {
             id: otherUser.id,
-            job: otherUser.job,
+            headline: otherUser.headline,
+            jobs: otherUser.jobs,
+            education: otherUser.education,
             firstName: otherUser.firstName,
             lastName: otherUser.lastName,
             image: otherUser.image,

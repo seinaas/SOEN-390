@@ -52,9 +52,15 @@ export const SignIn: NextPageWithLayout = () => {
 
   return (
     <motion.form className='flex w-full flex-col gap-4' onSubmit={onSubmit}>
-      <Input type='email' placeholder='Email' autoComplete='email' {...register('email')} />
-      <Input type='password' placeholder='Password' autoComplete='new-password' {...register('password')} />
-      <Button layoutId='auth-btn' fullWidth>
+      <Input data-cy='email-input' type='email' placeholder='Email' autoComplete='email' {...register('email')} />
+      <Input
+        data-cy='password-input'
+        type='password'
+        placeholder='Password'
+        autoComplete='new-password'
+        {...register('password')}
+      />
+      <Button data-cy='signin-btn' layoutId='auth-btn' fullWidth>
         Sign In
       </Button>
       {isError && (

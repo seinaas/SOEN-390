@@ -5,6 +5,7 @@ import { type ReactElement, type ReactNode } from 'react';
 import { type Session } from 'next-auth';
 
 import { api } from '../utils/api';
+import { initPusher } from '../utils/pusher';
 
 import '../styles/globals.css';
 
@@ -19,6 +20,7 @@ export type MyAppProps = AppProps & {
   };
 };
 
+initPusher();
 const MyApp = (({ Component, pageProps: { session, ...pageProps } }: MyAppProps) => {
   const getLayout = Component.getLayout ?? ((page) => page);
   return <SessionProvider session={session as Session}>{getLayout(<Component {...pageProps} />)}</SessionProvider>;
