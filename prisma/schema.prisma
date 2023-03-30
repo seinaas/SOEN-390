@@ -145,34 +145,6 @@ model Likes {
     
 }
 
-model Post {
-    id    String   @id @default(cuid())
-    userId    String @unique
-    createdAt DateTime @default(now())
-    content   String?  @db.Text
-    comments  Comments[]
-    likes     Likes[]
-    User      User     @relation(fields: [userId], references: [id])
-}
-
-model Comments {    
-    commentId String @id @default(cuid())
-    userId    String @unique
-    postId    String
-    content   String? @db.Text
-    Post      Post    @relation(fields: [postId], references: [id])
-    User      User    @relation(fields: [userId], references: [id])
-}
-
-model Likes {
-    likeId String @id @default(cuid())
-    userId String @unique
-    postId String
-    Post   Post   @relation(fields: [postId], references: [id])
-    User      User    @relation(fields: [userId], references: [id])
-    
-}
-
 enum ConnectionStatus {
     Pending_1_To_2
     Pending_2_To_1
