@@ -9,148 +9,6 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
  * This includes searching for users, getting a user by ID, and getting a user by email.
  */
 export const userRouter = createTRPCRouter({
-  // Update user education data
-  updateEducation: protectedProcedure
-    .input(
-      z.object({
-        educationId: z.string().min(1),
-        school: z.string().min(1).nullish(),
-        degree: z.string().min(1).nullish(),
-        location: z.string().nullish(),
-        startDate: z.date().nullish(),
-        endDate: z.date().nullish(),
-        description: z.string().nullish(),
-      }),
-    )
-    .mutation(async ({ input, ctx }) => {
-      const updateInput: Omit<typeof input, 'educationId'> & Partial<Pick<typeof input, 'educationId'>> = {
-        ...input,
-      };
-      delete updateInput.educationId;
-
-      const education = await ctx.prisma.education.update({
-        where: {
-          educationId: input.educationId,
-        },
-        data: {
-          ...updateInput,
-          school: updateInput.school ?? undefined,
-          degree: updateInput.degree ?? undefined,
-          startDate: updateInput.startDate ?? undefined,
-        },
-      });
-
-      return education;
-    }),
-  // Add education to a user
-  addEducation: protectedProcedure
-    .input(
-      z.object({
-        degree: z.string().min(1),
-        school: z.string().min(1),
-        location: z.string().nullish(),
-        startDate: z.date(),
-        endDate: z.date().nullish(),
-        description: z.string().nullish(),
-      }),
-    )
-    .mutation(async ({ input, ctx }) => {
-      const education = await ctx.prisma.education.create({
-        data: {
-          ...input,
-          userId: ctx.session.user.id,
-        },
-      });
-      return education;
-    }),
-  // Update user job data
-  updateJob: protectedProcedure
-    .input(
-      z.object({
-        jobId: z.string().min(1),
-        title: z.string().min(1).nullish(),
-        company: z.string().min(1).nullish(),
-        location: z.string().nullish(),
-        startDate: z.date().nullish(),
-        endDate: z.date().nullish(),
-        description: z.string().nullish(),
-      }),
-    )
-    .mutation(async ({ input, ctx }) => {
-      const updateInput: Omit<typeof input, 'jobId'> & Partial<Pick<typeof input, 'jobId'>> = {
-        ...input,
-      };
-      delete updateInput.jobId;
-
-      const job = await ctx.prisma.job.update({
-        where: {
-          jobId: input.jobId,
-        },
-        data: {
-          ...updateInput,
-          title: updateInput.title ?? undefined,
-          company: updateInput.company ?? undefined,
-          startDate: updateInput.startDate ?? undefined,
-        },
-      });
-
-      return job;
-    }),
-  // Add a job to a user
-  addJob: protectedProcedure
-    .input(
-      z.object({
-        title: z.string().min(1),
-        company: z.string().min(1),
-        location: z.string().nullish(),
-        startDate: z.date(),
-        endDate: z.date().nullish(),
-        description: z.string().nullish(),
-      }),
-    )
-    .mutation(async ({ input, ctx }) => {
-      const job = await ctx.prisma.job.create({
-        data: {
-          ...input,
-          userId: ctx.session.user.id,
-        },
-      });
-
-      return job;
-    }),
-  // Update user education data
-  updateEducation: protectedProcedure
-    .input(
-      z.object({
-        educationId: z.string().min(1),
-        school: z.string().min(1).nullish(),
-        degree: z.string().min(1).nullish(),
-        location: z.string().nullish(),
-        startDate: z.date().nullish(),
-        endDate: z.date().nullish(),
-        description: z.string().nullish(),
-      }),
-    )
-    .mutation(async ({ input, ctx }) => {
-      const updateInput: Omit<typeof input, 'educationId'> & Partial<Pick<typeof input, 'educationId'>> = {
-        ...input,
-      };
-      delete updateInput.educationId;
-
-      const education = await ctx.prisma.education.update({
-        where: {
-          educationId: input.educationId,
-        },
-        data: {
-          ...updateInput,
-          school: updateInput.school ?? undefined,
-          degree: updateInput.degree ?? undefined,
-          startDate: updateInput.startDate ?? undefined,
-        },
-      });
-
-      return education;
-    }),
   // Search for users by name
   search: publicProcedure.input(z.object({ query: z.string() })).query(async ({ ctx, input }) => {
     if (input.query.length < 3) {
@@ -275,268 +133,113 @@ export const userRouter = createTRPCRouter({
 
       return user;
     }),
-
-  /**
-   * Routes Mohsen worked on for the feed feature. These API routes will achieve th following:
-   * 1. Get all posts for a user
-   * 2. Create a post for a user
-   * 3. Update a post for a user
-   * 4. Delete a post for a user
-   * 5. Create a comment for a post
-   * 6. Update a comment for a post
-   * 7. Delete a comment for a post
-   * 8. Get all comments for a post
-   * 8. Like a post
-   * 9. Unlike a post
-   * 10. Get all likes for a post
-   */
-
-  getUserPosts: protectedProcedure
+  // Add a job to a user
+  addJob: protectedProcedure
     .input(
       z.object({
-        userId: z.string().min(1),
-      }),
-    )
-    .query(async ({ input, ctx }) => {
-      const posts = await ctx.prisma.post.findMany({
-        where: {
-          userId: input.userId,
-        },
-        include: {
-          comments: true,
-          likes: true,
-        },
-      });
-      return posts;
-    }),
-
-  getPosts: protectedProcedure.query(async ({ ctx }) => {
-    console.log('\n Get post api \n ');
-    const user = await ctx.prisma.user.findUnique({
-      select: {
-        connections: true,
-      },
-      where: {
-        id: ctx.session.user.id,
-      },
-    });
-
-    const posts = await ctx.prisma.post.findMany({
-      where: {
-        userId: {
-          in: user?.connections.map((c) => (c.user1Id === ctx.session.user.id ? c.user2Id : c.user1Id)) || [],
-        },
-      },
-      include: {
-        comments: true,
-        likes: true,
-      },
-    });
-    console.log(posts);
-  }),
-
-  createPost: protectedProcedure
-    .input(
-      z.object({
-        content: z.string().min(1).nullish(),
+        title: z.string().min(1),
+        company: z.string().min(1),
+        location: z.string().nullish(),
+        startDate: z.date(),
+        endDate: z.date().nullish(),
+        description: z.string().nullish(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      console.log(ctx.session.user);
-      console.log(input);
-
-      const post = await ctx.prisma.post.create({
+      const job = await ctx.prisma.job.create({
         data: {
           ...input,
           userId: ctx.session.user.id,
         },
       });
-      return post;
-    }),
 
-  editPost: protectedProcedure
+      return job;
+    }),
+  // Update user job data
+  updateJob: protectedProcedure
     .input(
       z.object({
-        postId: z.string().min(1),
-        content: z.string().min(1).nullish(),
+        jobId: z.string().min(1),
+        title: z.string().min(1).nullish(),
+        company: z.string().min(1).nullish(),
+        location: z.string().nullish(),
+        startDate: z.date().nullish(),
+        endDate: z.date().nullish(),
+        description: z.string().nullish(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const updateInput: Omit<typeof input, 'postId'> & Partial<Pick<typeof input, 'postId'>> = {
+      const updateInput: Omit<typeof input, 'jobId'> & Partial<Pick<typeof input, 'jobId'>> = {
         ...input,
       };
-      delete updateInput.postId;
+      delete updateInput.jobId;
 
-      const post = await ctx.prisma.post.update({
-        select: {
-          id: true,
-          userId: true,
-          content: true,
-          createdAt: true,
-          comments: true,
-        },
+      const job = await ctx.prisma.job.update({
         where: {
-          id: input.postId,
+          jobId: input.jobId,
         },
-        data: updateInput,
-      });
-
-      return post;
-    }),
-
-  deletePost: protectedProcedure
-    .input(
-      z.object({
-        postId: z.string().min(1),
-      }),
-    )
-    .mutation(async ({ input, ctx }) => {
-      const post = await ctx.prisma.post.delete({
-        where: {
-          id: input.postId,
+        data: {
+          ...updateInput,
+          title: updateInput.title ?? undefined,
+          company: updateInput.company ?? undefined,
+          startDate: updateInput.startDate ?? undefined,
         },
       });
 
-      return post;
+      return job;
     }),
-
-  createComment: protectedProcedure
+  // Add education to a user
+  addEducation: protectedProcedure
     .input(
       z.object({
-        postId: z.string().min(1),
-        content: z.string().min(1).nullish(),
+        degree: z.string().min(1),
+        school: z.string().min(1),
+        location: z.string().nullish(),
+        startDate: z.date(),
+        endDate: z.date().nullish(),
+        description: z.string().nullish(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const comment = await ctx.prisma.comments.create({
+      const education = await ctx.prisma.education.create({
         data: {
           ...input,
           userId: ctx.session.user.id,
         },
       });
-      return comment;
+      return education;
     }),
-
-  getCommentsPerPost: protectedProcedure
+  // Update user education data
+  updateEducation: protectedProcedure
     .input(
       z.object({
-        postId: z.string().min(1),
-      }),
-    )
-    .query(async ({ input, ctx }) => {
-      const comments = await ctx.prisma.comments.findMany({
-        where: {
-          postId: input.postId,
-        },
-        include: {
-          User: {
-            select: {
-              firstName: true,
-              lastName: true,
-              image: true,
-            },
-          },
-        },
-      });
-      return comments;
-    }),
-
-  editComment: protectedProcedure
-    .input(
-      z.object({
-        commentId: z.string().min(1),
-        postId: z.string().min(1),
-        content: z.string().min(1).nullish(),
+        educationId: z.string().min(1),
+        school: z.string().min(1).nullish(),
+        degree: z.string().min(1).nullish(),
+        location: z.string().nullish(),
+        startDate: z.date().nullish(),
+        endDate: z.date().nullish(),
+        description: z.string().nullish(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const updateInput: Omit<typeof input, 'commentId'> & Partial<Pick<typeof input, 'commentId'>> = {
+      const updateInput: Omit<typeof input, 'educationId'> & Partial<Pick<typeof input, 'educationId'>> = {
         ...input,
       };
-      delete updateInput.commentId;
+      delete updateInput.educationId;
 
-      const comment = await ctx.prisma.comments.update({
+      const education = await ctx.prisma.education.update({
         where: {
-          commentId: input.commentId,
+          educationId: input.educationId,
         },
-        data: updateInput,
-      });
-
-      return comment;
-    }),
-
-  deleteComment: protectedProcedure
-    .input(
-      z.object({
-        commentId: z.string().min(1),
-      }),
-    )
-    .mutation(async ({ input, ctx }) => {
-      const comment = await ctx.prisma.comments.delete({
-        where: {
-          commentId: input.commentId,
-        },
-      });
-
-      return comment;
-    }),
-
-  createLike: protectedProcedure
-    .input(
-      z.object({
-        postId: z.string().min(1),
-        userId: z.string().min(1).nullish(),
-      }),
-    )
-    .mutation(async ({ input, ctx }) => {
-      const like = await ctx.prisma.likes.create({
         data: {
-          ...input,
-          userId: ctx.session.user.id,
-          postId: input.postId,
+          ...updateInput,
+          school: updateInput.school ?? undefined,
+          degree: updateInput.degree ?? undefined,
+          startDate: updateInput.startDate ?? undefined,
         },
       });
-      return like;
-    }),
 
-  removeLike: protectedProcedure
-    .input(
-      z.object({
-        postId: z.string().min(1),
-        userId: z.string().min(1).nullish(),
-        likeId: z.string().min(1),
-      }),
-    )
-    .mutation(async ({ input, ctx }) => {
-      const like = await ctx.prisma.likes.delete({
-        where: {
-          likeId: input.likeId,
-        },
-      });
-      return like;
-    }),
-
-  getLikesPerPost: protectedProcedure
-    .input(
-      z.object({
-        postId: z.string().min(1),
-      }),
-    )
-    .query(async ({ input, ctx }) => {
-      const likes = await ctx.prisma.likes.findMany({
-        where: {
-          postId: input.postId,
-        },
-        include: {
-          User: {
-            select: {
-              firstName: true,
-              lastName: true,
-              image: true,
-            },
-          },
-        },
-      });
-      return likes;
+      return education;
     }),
 });
