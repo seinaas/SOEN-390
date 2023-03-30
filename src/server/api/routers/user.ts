@@ -9,6 +9,60 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
  * This includes searching for users, getting a user by ID, and getting a user by email.
  */
 export const userRouter = createTRPCRouter({
+  // Update user education data
+  updateEducation: protectedProcedure
+    .input(
+      z.object({
+        educationId: z.string().min(1),
+        school: z.string().min(1).nullish(),
+        degree: z.string().min(1).nullish(),
+        location: z.string().nullish(),
+        startDate: z.date().nullish(),
+        endDate: z.date().nullish(),
+        description: z.string().nullish(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const updateInput: Omit<typeof input, 'educationId'> & Partial<Pick<typeof input, 'educationId'>> = {
+        ...input,
+      };
+      delete updateInput.educationId;
+
+      const education = await ctx.prisma.education.update({
+        where: {
+          educationId: input.educationId,
+        },
+        data: {
+          ...updateInput,
+          school: updateInput.school ?? undefined,
+          degree: updateInput.degree ?? undefined,
+          startDate: updateInput.startDate ?? undefined,
+        },
+      });
+
+      return education;
+    }),
+  // Add education to a user
+  addEducation: protectedProcedure
+    .input(
+      z.object({
+        degree: z.string().min(1),
+        school: z.string().min(1),
+        location: z.string().nullish(),
+        startDate: z.date(),
+        endDate: z.date().nullish(),
+        description: z.string().nullish(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const education = await ctx.prisma.education.create({
+        data: {
+          ...input,
+          userId: ctx.session.user.id,
+        },
+      });
+      return education;
+    }),
   // Update user job data
   updateJob: protectedProcedure
     .input(
