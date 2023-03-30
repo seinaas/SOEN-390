@@ -73,6 +73,9 @@ model User {
     accounts        Account[]
     sessions        Session[]
     password        String?
+    DirectMessages   DirectMessages[]
+    MessagesTo       Messages[]       @relation("Sender")
+    directMessagesId String?
 }
 
 model Connection {
