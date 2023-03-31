@@ -47,6 +47,7 @@
     "react-icons": "^4.8.0",
     "start-server-and-test": "^1.15.3",
     "superjson": "1.9.1",
+    "ws": "^8.13.0",
     "zod": "^3.20.2",
     "zustand": "^4.3.6"
   },

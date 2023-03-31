@@ -4,11 +4,11 @@ import { createUser, trpcRequest } from '../../utils';
 describe('conversations', () => {
   describe('getUserConversations', () => {
     it('should return empty array if user does not exist', async () => {
-      const request = trpcRequest({ user: { id: '' }, expires: '' });
+      const request = trpcRequest({ user: { id: '', email: 'testemail' }, expires: '' });
 
       request.ctx.prisma.user.findUnique.mockResolvedValueOnce(null);
 
-      const data = await request.caller.conversation.getUserConversations({ userEmail: '' });
+      const data = await request.caller.conversation.getUserConversations();
       expect(data).toEqual([]);
     });
     it('should return empty array if user has no connections', async () => {
@@ -22,12 +22,12 @@ describe('conversations', () => {
         DirectMessages: [],
       } as any);
 
-      const data = await request.caller.conversation.getUserConversations({ userEmail: '' });
+      const data = await request.caller.conversation.getUserConversations();
 
       expect(data).toEqual([]);
     });
     it('should return a list of conversations', async () => {
-      const request = trpcRequest({ user: { id: '' }, expires: '' });
+      const request = trpcRequest({ user: { id: '', email: 'testemail' }, expires: '' });
 
       const userBase = createUser();
 
@@ -48,7 +48,7 @@ describe('conversations', () => {
         ],
       } as any);
 
-      const data = await request.caller.conversation.getUserConversations({ userEmail: '' });
+      const data = await request.caller.conversation.getUserConversations();
 
       expect(data[0]).toEqual({
         id: '1',
@@ -101,7 +101,7 @@ describe('conversations', () => {
   });
   describe('editConversation', () => {
     it('should remove user from convo', async () => {
-      const request = trpcRequest({ user: { id: '' }, expires: '' });
+      const request = trpcRequest({ user: { id: '1' }, expires: '' });
 
       request.ctx.prisma.user.findUnique.mockResolvedValueOnce(null);
 
@@ -112,7 +112,7 @@ describe('conversations', () => {
       }
     });
     it('should remove user from convo', async () => {
-      const request = trpcRequest({ user: { id: '' }, expires: '' });
+      const request = trpcRequest({ user: { id: '1' }, expires: '' });
 
       const userBase = createUser();
       const update = jest.spyOn(request.ctx.prisma.directMessages, 'update').mockImplementation();
@@ -134,7 +134,7 @@ describe('conversations', () => {
         ],
       } as any);
 
-      await request.caller.conversation.removeFromConversation({ userId: '1', conversationId: '1' });
+      await request.caller.conversation.removeFromConversation({ conversationId: '1' });
 
       expect(update).toHaveBeenCalledWith({
         where: {
@@ -183,7 +183,7 @@ describe('conversations', () => {
         messages: [{ id: '1', message: 'hello', senderId: '1', conversationId: '1' }],
       } as any);
 
-      await request.caller.conversation.removeFromConversation({ userId: '1', conversationId: '1' });
+      await request.caller.conversation.removeFromConversation({ conversationId: '1' });
 
       expect(update).toHaveBeenCalledWith({
         where: {
