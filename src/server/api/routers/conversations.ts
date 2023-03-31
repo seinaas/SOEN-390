@@ -3,19 +3,9 @@ import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 
 export const conversationsRouter = createTRPCRouter({
-  createConversation: protectedProcedure.input(z.array(z.custom<User>())).mutation(async ({ ctx, input }) => {
-    const conversation = await ctx.prisma.directMessages.create({
-      data: {
-        users: {
-          connect: input.map((user) => ({ id: user.id })),
-        },
-      },
-    });
-    return conversation;
-  }),
-
   createConversationFromEmails: protectedProcedure.input(z.array(z.string())).mutation(async ({ ctx, input }) => {
-    let exists = false;
+    input.push(ctx?.session?.user?.email || '');
+    let existingConversation = null;
     const conversations = await ctx.prisma.directMessages.findMany({
       where: {
         users: {
@@ -32,10 +22,10 @@ export const conversationsRouter = createTRPCRouter({
     });
     conversations.forEach((conversation) => {
       if (JSON.stringify(conversation.users.map((user) => user.email).sort()) === JSON.stringify(input.sort())) {
-        exists = true;
+        existingConversation = conversation;
       }
     });
-    if (!exists) {
+    if (existingConversation === null) {
       const conversation = await ctx.prisma.directMessages.create({
         data: {
           users: {
@@ -45,12 +35,12 @@ export const conversationsRouter = createTRPCRouter({
       });
       return conversation;
     }
-    return 'Already exists';
+    return existingConversation.id;
   }),
-  getUserConversations: protectedProcedure.input(z.object({ userEmail: z.string() })).query(async ({ input, ctx }) => {
+  getUserConversations: protectedProcedure.query(async ({ ctx }) => {
     const user = await ctx.prisma.user.findUnique({
       where: {
-        email: input.userEmail,
+        email: ctx?.session?.user?.email,
       },
       include: {
         DirectMessages: {
@@ -103,7 +93,7 @@ export const conversationsRouter = createTRPCRouter({
     }),
 
   removeFromConversation: protectedProcedure
-    .input(z.object({ userId: z.string(), conversationId: z.string() }))
+    .input(z.object({ conversationId: z.string() }))
     .mutation(async ({ input, ctx }) => {
       const convo = await ctx.prisma.directMessages.findFirst({
         where: {
@@ -113,7 +103,7 @@ export const conversationsRouter = createTRPCRouter({
           users: true,
         },
       });
-      const newConvoUsers = convo?.users?.filter((user) => user.id !== input.userId);
+      const newConvoUsers = convo?.users?.filter((user) => user.id !== ctx?.session?.user?.id);
       if (newConvoUsers?.length && newConvoUsers.length <= 1) {
         await ctx.prisma.directMessages.update({
           where: {
@@ -121,7 +111,7 @@ export const conversationsRouter = createTRPCRouter({
           },
           data: {
             users: {
-              disconnect: [{ id: input.userId }, { id: newConvoUsers[0]?.id }],
+              disconnect: [{ id: ctx?.session?.user?.id }, { id: newConvoUsers[0]?.id }],
             },
           },
           include: {
@@ -145,7 +135,7 @@ export const conversationsRouter = createTRPCRouter({
           },
           data: {
             users: {
-              disconnect: { id: input.userId },
+              disconnect: { id: ctx?.session?.user?.id },
             },
           },
           include: {
