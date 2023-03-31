@@ -1,4 +1,3 @@
-import type { DirectMessages, User } from '@prisma/client';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 

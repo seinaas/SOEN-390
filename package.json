@@ -24,13 +24,7 @@
     "report-dir": "cy-coverage"
   },
   "dependencies": {
-<<<<<<< HEAD
     "@hookform/resolvers": "^2.9.10",
-=======
-    "@emotion/react": "^11.10.6",
-    "@emotion/styled": "^11.10.6",
-    "@mui/material": "^5.11.12",
->>>>>>> 3283d0e (Fixed some issues)
     "@next-auth/prisma-adapter": "^1.0.5",
     "@prisma/client": "^4.11.0",
     "@tanstack/react-query": "^4.20.0",
