@@ -84,7 +84,6 @@ const Chat: NextPageWithLayout = () => {
   const [messages, setMessages] = useState<
     (Messages & { sender: { firstName: string | null; lastName: string | null } })[]
   >([]);
-  const [showAlreadyExists, setShowAlreadyExists] = useState(false);
   const [showLeaveGroup, setShowLeaveGroup] = useState(false);
   const [showAddUsers, setShowAddUsers] = useState(false);
 
@@ -109,9 +108,7 @@ const Chat: NextPageWithLayout = () => {
   const leaveConversation = api.conversation.removeFromConversation.useMutation();
   const newChatMutation = api.chat.sendMessage.useMutation();
 
-  const conversations = api.conversation.getUserConversations.useQuery({
-    userEmail: session?.user?.email || '',
-  }).data;
+  const conversations = api.conversation.getUserConversations.useQuery().data;
 
   useEffect(() => {
     if (messagesToUse) {
@@ -149,7 +146,6 @@ const Chat: NextPageWithLayout = () => {
   const confirmLeaveGroup = (conversationId: string) => {
     leaveConversation.mutate(
       {
-        userId: session?.user?.id || '',
         conversationId: conversationId,
       },
       {
@@ -182,13 +178,13 @@ const Chat: NextPageWithLayout = () => {
     setOpenNewChatModal(false);
     createConversation.mutate([...tags, session?.user?.email || ''], {
       onSuccess: (data) => {
-        if (data != 'Already exists' && data?.id) {
+        if (data?.id) {
           setSelectedConversationId(data.id);
           void utils.conversation.getUserConversations.invalidate();
           connectToChannel(data.id);
           localStorage.setItem('lastChannel', data.id);
         } else {
-          setShowAlreadyExists(true);
+          setSelectedConversationId(data);
         }
       },
     });
@@ -230,7 +226,7 @@ const Chat: NextPageWithLayout = () => {
                 />
               </div>
               <div className='text-left'>
-                <div className='text-lg font-semibold'>
+                <div className='text-ellipsis text-lg font-semibold'>
                   {conversation.users.length < 2
                     ? `${conversation.users[0]?.firstName || ''} ${conversation.users[0]?.lastName || ''}`
                     : String(conversation.users.map((user) => `${user.firstName || ''} ${user.lastName || ''}, `)) +
@@ -275,11 +271,6 @@ const Chat: NextPageWithLayout = () => {
               newChatMutation.mutate({
                 message: message,
                 conversationId: selectedConversationId,
-                senderId: session?.user?.id || '',
-                sender: {
-                  firstName: session?.user?.firstName || 'Unknown',
-                  lastName: session?.user?.lastName || 'User',
-                },
               });
               setMessage('');
             }}
@@ -332,13 +323,6 @@ const Chat: NextPageWithLayout = () => {
                 <TagsInput tagList={tags} setTagList={setTags}></TagsInput>
               </div>
             )}
-          </Modal>
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {showAlreadyExists && (
-          <Modal onConfirm={() => setShowAlreadyExists(false)} confirmText='OK' showCancel={false}>
-            <h1 className='mb-4 text-2xl font-semibold'>You already have a similar conversation!</h1>
           </Modal>
         )}
       </AnimatePresence>
