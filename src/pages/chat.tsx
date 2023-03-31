@@ -202,7 +202,9 @@ const Chat: NextPageWithLayout = () => {
         </div>
         {!conversations?.length ? (
           <div className='flex h-full flex-col items-center justify-center'>
-            <div className='text-2xl font-semibold text-primary-500'>No conversations yet</div>
+            <div className='text-2xl font-semibold text-primary-500' data-cy='no-convos'>
+              No conversations yet
+            </div>
             <div className='text-lg font-semibold text-primary-500'>Create one to start chatting!</div>
           </div>
         ) : (
