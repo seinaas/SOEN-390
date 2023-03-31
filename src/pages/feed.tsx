@@ -1,7 +1,7 @@
 import { formatDistance, formatDistanceToNowStrict } from 'date-fns';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useMemo, useState } from 'react';
 import { IoIosChatboxes, IoMdShare, IoMdThumbsUp, IoMdCreate, IoMdRemove } from 'react-icons/io';
 import MainLayout from '../components/mainLayout';
 import { type NextPageWithLayout } from './_app';
@@ -9,6 +9,8 @@ import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
 import { type GetServerSidePropsContext } from 'next';
 import { getServerAuthSession } from '../server/auth';
 import { type RouterOutputs, api } from '../utils/api';
+import { Upload, uploadFile } from '../components/upload';
+import FilePreview from '../components/filePreview';
 import { useTranslations } from 'next-intl';
 import { enCA, fr } from 'date-fns/locale';
 import { useRouter } from 'next/router';
@@ -386,6 +388,7 @@ const Feed: NextPageWithLayout = () => {
   const { data } = useSession();
   const t = useTranslations('feed');
   const [newPost, setNewPost] = useState('');
+  const [file, setFile] = useState<File>();
   const [commentingPostId, setCommentingPostId] = useState('');
   const [editingPostId, setEditingPostId] = useState('');
 
@@ -396,7 +399,11 @@ const Feed: NextPageWithLayout = () => {
 
   const createPost = api.post.createPost.useMutation();
 
-  const addPost = (e: React.FormEvent<HTMLFormElement>) => {
+  const createPost = api.post.createPost.useMutation();
+
+  const getPreSignedPUTUrl = api.cloudFlare.getPresignedPUTUrl.useMutation();
+
+  const addPost = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (newPost) {
       createPost.mutate(
@@ -404,42 +411,66 @@ const Feed: NextPageWithLayout = () => {
           content: newPost,
         },
         {
-          onSuccess: () => {
+          onSuccess: (postData) => {
             void utils.post.getPosts.invalidate();
             setNewPost('');
+            console.log(postData);
+            void handleUploadFile(postData);
           },
         },
       );
     }
   };
 
+  const handleUploadFile = async (postData: object) => {
+    if (file && postData) {
+      const url = await getPreSignedPUTUrl.mutateAsync({
+        fileName: file.name,
+        userId: postData.userId,
+        postId: postData.id,
+        containerType: 'posts',
+      });
+      await uploadFile(file, url);
+      setFile(undefined);
+    }
+  };
+
+  const handleSetFile = (newFile: File | undefined) => {
+    setFile(newFile);
+  };
+
   return (
     <div className='flex h-full w-full justify-center p-2 md:p-8'>
       <div className='flex w-full max-w-[32rem] flex-col gap-2'>
         {data?.user && (
-          <div className='flex gap-4 rounded-full bg-primary-100/10 p-4'>
-            <Image
-              alt='User Avatar'
-              loader={() => data?.user?.image || '/placeholder.jpeg'}
-              src={data.user.image || '/placeholder.jpeg'}
-              width={48}
-              height={48}
-              className='rounded-full'
-              referrerPolicy='no-referrer'
-            />
-            <form data-cy='post-form' onSubmit={addPost} className='w-full'>
-              <input
-                data-cy='post-input'
-                type='text'
-                className='h-full w-full rounded-full bg-white py-2 px-6 text-primary-600 outline-none'
-                placeholder={t('post')}
-                value={newPost}
-                onChange={(e) => setNewPost(e.target.value)}
+          <div className='flex flex-col items-center rounded-full bg-primary-100/10 '>
+            <div className='flex w-full gap-4 p-4'>
+              <Image
+                alt='User Avatar'
+                loader={() => data?.user?.image || '/placeholder.jpeg'}
+                src={data.user.image || '/placeholder.jpeg'}
+                width={48}
+                height={48}
+                className='rounded-full'
+                referrerPolicy='no-referrer'
               />
-            </form>
+              <form data-cy='post-form' onSubmit={addPost} className='w-full'>
+                <div className='flex h-full items-center rounded-full bg-white py-2 px-6'>
+                  <input
+                    data-cy='post-input'
+                    type='text'
+                    className='h-full w-full  text-primary-600 outline-none'
+                    placeholder={t('post')}
+                    value={newPost}
+                    onChange={(e) => setNewPost(e.target.value)}
+                  />
+                  <Upload file={file} setFile={handleSetFile} />
+                </div>
+              </form>
+            </div>
+            <FilePreview file={file} />
           </div>
         )}
-
         <div className='my-2 h-px w-full bg-primary-100/20' />
 
         <LayoutGroup>
