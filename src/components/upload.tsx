@@ -1,6 +1,10 @@
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import { useState, useRef } from 'react';
+import { api } from '../utils/api';
+import Button from './button';
+import { BsFileEarmarkPlus, BsSend } from 'react-icons/bs';
+import { IoMdSend } from 'react-icons/io';
 
 const Upload: React.FC = () => {
   // TODO: add multi-upload capabilities
@@ -8,7 +12,7 @@ const Upload: React.FC = () => {
   const [file, setFile] = useState<File>();
   const [imgPreview, setImgPreview] = useState<string>();
 
-  const inputRef = useRef();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     //Loads the file as a state
@@ -56,9 +60,8 @@ const Upload: React.FC = () => {
   };
 
   return (
-    <div>
-      <p>Upload a file</p>
-      {file?.type.includes('image') && (
+    <div className='flex w-fit flex-col space-y-4 border-2 border-black'>
+      {(file?.type.includes('image') && (
         <Image
           alt='image'
           src={imgPreview || ''}
@@ -67,10 +70,17 @@ const Upload: React.FC = () => {
           className='object-contain'
           referrerPolicy='no-referrer'
         />
-      )}
-      <input ref={inputRef} type='file' onChange={handleInputChange} />
-
-      <button onClick={uploadFile}> Upload </button>
+      )) || <span>{file?.name}</span>}
+      <div className='flex '>
+        <BsFileEarmarkPlus
+          onClick={() => {
+            inputRef.current && inputRef.current.click();
+          }}
+          className={`h-8 w-8 cursor-pointer rounded-lg text-primary-600 hover:text-primary-300`}
+        />
+        <input ref={inputRef} type='file' onChange={handleInputChange} className='hidden' />
+        <IoMdSend onClick={uploadFile} className='h-8 w-8  cursor-pointer text-primary-600 hover:text-primary-300' />
+      </div>
     </div>
   );
 };
