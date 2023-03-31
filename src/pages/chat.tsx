@@ -176,7 +176,7 @@ const Chat: NextPageWithLayout = () => {
 
   const confirmCreation = () => {
     setOpenNewChatModal(false);
-    createConversation.mutate([...tags, session?.user?.email || ''], {
+    createConversation.mutate([...tags], {
       onSuccess: (data) => {
         if (data?.id) {
           setSelectedConversationId(data.id);

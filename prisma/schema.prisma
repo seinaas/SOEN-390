@@ -75,7 +75,6 @@ model User {
     password        String?
     DirectMessages   DirectMessages[]
     MessagesTo       Messages[]       @relation("Sender")
-    directMessagesId String?
 }
 
 model Connection {
