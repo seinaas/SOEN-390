@@ -1,12 +1,10 @@
-import type { User } from '@prisma/client';
+import type { DirectMessages, User } from '@prisma/client';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 
 export const conversationsRouter = createTRPCRouter({
   createConversationFromEmails: protectedProcedure.input(z.array(z.string())).mutation(async ({ ctx, input }) => {
     input.push(ctx?.session?.user?.email || '');
-    let existingConversation = null;
-    let exists = false;
     const conversations = await ctx.prisma.directMessages.findMany({
       where: {
         users: {
@@ -22,25 +20,18 @@ export const conversationsRouter = createTRPCRouter({
       },
     });
     conversations.forEach((conversation) => {
-      console.log(conversation);
-      console.log(JSON.stringify(input.sort()));
       if (JSON.stringify(conversation.users.map((user) => user.email).sort()) === JSON.stringify(input.sort())) {
-        console.log(JSON.stringify(input.sort()));
-        existingConversation = conversation;
-        exists = true;
+        return conversation?.id;
       }
     });
-    if (!exists) {
-      const conversation = await ctx.prisma.directMessages.create({
-        data: {
-          users: {
-            connect: input.map((email) => ({ email: email })),
-          },
+    const conversation = await ctx.prisma.directMessages.create({
+      data: {
+        users: {
+          connect: input.map((email) => ({ email: email })),
         },
-      });
-      return conversation;
-    }
-    return existingConversation?.id;
+      },
+    });
+    return conversation;
   }),
   getUserConversations: protectedProcedure.query(async ({ ctx }) => {
     const user = await ctx.prisma.user.findUnique({
