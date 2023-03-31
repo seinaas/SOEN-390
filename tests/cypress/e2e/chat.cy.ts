@@ -1,5 +1,3 @@
-import { trpcRequest } from '../../utils';
-
 describe('Chat Page', () => {
   it('should hide chat input if the user is not in a channel', () => {
     cy.intercept('GET', '/api/auth/session', {
@@ -15,16 +13,33 @@ describe('Chat Page', () => {
 
     cy.dataCy('chat-input').should('not.exist');
   });
-  // it('should show chat input if the user is in a channel', () => {
-  //   // TODO: Update this test once chat channels are implemented
-  //   cy.intercept('GET', '/api/auth/session', {
-  //     body: {
-  //       user: {
-  //         id: '1',
-  //         name: 'John Doe',
-  //       },
-  //     },
-  //   });
+  it('should show chat input if the user is in a channel', () => {
+    // TODO: Update this test once chat channels are implemented
+    cy.intercept('GET', '/api/auth/session', {
+      body: {
+        user: {
+          id: '1',
+          name: 'John Doe',
+          DirectMessages: [
+            {
+              id: '1',
+              users: [
+                {
+                  id: '1',
+                },
+                {
+                  id: '2',
+                },
+              ],
+            },
+          ],
+        },
+      },
+    });
+    cy.visit('/chat');
+
+    cy.dataCy('no-convos').should('exist');
+  });
 
   //   const request = trpcRequest({ user: { email: 'test@hotmail.com', image: '', name: 'Test' }, expires: '' });
 

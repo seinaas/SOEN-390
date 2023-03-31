@@ -100,16 +100,50 @@ describe('conversations', () => {
     });
   });
   describe('editConversation', () => {
-    it('should remove user from convo', async () => {
-      const request = trpcRequest({ user: { id: '1' }, expires: '' });
+    it('should create and return a convo on creation', async () => {
+      const request = trpcRequest({ user: { id: '1', email: 'testemail' }, expires: '' });
+      const create = jest.spyOn(request.ctx.prisma.directMessages, 'create').mockImplementation();
+      await request.caller.conversation.createConversationFromEmails(['test2email', 'test3email', 'test4email']);
+      expect(create).toBeCalledWith({
+        data: {
+          users: {
+            connect: [
+              { email: 'test2email' },
+              { email: 'test3email' },
+              { email: 'test4email' },
+              { email: 'testemail' },
+            ],
+          },
+        },
+        include: {
+          users: {
+            select: {
+              email: true,
+            },
+          },
+        },
+      });
+    });
+    it('should return id of existing convo if user tries to create one', async () => {
+      const request = trpcRequest({ user: { id: '1', email: 'testemail' }, expires: '' });
+      request.ctx.prisma.directMessages.findMany.mockResolvedValueOnce([
+        {
+          id: '1',
+          users: [
+            { id: '0', email: 'testemail' },
+            { id: '1', email: 'test2email' },
+            { id: '2', email: 'test3email' },
+            { id: '3', email: 'test4email' },
+          ],
+        },
+      ] as any);
 
-      request.ctx.prisma.user.findUnique.mockResolvedValueOnce(null);
-
-      try {
-        await request.caller.connections.getConnectionStatus({ userEmail: 'john@doe.com' });
-      } catch (e) {
-        expect((e as TRPCError).message).toEqual('User not found');
-      }
+      const data = await request.caller.conversation.createConversationFromEmails([
+        'test2email',
+        'test3email',
+        'test4email',
+      ]);
+      expect(data).toEqual('1');
     });
     it('should remove user from convo', async () => {
       const request = trpcRequest({ user: { id: '1' }, expires: '' });
