@@ -9,12 +9,7 @@ describe('chat', () => {
 
       await request.caller.chat.sendMessage({
         message: 'Hello World',
-        senderId: '1',
         conversationId: 'test',
-        sender: {
-          firstName: 'Unknown',
-          lastName: 'User',
-        },
       });
       expect(trigger).toHaveBeenCalledWith('test', 'message-sent', {
         sender: {
