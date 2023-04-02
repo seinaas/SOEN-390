@@ -24,6 +24,10 @@ const createPusherStore = () => {
     pusherClient = new Pusher(env.NEXT_PUBLIC_PUSHER_KEY, {
       cluster: env.NEXT_PUBLIC_PUSHER_CLUSTER,
       authEndpoint: '/api/pusher/auth-channel',
+      userAuthentication: {
+        transport: 'ajax',
+        endpoint: '/api/pusher/auth-user',
+      },
     });
   }
 
@@ -47,6 +51,8 @@ const createPusherStore = () => {
   // presenceChannel.bind('pusher:subscription_succeeded', updateMembers);
   // presenceChannel.bind('pusher:member_added', updateMembers);
   // presenceChannel.bind('pusher:member_removed', updateMembers);
+
+  pusherClient.signin();
 
   return store;
 };
@@ -73,7 +79,7 @@ export function connectToChannel(userId: string) {
  */
 
 // Subscribe to an event on the channel
-export function useSubscribeToEvent<MessageType>(eventName: string, callback: (data: MessageType) => void) {
+export function useSubscribeToChannelEvent<MessageType>(eventName: string, callback: (data: MessageType) => void) {
   const channel = useStore(pusherStore, (state) => state.channel);
 
   const stableCallback = useRef(callback);
@@ -92,6 +98,27 @@ export function useSubscribeToEvent<MessageType>(eventName: string, callback: (d
       channel?.unbind(eventName, reference);
     };
   }, [channel, eventName]);
+}
+
+export function useSubscribeToUserEvent<MessageType>(eventName: string, callback: (data: MessageType) => void) {
+  const pusher = useStore(pusherStore, (state) => state.pusherClient);
+
+  const stableCallback = useRef(callback);
+
+  // Keep callback sync'd
+  useEffect(() => {
+    stableCallback.current = callback;
+  }, [callback]);
+
+  useEffect(() => {
+    const reference = (data: MessageType) => {
+      stableCallback.current(data);
+    };
+    pusher.user.bind(eventName, reference);
+    return () => {
+      pusher.user.unbind(eventName, reference);
+    };
+  }, [pusher, eventName]);
 }
 
 // Retrieve the current number of members in the presence channel

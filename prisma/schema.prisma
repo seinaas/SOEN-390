@@ -73,6 +73,9 @@ model User {
     accounts        Account[]
     sessions        Session[]
     password        String?
+    notifications   Notification[]
+    sentNotifications Notification[] @relation("Sender")
+    mutedNotifTypes MutedNotificationTypes[]
 }
 
 model Connection {
@@ -152,4 +155,32 @@ enum ConnectionStatus {
     Blocked
 }
 
+// Added types for filtering, could potentially add more if needed
+enum NotificationType {
+  ConnectionRequest
+  ConnectionResponse
+  ConnectionAccepted
+  Like
+  Comment
+}
 
+model MutedNotificationTypes {
+  userId String
+  type   NotificationType
+  User   User @relation(fields: [userId], references: [id])
+
+  @@id([userId, type])
+}
+
+model Notification {
+    id        String   @id @default(cuid())
+    userId    String
+    senderId  String
+    createdAt DateTime @default(now())
+    content   String?  @db.Text
+    seen      Boolean  @default(false)
+    type      NotificationType
+    route     String?  @db.Text
+    Sender    User     @relation("Sender", fields: [senderId], references: [id])
+    User      User     @relation(fields: [userId], references: [id])
+}
