@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react';
 import { api } from '../utils/api';
 import axios from 'axios';
+export type postFile = {
+  fileName: string | undefined;
+  url: string;
+};
 
 export const usePostFiles = (post: object) => {
-  const [fileList, setFileList] = useState<string[]>();
+  const [fileList, setFileList] = useState<postFile[]>();
   const getPreSignedLISTUrl = api.cloudFlare.getPresignedLISTUrl.useMutation();
   const getPreSignedGETUrl = api.cloudFlare.getPresignedGETUrl.useMutation();
 
@@ -23,12 +27,13 @@ export const usePostFiles = (post: object) => {
     const xmlDoc = new DOMParser().parseFromString(listFileKeys.data, 'text/xml');
     const keys = xmlDoc.querySelectorAll('Key');
 
-    const fileUrlList: string[] = [];
+    const fileUrlList: postFile[] = [];
 
     //For each file key, obtain the associated get url for that file and add it to the fileUrlList
     for (const key of keys) {
-      const getUrl = await getPreSignedGETUrl.mutateAsync({ key: key?.firstChild?.data as string });
-      fileUrlList.push(getUrl);
+      const fileName = key?.innerHTML.split('/')[3];
+      const getUrl = await getPreSignedGETUrl.mutateAsync({ key: key?.innerHTML });
+      fileUrlList.push({ fileName: fileName, url: getUrl });
     }
     setFileList(fileUrlList);
   };

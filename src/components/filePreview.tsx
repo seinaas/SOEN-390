@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import * as AWS from '@aws-sdk/client-s3';
 import { env } from '../env/server.mjs';
 import axios from 'axios';
-import { usePostFiles } from '../customHooks/usePostFiles';
+import { usePostFiles, postFile } from '../customHooks/usePostFiles';
 
 type FileUploadPreviewProps = { file: File | undefined };
 type FileDownloadPreviewProps = { post: object };
@@ -36,8 +36,8 @@ export const FileDownloadPreview: React.FC<FileDownloadPreviewProps> = ({ post }
     fileList &&
     fileList.map((file) => {
       return (
-        <a href={file} key={file} download className={`relative m-4 flex`}>
-          <span>Download File</span>
+        <a href={file.url} key={file.url} download className={`relative m-4 flex`}>
+          <span>{file.fileName}</span>
         </a>
       );
     })
