@@ -29,7 +29,6 @@ export const postRouter = createTRPCRouter({
 
   // Get all posts made by a user's connections
   getPosts: protectedProcedure.query(async ({ ctx }) => {
-    console.log('\n Get post api \n ');
     const user = await ctx.prisma.user.findUnique({
       select: {
         connections: true,
@@ -100,13 +99,6 @@ export const postRouter = createTRPCRouter({
       delete updateInput.postId;
 
       const post = await ctx.prisma.post.update({
-        select: {
-          id: true,
-          userId: true,
-          content: true,
-          createdAt: true,
-          comments: true,
-        },
         where: {
           id: input.postId,
         },
@@ -241,7 +233,6 @@ export const postRouter = createTRPCRouter({
   removeLike: protectedProcedure
     .input(
       z.object({
-        postId: z.string().min(1),
         likeId: z.string().min(1),
       }),
     )
