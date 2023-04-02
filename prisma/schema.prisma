@@ -113,6 +113,8 @@ model Messages {
     createdAt      DateTime       @default(now())
     conversationId String
     DirectMessages DirectMessages @relation("Messages", fields: [conversationId], references: [id])
+    embeddedPostId String?
+    embeddedPost Post? @relation("Embed", fields: [embeddedPostId], references: [id])
 }
 
 model Education {
@@ -143,6 +145,7 @@ model Post {
     comments  Comments[]
     likes     Likes[]
     User      User     @relation(fields: [userId], references: [id])
+    messagesEmbed Messages[] @relation("Embed")
 }
 
 model Comments {    

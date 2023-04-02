@@ -1,12 +1,14 @@
 import { z } from 'zod';
 
 import { createTRPCRouter, protectedProcedure } from '../trpc';
+import type { Post } from '@prisma/client';
 
 export const chatRouter = createTRPCRouter({
   sendMessage: protectedProcedure
     .input(
       z.object({
         message: z.string(),
+        post: z.custom<Post>().optional(),
         conversationId: z.string(),
       }),
     )
@@ -15,7 +17,21 @@ export const chatRouter = createTRPCRouter({
         data: {
           senderId: ctx.session.user.id,
           message: input.message,
+          embeddedPostId: input.post?.id,
           conversationId: input.conversationId,
+        },
+        include: {
+          embeddedPost: {
+            include: {
+              User: true,
+              _count: {
+                select: {
+                  likes: true,
+                  comments: true,
+                },
+              },
+            },
+          },
         },
       });
       await ctx.pusher.trigger(input.conversationId, 'message-sent', {

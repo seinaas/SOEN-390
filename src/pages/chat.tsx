@@ -12,6 +12,7 @@ import type { RouterOutputs } from '../utils/api';
 import { api } from '../utils/api';
 import { connectToChannel, useSubscribeToEvent } from '../utils/pusher';
 import { type NextPageWithLayout } from './_app';
+import { PostMessageItem } from '../components/postMessage';
 
 function TagsInput({ tagList, setTagList }: { tagList: string[]; setTagList: Dispatch<SetStateAction<string[]>> }) {
   return (
@@ -39,7 +40,9 @@ function MessageItem({
   userId,
   lastCreatedAt,
 }: {
-  message: RouterOutputs['chat']['sendMessage'] & { sender: { firstName: string | null; lastName: string | null } };
+  message: RouterOutputs['chat']['sendMessage'] & {
+    sender: { firstName: string | null; lastName: string | null };
+  };
   userId: string;
   lastCreatedAt?: Date;
 }) {
@@ -62,13 +65,28 @@ function MessageItem({
     >
       <div className={`flex flex-col gap-1 ${isSender ? 'items-end text-right' : 'items-start text-left'} max-w-[80%]`}>
         <div>{`${message?.sender?.firstName || ''} ${message?.sender?.lastName || ''}`}</div>
-        <div
-          className={`rounded-md px-4 py-3 ${
-            isSender ? 'bg-primary-500 text-white' : 'bg-primary-100/10 text-primary-500'
-          }`}
-        >
-          {message.message}
-        </div>
+        {message.message ? (
+          <div
+            className={`rounded-md px-4 py-3 ${
+              isSender ? 'bg-primary-500 text-white' : 'bg-primary-100/10 text-primary-500'
+            }`}
+          >
+            {message.message}
+          </div>
+        ) : (
+          ''
+        )}
+        {message.embeddedPost && (
+          <div
+            className={
+              isSender
+                ? 'mt-1 rounded-md bg-primary-500 px-4 py-3 text-left'
+                : 'mt-1 rounded-md bg-primary-100/10 px-4 py-3 text-left'
+            }
+          >
+            <PostMessageItem post={message.embeddedPost}></PostMessageItem>
+          </div>
+        )}
         {(!lastCreatedAt || differenceInMinutes(message.createdAt, lastCreatedAt) > 5) && (
           <div className='text-xs text-gray-500'>{format(message.createdAt, 'MMM. do, p')}</div>
         )}
@@ -127,7 +145,11 @@ const Chat: NextPageWithLayout = () => {
   // Subscribe to a Pusher event
   useSubscribeToEvent(
     'message-sent',
-    (data: Messages & { sender: { firstName: string | null; lastName: string | null } }) => {
+    (
+      data: RouterOutputs['chat']['sendMessage'] & {
+        sender: { firstName: string | null; lastName: string | null };
+      },
+    ) => {
       setMessages((oldData) => [
         {
           ...data,
@@ -198,7 +220,9 @@ const Chat: NextPageWithLayout = () => {
       <div className='flex h-full w-[350px] flex-col overflow-y-auto bg-primary-100/10'>
         <div className='flex items-center justify-between bg-primary-500 p-4 text-2xl font-semibold text-white'>
           <h1>Your Conversations</h1>
-          <EditButton name='chat' type='add' onClick={() => setOpenNewChatModal(true)} />
+          <div data-cy='create-convo-btn'>
+            <EditButton name='chat' type='add' onClick={() => setOpenNewChatModal(true)} />
+          </div>
         </div>
         {!conversations?.length ? (
           <div className='flex h-full flex-col items-center justify-center'>
@@ -270,6 +294,9 @@ const Chat: NextPageWithLayout = () => {
             className='mt-8'
             onSubmit={(e) => {
               e.preventDefault();
+              if (!message) {
+                return;
+              }
               newChatMutation.mutate({
                 message: message,
                 conversationId: selectedConversationId,
@@ -296,6 +323,7 @@ const Chat: NextPageWithLayout = () => {
               {connections?.map((connection) => (
                 <button
                   className='flex items-center justify-start rounded-md px-4 py-3 transition-colors duration-200 hover:bg-primary-100/10'
+                  data-cy='connection-btn'
                   key={connection.id}
                   onClick={() => {
                     if (tags.find((tag) => connection.email == tag) == undefined) {
@@ -321,7 +349,7 @@ const Chat: NextPageWithLayout = () => {
               ))}
             </div>
             {tags && (
-              <div>
+              <div data-cy='tags-list'>
                 <TagsInput tagList={tags} setTagList={setTags}></TagsInput>
               </div>
             )}

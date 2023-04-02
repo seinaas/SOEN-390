@@ -1,23 +1,34 @@
 import { formatDistance } from 'date-fns';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { IoIosChatboxes, IoMdShare, IoMdThumbsUp } from 'react-icons/io';
 import MainLayout from '../components/mainLayout';
 import { type NextPageWithLayout } from './_app';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { type GetServerSidePropsContext } from 'next';
 import { getServerAuthSession } from '../server/auth';
+import type { RouterOutputs } from '../utils/api';
 import { api } from '../utils/api';
+import Modal from '../components/modal';
+import type { PostMessage } from '../components/postMessage';
 
 const Feed: NextPageWithLayout = () => {
+  const [postToShare, setPostToShare] = useState<PostMessage>({} as PostMessage);
+  const [messageToShare, setMessageToShare] = useState('');
+  const [sharePostModal, setSharePostModal] = useState(false);
   const { data } = useSession();
-
+  const [convosToShare, setConvosToShare] = useState([] as string[]);
   const [newPost, setNewPost] = useState('');
 
   const utils = api.useContext();
   const createPost = api.post.createPost.useMutation();
+  const sendMessage = api.chat.sendMessage.useMutation();
   const posts = api.post.getPosts.useQuery().data;
+
+  const conversations = api.conversation.getUserConversations.useQuery(undefined, {
+    enabled: sharePostModal,
+  }).data;
 
   const addPost = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,6 +45,18 @@ const Feed: NextPageWithLayout = () => {
         },
       );
     }
+  };
+  const sharePost = (post: RouterOutputs['post']['getPosts'][number]) => {
+    convosToShare.forEach((convoToShare) => {
+      sendMessage.mutate({
+        message: messageToShare,
+        post: post,
+        conversationId: convoToShare,
+      });
+    });
+    setConvosToShare([]);
+    setPostToShare({} as PostMessage);
+    setSharePostModal(false);
   };
 
   return (
@@ -112,7 +135,13 @@ const Feed: NextPageWithLayout = () => {
                   <IoIosChatboxes />
                   <p>Comment</p>
                 </button>
-                <button className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'>
+                <button
+                  className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'
+                  onClick={() => {
+                    setPostToShare(post);
+                    setSharePostModal(true);
+                  }}
+                >
                   <IoMdShare />
                   <p>Share</p>
                 </button>
@@ -121,6 +150,75 @@ const Feed: NextPageWithLayout = () => {
           </motion.div>
         ))}
       </div>
+      <AnimatePresence>
+        {sharePostModal && (
+          <Modal
+            onCancel={() => {
+              setConvosToShare([]);
+              setPostToShare({} as PostMessage);
+              setSharePostModal(false);
+            }}
+            onConfirm={() => sharePost(postToShare)}
+          >
+            <h1 className='mb-4 text-2xl font-semibold'>Share post</h1>
+            <div className='mb-2 flex flex-col'>
+              {conversations?.map((conversation, index) => (
+                <div className='mb-2 flex flex-row' key={index}>
+                  <input
+                    key={conversation.id}
+                    type='checkbox'
+                    id={`custom-checkbox-${index}`}
+                    className='peer hidden'
+                    checked={convosToShare.find((convo) => conversation.id === convo) != undefined}
+                    onChange={() => {
+                      if (convosToShare.find((convo) => conversation.id === convo) == undefined) {
+                        setConvosToShare((oldConvos) => [...oldConvos, conversation.id]);
+                      } else {
+                        setConvosToShare([...convosToShare.filter((convo) => convo !== conversation.id)]);
+                      }
+                    }}
+                  />
+                  <label
+                    htmlFor={`custom-checkbox-${index}`}
+                    className='w-full cursor-pointer select-none
+                  rounded-lg py-3 px-6 font-bold text-gray-200 transition-colors duration-200 ease-in-out peer-checked:bg-primary-100/10'
+                  >
+                    <div className='flex items-center'>
+                      <div className='relative h-12 w-12'>
+                        <Image
+                          fill
+                          className='rounded-full object-cover'
+                          loader={({ src }) => src}
+                          src={conversation?.users[0]?.image || '/placeholder.jpeg'}
+                          alt='User Image'
+                        />
+                      </div>
+                      <div className='ml-4'>
+                        <div className='text-lg font-semibold text-primary-500'>
+                          {conversation?.users?.length < 2
+                            ? `${conversation.users[0]?.firstName || ''} ${conversation.users[0]?.lastName || ''}`
+                            : String(
+                                conversation.users.map((user) => `${user.firstName || ''} ${user.lastName || ''}, `),
+                              ) + ` ${String(data?.user?.firstName)} ${String(data?.user?.lastName)}`}
+                        </div>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              ))}
+              {convosToShare.length > 0 && (
+                <input
+                  type='text'
+                  className='mt-5 w-full rounded-md bg-primary-100/10 px-4 py-3 pt-2 outline-none'
+                  placeholder='Type a message...'
+                  value={messageToShare}
+                  onChange={(e) => setMessageToShare(e.target.value)}
+                />
+              )}
+            </div>
+          </Modal>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

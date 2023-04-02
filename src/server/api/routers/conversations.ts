@@ -172,6 +172,23 @@ export const conversationsRouter = createTRPCRouter({
               lastName: true,
             },
           },
+          embeddedPost: {
+            include: {
+              _count: {
+                select: {
+                  comments: true,
+                  likes: true,
+                },
+              },
+              User: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  image: true,
+                },
+              },
+            },
+          },
         },
       });
       return messages;
