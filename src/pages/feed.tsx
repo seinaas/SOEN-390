@@ -1,7 +1,7 @@
 import { formatDistance, formatDistanceToNowStrict } from 'date-fns';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
-import React, { useEffect, useRef, useMemo, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { IoIosChatboxes, IoMdShare, IoMdThumbsUp, IoMdCreate, IoMdRemove } from 'react-icons/io';
 import MainLayout from '../components/mainLayout';
 import { type NextPageWithLayout } from './_app';
@@ -455,21 +455,23 @@ const Feed: NextPageWithLayout = () => {
                 className='rounded-full'
                 referrerPolicy='no-referrer'
               />
-              <form data-cy='post-form' onSubmit={addPost} className='w-full'>
-                <div className='flex h-full items-center rounded-full bg-white py-2 px-6'>
-                  <input
-                    data-cy='post-input'
-                    type='text'
-                    className='h-full w-full  text-primary-600 outline-none'
-                    placeholder={t('post')}
-                    value={newPost}
-                    onChange={(e) => setNewPost(e.target.value)}
-                  />
-                  <Upload file={file} setFile={handleSetFile} />
-                </div>
-              </form>
+              <div className='gap-y- flex flex-grow flex-col justify-center gap-y-2'>
+                <form data-cy='post-form' onSubmit={addPost} className='w-full'>
+                  <div className='flex h-full items-center rounded-full bg-white py-2 px-6'>
+                    <input
+                      data-cy='post-input'
+                      type='text'
+                      className='h-full w-full  text-primary-600 outline-none'
+                      placeholder={t('post')}
+                      value={newPost}
+                      onChange={(e) => setNewPost(e.target.value)}
+                    />
+                    <Upload file={file} setFile={handleSetFile} />
+                  </div>
+                </form>
+                {file && <FileUploadPreview file={file} />}
+              </div>
             </div>
-            <FileUploadPreview file={file} />
           </div>
         )}
         <div className='my-2 h-px w-full bg-primary-100/20' />
@@ -487,6 +489,7 @@ const Feed: NextPageWithLayout = () => {
               setEditingPostId={setEditingPostId}
             />
           ))}
+          {/* Preview of the attached file */}
           {post.hasFiles && <FileDownloadPreview post={post} />}
         </LayoutGroup>
       </div>

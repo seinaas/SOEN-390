@@ -1,30 +1,24 @@
 import Image from 'next/image';
-import { api } from '../utils/api';
-import { useEffect, useState } from 'react';
-import * as AWS from '@aws-sdk/client-s3';
-import { env } from '../env/server.mjs';
-import axios from 'axios';
-import { usePostFiles, postFile } from '../customHooks/usePostFiles';
+import { usePostFiles } from '../customHooks/usePostFiles';
+import { BsDownload } from 'react-icons/bs';
+import { IoDocumentAttachOutline } from 'react-icons/io5';
 
 type FileUploadPreviewProps = { file: File | undefined };
 type FileDownloadPreviewProps = { post: object };
 
 export const FileUploadPreview: React.FC<FileUploadPreviewProps> = ({ file }) => {
-  const imgPreview = file?.type.includes('image') ? URL.createObjectURL(file) : undefined;
+  //const imgPreview = file?.type.includes('image') ? URL.createObjectURL(file) : undefined;
 
   return (
-    <div className={`${file ? 'flex' : 'hidden'} m-4`}>
-      {(imgPreview && (
-        <Image
-          alt='image'
-          src={imgPreview || ''}
-          width={128}
-          height={32}
-          className='object-contain'
-          referrerPolicy='no-referrer'
-        />
-      )) ||
-        (file && <span>{file?.name}</span>)}
+    <div
+      className={`${
+        file ? 'flex' : 'hidden'
+      } w-fit items-center rounded-full bg-white/50 py-2 pr-4 pl-2 text-primary-600`}
+    >
+      <div className='flex items-center gap-x-2 '>
+        <IoDocumentAttachOutline className='h-6 w-6' />
+        <span>{file?.name}</span>
+      </div>
     </div>
   );
 };
@@ -36,9 +30,18 @@ export const FileDownloadPreview: React.FC<FileDownloadPreviewProps> = ({ post }
     fileList &&
     fileList.map((file) => {
       return (
-        <a href={file.url} key={file.url} download className={`relative m-4 flex`}>
-          <span>{file.fileName}</span>
-        </a>
+        <div
+          className={`mt-4 flex items-center justify-between rounded-lg bg-white/50 py-2 pr-4 pl-2 text-primary-600`}
+          key={file.url}
+        >
+          <div className='flex items-center gap-x-2 '>
+            <IoDocumentAttachOutline className='h-6 w-6' />
+            <span>{file.fileName}</span>
+          </div>
+          <a href={file.url}>
+            <BsDownload className='h-5 w-5 hover:text-primary-300' />
+          </a>
+        </div>
       );
     })
   );

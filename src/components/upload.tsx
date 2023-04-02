@@ -1,9 +1,5 @@
-import Image from 'next/image';
-import { useSession } from 'next-auth/react';
-import { useState, useRef, SetStateAction, Dispatch } from 'react';
-import { BsFileEarmarkPlus, BsSend } from 'react-icons/bs';
-import { IoMdSend } from 'react-icons/io';
-import { api } from '../utils/api';
+import { useRef } from 'react';
+import { BsFileEarmarkPlus } from 'react-icons/bs';
 
 type UploadProps = {
   file: File | undefined;
