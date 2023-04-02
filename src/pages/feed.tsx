@@ -446,15 +446,17 @@ const Feed: NextPageWithLayout = () => {
         {data?.user && (
           <div className='flex flex-col items-center rounded-full bg-primary-100/10 '>
             <div className='flex w-full gap-4 p-4'>
-              <Image
-                alt='User Avatar'
-                loader={() => data?.user?.image || '/placeholder.jpeg'}
-                src={data.user.image || '/placeholder.jpeg'}
-                width={48}
-                height={48}
-                className='rounded-full'
-                referrerPolicy='no-referrer'
-              />
+              <div className='flex flex-col '>
+                <Image
+                  alt='User Avatar'
+                  loader={() => data?.user?.image || '/placeholder.jpeg'}
+                  src={data.user.image || '/placeholder.jpeg'}
+                  width={48}
+                  height={48}
+                  className='rounded-full'
+                  referrerPolicy='no-referrer'
+                />
+              </div>
               <div className='gap-y- flex flex-grow flex-col justify-center gap-y-2'>
                 <form data-cy='post-form' onSubmit={addPost} className='w-full'>
                   <div className='flex h-full items-center rounded-full bg-white py-2 px-6'>
