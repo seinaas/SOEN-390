@@ -6,7 +6,7 @@ import { useStore } from 'zustand';
 import Button from '../components/button';
 import MainLayout from '../components/mainLayout';
 import { api } from '../utils/api';
-import { connectToChannel, pusherStore, useSubscribeToEvent } from '../utils/pusher';
+import { connectToChannel, pusherStore, useSubscribeToChannelEvent, useSubscribeToUserEvent } from '../utils/pusher';
 import { type NextPageWithLayout } from './_app';
 
 const formSchema = z.object({
@@ -20,7 +20,7 @@ const Chat: NextPageWithLayout = () => {
   const { channel } = useStore(pusherStore, (state) => state);
 
   // Subscribe to a Pusher event
-  useSubscribeToEvent('test-event', ({ message }: { message: string }) => {
+  useSubscribeToUserEvent('chat', ({ message }: { message: string }) => {
     console.log('Chat received!', message);
   });
 
