@@ -10,7 +10,7 @@ import { type GetServerSidePropsContext } from 'next';
 import { getServerAuthSession } from '../server/auth';
 import { type RouterOutputs, api } from '../utils/api';
 import { Upload, uploadFile } from '../components/upload';
-import FilePreview from '../components/filePreview';
+import { FileDownloadPreview, FileUploadPreview } from '../components/filePreview';
 import { useTranslations } from 'next-intl';
 import { enCA, fr } from 'date-fns/locale';
 import { useRouter } from 'next/router';
@@ -409,12 +409,12 @@ const Feed: NextPageWithLayout = () => {
       createPost.mutate(
         {
           content: newPost,
+          hasFiles: file ? true : false,
         },
         {
           onSuccess: (postData) => {
             void utils.post.getPosts.invalidate();
             setNewPost('');
-            console.log(postData);
             void handleUploadFile(postData);
           },
         },
@@ -435,6 +435,7 @@ const Feed: NextPageWithLayout = () => {
     }
   };
 
+  //Method passed as props to bind the file state to the Upload component
   const handleSetFile = (newFile: File | undefined) => {
     setFile(newFile);
   };
@@ -468,7 +469,7 @@ const Feed: NextPageWithLayout = () => {
                 </div>
               </form>
             </div>
-            <FilePreview file={file} />
+            <FileUploadPreview file={file} />
           </div>
         )}
         <div className='my-2 h-px w-full bg-primary-100/20' />
@@ -486,6 +487,7 @@ const Feed: NextPageWithLayout = () => {
               setEditingPostId={setEditingPostId}
             />
           ))}
+          {post.hasFiles && <FileDownloadPreview post={post} />}
         </LayoutGroup>
       </div>
     </div>

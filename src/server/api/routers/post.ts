@@ -109,6 +109,7 @@ export const postRouter = createTRPCRouter({
     .input(
       z.object({
         content: z.string().min(1).nullish(),
+        hasFiles: z.boolean().optional(),
       }),
     )
     .mutation(async ({ input, ctx }) => {

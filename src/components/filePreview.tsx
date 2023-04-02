@@ -1,13 +1,20 @@
 import Image from 'next/image';
+import { api } from '../utils/api';
+import { useEffect, useState } from 'react';
+import * as AWS from '@aws-sdk/client-s3';
+import { env } from '../env/server.mjs';
+import axios from 'axios';
+import { usePostFiles } from '../customHooks/usePostFiles';
 
-type FilePreviewProps = { file: File | undefined };
+type FileUploadPreviewProps = { file: File | undefined };
+type FileDownloadPreviewProps = { post: object };
 
-const FilePreview: React.FC<FilePreviewProps> = ({ file }) => {
+export const FileUploadPreview: React.FC<FileUploadPreviewProps> = ({ file }) => {
   const imgPreview = file?.type.includes('image') ? URL.createObjectURL(file) : undefined;
 
   return (
     <div className={`${file ? 'flex' : 'hidden'} m-4`}>
-      {(file?.type.includes('image') && (
+      {(imgPreview && (
         <Image
           alt='image'
           src={imgPreview || ''}
@@ -22,4 +29,17 @@ const FilePreview: React.FC<FilePreviewProps> = ({ file }) => {
   );
 };
 
-export default FilePreview;
+export const FileDownloadPreview: React.FC<FileDownloadPreviewProps> = ({ post }) => {
+  const [fileList] = usePostFiles(post);
+
+  return (
+    fileList &&
+    fileList.map((file) => {
+      return (
+        <a href={file} key={file} download className={`relative m-4 flex`}>
+          <span>Download File</span>
+        </a>
+      );
+    })
+  );
+};

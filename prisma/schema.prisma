@@ -146,6 +146,7 @@ model Post {
     comments  Comments[]
     likes     Likes[]
     User      User     @relation(fields: [userId], references: [id])
+    hasFiles Boolean @default(false)
 }
 
 model Comments {    
