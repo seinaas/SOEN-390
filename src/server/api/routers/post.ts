@@ -315,24 +315,26 @@ export const postRouter = createTRPCRouter({
         // Find related notification and delete it
         // TODO: This is a bit of a hack, we should be able to delete the notification
         // using the postId and userId
-        const notif = await ctx.prisma.notification.findFirst({
-          where: {
-            type: 'Like',
-            senderId: ctx.session.user.id,
-            userId: post?.userId,
-          },
-          orderBy: {
-            createdAt: 'desc',
-          },
-        });
-
-        if (notif && post?.userId) {
-          await ctx.prisma.notification.delete({
+        if (post?.userId) {
+          const notif = await ctx.prisma.notification.findFirst({
             where: {
-              id: notif.id,
+              type: 'Like',
+              senderId: ctx.session.user.id,
+              userId: post?.userId,
+            },
+            orderBy: {
+              createdAt: 'desc',
             },
           });
-          await triggerNotificationRefresh({ ctx, to: post.userId });
+
+          if (notif) {
+            await ctx.prisma.notification.delete({
+              where: {
+                id: notif.id,
+              },
+            });
+            await triggerNotificationRefresh({ ctx, to: post.userId });
+          }
         }
 
         return false;
