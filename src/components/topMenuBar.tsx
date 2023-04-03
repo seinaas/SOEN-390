@@ -1,3 +1,10 @@
+/*
+*		Top Menu Bar React Layout
+*
+*
+*		This is a React template for the menu bar at the top of each webpage, which allows for navigation between different webpages within the wesite. It contains links needed for navigation, as well as buttons
+*		for sign-in and sign-out if needed. It also does some styling and animation handling.
+*/
 import { signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';

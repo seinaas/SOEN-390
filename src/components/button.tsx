@@ -1,3 +1,9 @@
+/*
+*		Button Layout Template
+*
+*
+*		This is the React template used for buttons throughout the project. It applies animation, color schemes, as well as focusing and unfocusing functionality to all buttons that it is applied to.
+*/
 import { motion, type HTMLMotionProps } from 'framer-motion';
 
 type Props = {
