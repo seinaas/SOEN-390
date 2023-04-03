@@ -1,6 +1,6 @@
-import { comment } from 'postcss';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
+import { triggerNotification, triggerNotificationRefresh } from '../helpers';
 
 /**
  * This is the post router.
@@ -59,14 +59,14 @@ export const postRouter = createTRPCRouter({
   // Get all posts made by a user's connections
   getPosts: protectedProcedure.query(async ({ ctx }) => {
     const user = await ctx.prisma.user.findUnique({
-      select: {
+      include: {
         connections: true,
+        connectionOf: true,
       },
       where: {
         id: ctx.session.user.id,
       },
     });
-
     // Search for posts where the poster's userId is in the list of connections
     const posts = await ctx.prisma.post.findMany({
       where: {
@@ -74,6 +74,7 @@ export const postRouter = createTRPCRouter({
           in: [
             ctx.session.user.id,
             ...(user?.connections.map((c) => (c.user1Id === ctx.session.user.id ? c.user2Id : c.user1Id)) || []),
+            ...(user?.connectionOf.map((c) => (c.user1Id === ctx.session.user.id ? c.user2Id : c.user1Id)) || []),
           ] || [ctx.session.user.id],
         },
       },
@@ -169,7 +170,7 @@ export const postRouter = createTRPCRouter({
     .input(
       z.object({
         postId: z.string().min(1),
-        content: z.string().min(1).nullish(),
+        content: z.string().min(1),
       }),
     )
     .mutation(async ({ input, ctx }) => {
@@ -179,6 +180,23 @@ export const postRouter = createTRPCRouter({
           userId: ctx.session.user.id,
         },
       });
+
+      // Get the post that the comment was made on
+      const post = await ctx.prisma.post.findUnique({
+        where: {
+          id: input.postId,
+        },
+      });
+
+      // Send a notification to the user that made the post
+      if (post?.userId) {
+        await triggerNotification({
+          type: 'Comment',
+          to: post.userId,
+          content: `Left a comment: ${input.content}`,
+          ctx,
+        });
+      }
       return comment;
     }),
 
@@ -270,32 +288,19 @@ export const postRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-<<<<<<< HEAD
-      const like = await ctx.prisma.likes.create({
-        data: {
-          ...input,
-          userId: ctx.session.user.id,
-          postId: input.postId,
-        },
-      });
-      return like;
-    }),
-
-  // Unlike a post
-  removeLike: protectedProcedure
-    .input(
-      z.object({
-        likeId: z.string().min(1),
-      }),
-    )
-    .mutation(async ({ input, ctx }) => {
-      const like = await ctx.prisma.likes.delete({
-=======
       const like = await ctx.prisma.likes.findMany({
->>>>>>> 7e690b8 (Updated styling, separated code into components, fixed api issues, updated api)
         where: {
           postId: input.postId,
           userId: ctx.session.user.id,
+        },
+      });
+
+      const post = await ctx.prisma.post.findUnique({
+        where: {
+          id: input.postId,
+        },
+        select: {
+          userId: true,
         },
       });
 
@@ -306,6 +311,30 @@ export const postRouter = createTRPCRouter({
             userId: ctx.session.user.id,
           },
         });
+
+        // Find related notification and delete it
+        // TODO: This is a bit of a hack, we should be able to delete the notification
+        // using the postId and userId
+        const notif = await ctx.prisma.notification.findFirst({
+          where: {
+            type: 'Like',
+            senderId: ctx.session.user.id,
+            userId: post?.userId,
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+        });
+
+        if (notif && post?.userId) {
+          await ctx.prisma.notification.delete({
+            where: {
+              id: notif.id,
+            },
+          });
+          await triggerNotificationRefresh({ ctx, to: post.userId });
+        }
+
         return false;
       } else {
         await ctx.prisma.likes.create({
@@ -314,6 +343,16 @@ export const postRouter = createTRPCRouter({
             userId: ctx.session.user.id,
           },
         });
+
+        if (post?.userId) {
+          await triggerNotification({
+            type: 'Like',
+            to: post.userId,
+            content: 'liked your post',
+            ctx,
+          });
+        }
+
         return true;
       }
     }),

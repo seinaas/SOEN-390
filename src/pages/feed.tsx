@@ -33,7 +33,6 @@ const Post: React.FC<PostProps> = ({
   const [editingContent, setEditingContent] = useState('');
   const [shared, setShared] = useState(false);
   const [newComment, setNewComment] = useState('');
-  const [liked, setLiked] = useState(false);
 
   const commentRef = useRef<HTMLInputElement>(null);
 
@@ -41,7 +40,6 @@ const Post: React.FC<PostProps> = ({
     { postId: initialPost.id },
     {
       enabled: false,
-      refetchOnWindowFocus: false,
     },
   );
   const utils = api.useContext();
@@ -63,7 +61,7 @@ const Post: React.FC<PostProps> = ({
   });
 
   const post = updatedPost || initialPost;
-  const isLiked = !!post.likes?.find((like) => like.userId === userId && like.postId === post.id) || liked;
+  const isLiked = !!post.likes?.find((like) => like.userId === userId && like.postId === post.id);
 
   const removePost = (postId: string) => {
     deletePost.mutate({
@@ -186,8 +184,8 @@ const Post: React.FC<PostProps> = ({
                     postId: post.id,
                   },
                   {
-                    onSuccess: (data) => {
-                      setLiked(data);
+                    onSuccess: () => {
+                      void refetchPost();
                     },
                   },
                 );
@@ -199,7 +197,7 @@ const Post: React.FC<PostProps> = ({
               }`}
             >
               <IoMdThumbsUp />
-              <p>Like {(!!post.likes?.length || isLiked) && post.likes.length + (isLiked ? 1 : 0)}</p>
+              <p>Like {!!post.likes?.length && post.likes.length}</p>
             </button>
             <button
               className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'
@@ -408,7 +406,7 @@ const Feed: NextPageWithLayout = () => {
   const currentUser = data?.user;
   const utils = api.useContext();
 
-  const posts = api.post.getPosts.useQuery(undefined, { refetchOnWindowFocus: false }).data;
+  const posts = api.post.getPosts.useQuery().data;
 
   const createPost = api.post.createPost.useMutation();
 
