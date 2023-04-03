@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { api } from '../utils/api';
 import axios from 'axios';
-export type postFile = {
+import { type Post } from '@prisma/client';
+
+export type PostFile = {
   fileName: string | undefined;
   url: string;
 };
-
-export const usePostFiles = (post: object) => {
-  const [fileList, setFileList] = useState<postFile[]>();
+export const usePostFiles = (post: Post) => {
+  const [fileList, setFileList] = useState<PostFile[]>();
   const getPreSignedLISTUrl = api.cloudFlare.getPresignedLISTUrl.useMutation();
   const getPreSignedGETUrl = api.cloudFlare.getPresignedGETUrl.useMutation();
 
@@ -24,10 +25,10 @@ export const usePostFiles = (post: object) => {
       method: 'GET',
     });
 
-    const xmlDoc = new DOMParser().parseFromString(listFileKeys.data, 'text/xml');
+    const xmlDoc = new DOMParser().parseFromString(listFileKeys.data as string, 'text/xml');
     const keys = xmlDoc.querySelectorAll('Key');
 
-    const fileUrlList: postFile[] = [];
+    const fileUrlList: PostFile[] = [];
 
     //For each file key, obtain the associated get url for that file and add it to the fileUrlList
     for (const key of keys) {
@@ -37,6 +38,7 @@ export const usePostFiles = (post: object) => {
     }
     setFileList(fileUrlList);
   };
+
   useEffect(() => {
     void loadFile();
   }, []);

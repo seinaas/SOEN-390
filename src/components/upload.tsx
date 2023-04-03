@@ -2,11 +2,11 @@ import { useRef } from 'react';
 import { BsFileEarmarkPlus } from 'react-icons/bs';
 
 type UploadProps = {
-  file: File | undefined;
-  setFile: (file: File | undefined) => void;
+  file?: File;
+  setFile: (file?: File) => void;
 };
 
-export const Upload: React.FC<UploadProps> = ({ file = undefined, setFile }) => {
+export const Upload: React.FC<UploadProps> = ({ setFile }) => {
   // TODO: add multi-upload capabilities
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -29,7 +29,7 @@ export const Upload: React.FC<UploadProps> = ({ file = undefined, setFile }) => 
   );
 };
 
-export const uploadFile = async (file: File | undefined, url: string) => {
+export const uploadFile = async ({ file, url }: { file?: File; url: string }) => {
   //If no files has been selected
   if (!file) {
     console.log('No file has been selected.');

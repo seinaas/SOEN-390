@@ -1,8 +1,7 @@
 import { type GetServerSidePropsContext } from 'next';
-import { useState, type ReactElement } from 'react';
+import { useState } from 'react';
 import { getServerAuthSession } from '../../server/auth';
 import { type NextPageWithLayout } from '../_app';
-import AuthLayout from '../../components/authLayout';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';

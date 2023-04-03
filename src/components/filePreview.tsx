@@ -1,10 +1,10 @@
-import Image from 'next/image';
+import { type Post } from '@prisma/client';
 import { usePostFiles } from '../customHooks/usePostFiles';
 import { BsDownload } from 'react-icons/bs';
 import { IoDocumentAttachOutline } from 'react-icons/io5';
 
-type FileUploadPreviewProps = { file: File | undefined };
-type FileDownloadPreviewProps = { post: object };
+type FileUploadPreviewProps = { file?: File };
+type FileDownloadPreviewProps = { post: Post };
 
 export const FileUploadPreview: React.FC<FileUploadPreviewProps> = ({ file }) => {
   //const imgPreview = file?.type.includes('image') ? URL.createObjectURL(file) : undefined;

@@ -11,6 +11,7 @@ import { getServerAuthSession } from '../server/auth';
 import { type RouterOutputs, api } from '../utils/api';
 import { Upload, uploadFile } from '../components/upload';
 import { FileDownloadPreview, FileUploadPreview } from '../components/filePreview';
+import { type Post } from '@prisma/client';
 import { useTranslations } from 'next-intl';
 import { enCA, fr } from 'date-fns/locale';
 import { useRouter } from 'next/router';
@@ -403,7 +404,7 @@ const Feed: NextPageWithLayout = () => {
 
   const getPreSignedPUTUrl = api.cloudFlare.getPresignedPUTUrl.useMutation();
 
-  const addPost = async (e: React.FormEvent<HTMLFormElement>) => {
+  const addPost = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (newPost) {
       createPost.mutate(
@@ -422,7 +423,7 @@ const Feed: NextPageWithLayout = () => {
     }
   };
 
-  const handleUploadFile = async (postData: object) => {
+  const handleUploadFile = async (postData: Post) => {
     if (file && postData) {
       const url = await getPreSignedPUTUrl.mutateAsync({
         fileName: file.name,
@@ -430,7 +431,7 @@ const Feed: NextPageWithLayout = () => {
         postId: postData.id,
         containerType: 'posts',
       });
-      await uploadFile(file, url);
+      await uploadFile({ file, url });
       setFile(undefined);
     }
   };
