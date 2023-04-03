@@ -200,21 +200,6 @@ export const postRouter = createTRPCRouter({
       return comment;
     }),
 
-  getComments: protectedProcedure.query(async ({ ctx }) => {
-    const comments = await ctx.prisma.comments.findMany({
-      include: {
-        User: {
-          select: {
-            firstName: true,
-            lastName: true,
-            image: true,
-          },
-        },
-      },
-    });
-    return comments;
-  }),
-
   // Get all comments for a post
   getCommentsPerPost: protectedProcedure
     .input(
@@ -358,21 +343,6 @@ export const postRouter = createTRPCRouter({
         return true;
       }
     }),
-
-  getLikes: protectedProcedure.query(async ({ ctx }) => {
-    const likes = await ctx.prisma.likes.findMany({
-      include: {
-        User: {
-          select: {
-            firstName: true,
-            lastName: true,
-            image: true,
-          },
-        },
-      },
-    });
-    return likes;
-  }),
 
   // Get all likes for a post
   getLikesPerPost: protectedProcedure

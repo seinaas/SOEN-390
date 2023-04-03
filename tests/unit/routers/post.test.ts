@@ -148,6 +148,20 @@ describe('post', () => {
         });
       });
     });
+    describe('getCommentsPerPost', () => {
+      it('should get comments for a post', async () => {
+        const getComments = jest.spyOn(request.ctx.prisma.comments, 'findMany').mockImplementation();
+        await request.caller.post.getCommentsPerPost({
+          postId: '1',
+        });
+        expect(getComments).toHaveBeenCalledWith({
+          where: {
+            postId: '1',
+          },
+          include: expect.anything(),
+        });
+      });
+    });
     describe('toggleLike', () => {
       it('should like a post if not liked', async () => {
         const createLike = jest.spyOn(request.ctx.prisma.likes, 'create').mockImplementation();

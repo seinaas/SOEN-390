@@ -118,6 +118,7 @@ const Post: React.FC<PostProps> = ({
 
   return (
     <motion.div
+      data-cy='post'
       className='flex flex-col gap-2 rounded-xl bg-primary-100/10 p-4'
       layout
       initial={{ opacity: 0, y: 20 }}
@@ -147,13 +148,14 @@ const Post: React.FC<PostProps> = ({
               <div className='flex items-center gap-1'>
                 <div>
                   <button
+                    data-cy='edit-post-btn'
                     onClick={() => {
                       setEditingPostId(editingPost ? '' : post.id);
                     }}
                   >
                     <IoMdCreate />
                   </button>
-                  <button onClick={() => removePost(post.id)}>
+                  <button data-cy='delete-post-btn' onClick={() => removePost(post.id)}>
                     <IoMdRemove />
                   </button>
                 </div>
@@ -162,8 +164,9 @@ const Post: React.FC<PostProps> = ({
           </motion.div>
 
           {editingPost ? (
-            <form onSubmit={(e) => modifyPost(e, post.id)} className='w-full'>
+            <form data-cy='edit-post-form' onSubmit={(e) => modifyPost(e, post.id)} className='w-full'>
               <input
+                data-cy='edit-post-input'
                 type='text'
                 className='h-full w-full rounded-full bg-white py-2 px-6 text-primary-600 outline-none'
                 placeholder={post.content || ''}
@@ -177,7 +180,7 @@ const Post: React.FC<PostProps> = ({
 
           <motion.div layout className='mt-2 flex items-center gap-2 border-t-2 border-t-primary-100/20 pt-2'>
             <button
-              key={post.id}
+              data-cy='like-btn'
               onClick={() => {
                 toggleLike.mutate(
                   {
@@ -197,9 +200,12 @@ const Post: React.FC<PostProps> = ({
               }`}
             >
               <IoMdThumbsUp />
-              <p>Like {!!post.likes?.length && post.likes.length}</p>
+              <p>
+                {isLiked ? 'Liked' : 'Like'} {!!post.likes?.length && post.likes.length}
+              </p>
             </button>
             <button
+              data-cy='comment-btn'
               className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'
               onClick={() => {
                 setCommentingPostId(commentingPost ? '' : post.id);
@@ -209,6 +215,7 @@ const Post: React.FC<PostProps> = ({
               <p>Comment</p>
             </button>
             <button
+              data-cy='share-btn'
               onClick={() => setShared(!shared)}
               className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'
             >
@@ -245,8 +252,9 @@ const Post: React.FC<PostProps> = ({
               className='rounded-full'
               referrerPolicy='no-referrer'
             />
-            <form onSubmit={(e) => addComment(e, post.id)} className='w-full'>
+            <form data-cy='comment-form' onSubmit={(e) => addComment(e, post.id)} className='w-full'>
               <input
+                data-cy='comment-input'
                 type='text'
                 className='h-full w-full rounded-full bg-white py-2 px-6 text-primary-600 outline-none'
                 placeholder='Write a comment'
@@ -307,6 +315,7 @@ const Comment: React.FC<CommentProps> = ({ comment, refetchPost }) => {
   };
   return (
     <motion.div
+      data-cy='comment'
       layout
       key={comment.commentId}
       initial={{ opacity: 0, y: 20 }}
@@ -330,21 +339,23 @@ const Comment: React.FC<CommentProps> = ({ comment, refetchPost }) => {
           </h1>
           <div className='flex items-center gap-1'>
             <button
+              data-cy='edit-comment-btn'
               onClick={() => {
                 setIsEditing(!isEditing);
               }}
             >
               <IoMdCreate />
             </button>
-            <button onClick={(e) => removeComment(e, comment.commentId)}>
+            <button data-cy='delete-comment-btn' onClick={(e) => removeComment(e, comment.commentId)}>
               <IoMdRemove />
             </button>
           </div>
         </motion.div>
         <div className='flex flex-col justify-center gap-2'>
           {isEditing ? (
-            <form onSubmit={(e) => modifyComment(e, comment.commentId)} className='w-full'>
+            <form data-cy='edit-comment-form' onSubmit={(e) => modifyComment(e, comment.commentId)} className='w-full'>
               <input
+                data-cy='edit-comment-input'
                 type='text'
                 className='h-full w-full rounded-full bg-white py-2 px-6 text-primary-600 outline-none'
                 placeholder={comment.content || ''}
@@ -360,42 +371,6 @@ const Comment: React.FC<CommentProps> = ({ comment, refetchPost }) => {
     </motion.div>
   );
 };
-
-type Post = {
-  poster: string;
-  logo: string;
-  time: Date;
-  likes: number;
-  text?: string;
-  padding?: boolean;
-  id: number;
-};
-
-const posts: Post[] = [
-  {
-    poster: 'Apple',
-    logo: 'https://cdn.cdnlogo.com/logos/a/2/apple.svg',
-    time: new Date(Date.now() - 1000 * 60 * 60 * 4),
-    likes: 123102,
-    padding: true,
-    id: 1,
-  },
-  {
-    poster: 'Netflix',
-    logo: 'https://cdn.cdnlogo.com/logos/n/75/netflix.svg',
-    time: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2),
-    likes: 92000,
-    padding: true,
-    id: 2,
-  },
-  {
-    poster: 'Concordia',
-    logo: '/concordia.jpeg',
-    time: new Date(Date.now() - 1000 * 55),
-    likes: 201,
-    id: 3,
-  },
-];
 
 const Feed: NextPageWithLayout = () => {
   const { data } = useSession();
@@ -441,8 +416,9 @@ const Feed: NextPageWithLayout = () => {
               className='rounded-full'
               referrerPolicy='no-referrer'
             />
-            <form onSubmit={addPost} className='w-full'>
+            <form data-cy='post-form' onSubmit={addPost} className='w-full'>
               <input
+                data-cy='post-input'
                 type='text'
                 className='h-full w-full rounded-full bg-white py-2 px-6 text-primary-600 outline-none'
                 placeholder='Start a post'
