@@ -3,16 +3,63 @@ import { signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { IoIosChatbubbles, IoMdHome, IoMdLogOut, IoMdPeople, IoMdClose } from 'react-icons/io';
+import { IoIosChatbubbles, IoMdHome, IoMdLogOut, IoMdPeople, IoMdClose, IoIosNotifications } from 'react-icons/io';
 import { api } from '../utils/api';
 import { FiMenu } from 'react-icons/fi';
+import { useSubscribeToUserEvent } from '../utils/pusher';
+import { NotificationsDropdown } from './notifications/notificationsDropdown';
+
+const NotificationBubble = ({ count }: { count: number }) => {
+  return (
+    <AnimatePresence>
+      {count > 0 && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.2 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.2 }}
+          transition={{
+            type: 'spring',
+            stiffness: 500,
+            damping: 30,
+          }}
+          className='absolute -top-1 -right-1 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-red-500 p-1'
+        >
+          <span className='text-xs font-bold text-white'>{count}</span>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
 
 const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
 
-  const { data } = useSession();
+  const [notifCount, setNotifCount] = useState(0);
+  const [chatNotifCount, setChatNotifCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const [showNotifDropdown, setShowNotifDropdown] = useState(false);
+
+  const utils = api.useContext();
+  api.notifications.getNotificationCount.useQuery(undefined, {
+    onSuccess: (data) => {
+      setNotifCount(data);
+    },
+    refetchOnWindowFocus: false,
+  });
+
+  useSubscribeToUserEvent('notification', () => {
+    setNotifCount((prev) => prev + 1);
+  });
+  useSubscribeToUserEvent('notification-refresh', () => {
+    void utils.notifications.getNotificationCount.refetch();
+    void utils.notifications.getNotifications.refetch();
+  });
+  useSubscribeToUserEvent('chat', () => {
+    setChatNotifCount((prev) => prev + 1);
+  });
+
+  const { data } = useSession();
   const { data: searchRes, refetch } = api.user.search.useQuery(
     { query: searchQuery },
     {
@@ -48,7 +95,7 @@ const Header: React.FC = () => {
             isOpen ? 'opacity-50' : 'opacity-0'
           }  min-h-screen bg-gray-900  transition-all duration-300 ease-out`}
           data-cy='header-sliding-mobile-menu-grey-area'
-        ></div>
+        />
         <div
           className={`${
             isOpen ? 'translate-x-0' : 'translate-x-full'
@@ -59,18 +106,23 @@ const Header: React.FC = () => {
               setIsOpen(!isOpen);
             }}
             data-cy='header-mobile-sliding-menu-close-btn'
-            className={`block h-8 w-8 cursor-pointer rounded-lg hover:text-primary-100  md:hidden`}
-          ></IoMdClose>
-          <Link href='/feed' className=' hover:text-primary-100'>
+            className={`block h-8 w-8 cursor-pointer rounded-lg hover:text-primary-100 md:hidden`}
+          />
+          <Link href='/feed' className='hover:text-primary-100'>
             <IoMdHome size={28} />
           </Link>
-          <Link href='/' className='  hover:text-primary-100 '>
+          <Link href='/' className='hover:text-primary-100'>
             <IoMdPeople size={28} />
           </Link>
-          <Link href='/chat' className='  hover:text-primary-100 '>
+          <Link href='/chat' className='relative hover:text-primary-100'>
+            <NotificationBubble count={chatNotifCount} />
             <IoIosChatbubbles size={28} />
           </Link>
-          <button onClick={() => signOut()} className='  hover:text-primary-100 '>
+          <Link href='/notifications' className='relative hover:text-primary-100'>
+            <NotificationBubble count={notifCount} />
+            <IoIosNotifications size={28} />
+          </Link>
+          <button onClick={() => signOut()} className='hover:text-primary-100'>
             <IoMdLogOut size={28} />
           </button>
         </div>
@@ -103,7 +155,7 @@ const Header: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
-                  className='absolute top-4 left-0 -z-10 max-h-96 w-96 overflow-auto rounded-lg bg-white pt-6 shadow-lg'
+                  className='absolute top-4 left-0 right-0 -z-10 max-h-96 overflow-auto rounded-lg bg-white pt-6 shadow-lg'
                 >
                   {searchRes.map((user) => (
                     <motion.div layout key={user.email}>
@@ -149,9 +201,20 @@ const Header: React.FC = () => {
             <Link href='/' className='text-primary-500 hover:text-primary-600'>
               <IoMdPeople size={28} />
             </Link>
-            <Link href='/chat' className='text-primary-500 hover:text-primary-600'>
+            <Link href='/chat' className='relative text-primary-500 hover:text-primary-600'>
+              <NotificationBubble count={chatNotifCount} />
               <IoIosChatbubbles size={28} />
             </Link>
+            <span className='relative flex items-center justify-center'>
+              <button
+                onClick={() => setShowNotifDropdown((prev) => !prev)}
+                className='relative text-primary-500 hover:text-primary-600'
+              >
+                <NotificationBubble count={notifCount} />
+                <IoIosNotifications size={28} />
+              </button>
+              <AnimatePresence>{showNotifDropdown && <NotificationsDropdown />}</AnimatePresence>
+            </span>
             <button
               onClick={() => signOut()}
               className='text-primary-500 hover:text-primary-600'
@@ -177,11 +240,10 @@ const Header: React.FC = () => {
             </Link>
           )}
           {/* Hamburger Menu Button*/}
-          <FiMenu
-            onClick={() => setIsOpen(!isOpen)}
-            className={`block h-8 w-8 cursor-pointer rounded-lg text-primary-500  md:hidden`}
-            data-cy='header-hamburger-button'
-          ></FiMenu>
+          <button data-cy='header-hamburger-button' onClick={() => setIsOpen(!isOpen)} className='relative md:hidden'>
+            <NotificationBubble count={notifCount + chatNotifCount} />
+            <FiMenu className={`block h-8 w-8 cursor-pointer rounded-lg text-primary-500`} />
+          </button>
         </div>
       </div>
     </>

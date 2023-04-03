@@ -1,4 +1,4 @@
-import { formatDistance } from 'date-fns';
+import { formatDistanceToNowStrict } from 'date-fns';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -37,14 +37,14 @@ const Feed: NextPageWithLayout = () => {
   };
 
   return (
-    <div className='flex items-center justify-center p-8'>
-      <div className='flex w-[32rem] flex-col gap-2'>
+    <div className='flex h-full w-full justify-center p-2 md:p-8'>
+      <div className='flex w-full max-w-[32rem] flex-col gap-2'>
         {data?.user && (
           <div className='flex gap-4 rounded-full bg-primary-100/10 p-4'>
             <Image
               alt='User Avatar'
-              loader={() => data?.user?.image || ''}
-              src={data.user.image || ''}
+              loader={() => data?.user?.image || '/placeholder.jpeg'}
+              src={data.user.image || '/placeholder.jpeg'}
               width={48}
               height={48}
               className='rounded-full'
@@ -63,46 +63,47 @@ const Feed: NextPageWithLayout = () => {
         )}
 
         <div className='my-2 h-px w-full bg-primary-100/20' />
-
-        {posts?.map((post) => (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            key={`${post.User.firstName || ''} ${post.User.lastName || ''} - ${post.createdAt.getTime()}`}
-            className='flex items-start gap-4 rounded-xl bg-primary-100/10 p-4 pr-8'
-          >
-            <div className='relative h-12 min-h-[48px] w-12 min-w-[48px]'>
-              <Image
-                alt='Logo'
-                loader={() => post.User.image || '/placeholder.jpeg'}
-                src={post.User.image || 'placeholder.jpeg'}
-                fill
-                className='rounded-md bg-white object-contain'
-                referrerPolicy='no-referrer'
-              />
-            </div>
-            <div className='flex flex-1 flex-col'>
-              <div className='flex items-center justify-between'>
-                <div className='flex items-center gap-2'>
-                  <p className='font-bold text-primary-500'>
-                    {post.User.firstName} {post.User.lastName}
-                  </p>
-                  <p className='text-primary-400'>•</p>
-                  <p className='text-primary-400'>{formatDistance(post.createdAt, new Date(), { addSuffix: true })}</p>
+        <div className='flex flex-col-reverse gap-4'>
+          {posts?.map((post) => (
+            <motion.div
+              layout
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              key={`${post.User.firstName || ''} ${post.User.lastName || ''} - ${post.createdAt.getTime()}`}
+              className='flex flex-col rounded-xl bg-primary-100/10 p-4'
+            >
+              <div className='flex gap-2'>
+                <div className='relative h-12 min-h-[48px] w-12 min-w-[48px]'>
+                  <Image
+                    alt='Logo'
+                    loader={() => post.User.image || '/placeholder.jpeg'}
+                    src={post.User.image || 'placeholder.jpeg'}
+                    fill
+                    className='rounded-md bg-white object-contain'
+                    referrerPolicy='no-referrer'
+                  />
                 </div>
-                <div className='flex items-center gap-1'>
-                  <span className='h-[2px] w-[2px] rounded-full bg-primary-600' />
-                  <div className='h-[2px] w-[2px] rounded-full bg-primary-600' />
-                  <div className='h-[2px] w-[2px] rounded-full bg-primary-600' />
-                </div>
-              </div>
-              <p className='text-primary-500'>
-                {post.content
-                  ? post.content
-                  : `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget consectetur lacinia,
+                <div className='flex flex-1 flex-col'>
+                  <div className='flex items-center justify-between'>
+                    <div className='flex items-center gap-2'>
+                      <p className='font-bold text-primary-500'>
+                        {post.User.firstName} {post.User.lastName}
+                      </p>
+                      <p className='text-primary-400'>•</p>
+                      <p className='text-primary-400'>
+                        {formatDistanceToNowStrict(post.createdAt, { addSuffix: true })}
+                      </p>
+                    </div>
+                  </div>
+                  <p className='text-primary-500'>
+                    {post.content
+                      ? post.content
+                      : `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget consectetur lacinia,
                 nisl nisl aliquam nisl, eget ultricies nisl nisl sit amet nisl. Suspendisse potenti. Nulla facilisi.
                 Nulla facilisi. Nulla facilisi. Nulla facilisi.`}
-              </p>
+                  </p>
+                </div>
+              </div>
               <div className='mt-2 flex items-center gap-2 border-t-2 border-t-primary-100/20 pt-2'>
                 <button className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'>
                   <IoMdThumbsUp />
@@ -117,9 +118,9 @@ const Feed: NextPageWithLayout = () => {
                   <p>Share</p>
                 </button>
               </div>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          ))}
+        </div>
       </div>
     </div>
   );
