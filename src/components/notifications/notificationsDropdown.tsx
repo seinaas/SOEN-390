@@ -22,6 +22,13 @@ export const NotificationsDropdown: React.FC = () => {
     },
   );
 
+  const markAsSeen = api.notifications.updateNotification.useMutation({
+    onSuccess: () => {
+      void utils.notifications.getNotifications.refetch();
+      void utils.notifications.getNotificationCount.refetch();
+    },
+  });
+
   useSubscribeToUserEvent('notification', () => {
     void utils.notifications.getNotifications.refetch();
   });
@@ -80,7 +87,12 @@ export const NotificationsDropdown: React.FC = () => {
               damping: 30,
             }}
             key={notification.id}
-            onClick={() => !!notification.route && router.push(notification.route)}
+            onClick={() => {
+              void markAsSeen.mutate({ id: notification.id, seen: true });
+              if (!!notification.route) {
+                void router.push(notification.route);
+              }
+            }}
             className={`flex items-center gap-2 rounded-lg p-2 pr-4 transition-colors duration-200 ${
               notification.seen ? 'bg-gray-200/30' : 'bg-primary-100/20'
             } ${notification.route ? 'hover:bg-primary-100/30 active:bg-primary-100/50' : ''}`}
@@ -94,7 +106,7 @@ export const NotificationsDropdown: React.FC = () => {
               className='rounded-full'
               referrerPolicy='no-referrer'
             />
-            <div className='flex flex-col'>
+            <div className='flex flex-1 flex-col'>
               <div className='flex items-center justify-between'>
                 <span className='font-bold text-primary-300'>
                   {notification.Sender.firstName} {notification.Sender.lastName}

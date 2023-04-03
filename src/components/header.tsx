@@ -87,7 +87,7 @@ const Header: React.FC = () => {
       {/* Sliding Mobile Menu */}
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className={`${isOpen ? '' : 'invisible'} fixed z-50 float-left min-h-screen w-full justify-end  md:hidden`}
+        className={`${isOpen ? '' : 'invisible'} fixed z-50 float-left min-h-screen w-full justify-end md:hidden`}
         data-cy='header-sliding-mobile-menu'
       >
         <div
@@ -128,7 +128,7 @@ const Header: React.FC = () => {
         </div>
       </div>
       {/* Heading Menu */}
-      <div className='z-40 flex h-20 w-full items-center justify-center gap-8 border-b-2 border-primary-100 px-6 py-4 md:px-12'>
+      <div className='z-40 flex h-20 min-h-[5rem] w-full items-center justify-center gap-8 border-b-2 border-primary-100 px-6 py-4 md:px-12'>
         {/* User Search Bar, Dropdown and Logo */}
         <div className='flex h-full flex-grow items-center gap-8'>
           <Link href='/feed' className='relative block h-full w-32'>
