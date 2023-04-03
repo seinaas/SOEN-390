@@ -27,22 +27,24 @@ export const FileDownloadPreview: React.FC<FileDownloadPreviewProps> = ({ post }
   const [fileList] = usePostFiles(post);
 
   return (
-    fileList &&
-    fileList.map((file) => {
-      return (
-        <div
-          className={`mt-4 flex items-center justify-between rounded-lg bg-white/50 py-2 pr-4 pl-2 text-primary-600`}
-          key={file.url}
-        >
-          <div className='flex items-center gap-x-2 '>
-            <IoDocumentAttachOutline className='h-6 w-6' />
-            <span>{file.fileName}</span>
-          </div>
-          <a href={file.url}>
-            <BsDownload className='h-5 w-5 hover:text-primary-300' />
-          </a>
-        </div>
-      );
-    })
+    <div>
+      {fileList &&
+        fileList.map((file) => {
+          return (
+            <div
+              className={`mt-4 flex items-center justify-between rounded-lg bg-white/50 py-2 pr-4 pl-2 text-primary-600`}
+              key={file.url}
+            >
+              <div className='flex items-center gap-x-2 '>
+                <IoDocumentAttachOutline className='h-6 w-6' />
+                <span>{file.fileName}</span>
+              </div>
+              <a href={file.url}>
+                <BsDownload className='h-5 w-5 hover:text-primary-300' />
+              </a>
+            </div>
+          );
+        })}
+    </div>
   );
 };
