@@ -10,14 +10,14 @@ import Modal from '../components/modal';
 import EditButton from '../components/profile/editButton';
 import type { RouterOutputs } from '../utils/api';
 import { api } from '../utils/api';
-import { connectToChannel, useSubscribeToEvent } from '../utils/pusher';
+import { connectToChannel, useSubscribeToChannelEvent } from '../utils/pusher';
 import { type NextPageWithLayout } from './_app';
 
 function TagsInput({ tagList, setTagList }: { tagList: string[]; setTagList: Dispatch<SetStateAction<string[]>> }) {
   return (
     <div className='tags-input-container mt-1 flex-wrap p-1'>
       {tagList.map((tag, index) => (
-        <div className='tag-item mr-1 mt-1 inline-block rounded-2xl bg-primary-100 p-2' key={index}>
+        <div className='tag-item mr-1 mt-1 inline-block rounded-2xl bg-primary-100 py-2 px-4 text-white' key={index}>
           <span className='text'>{tag}</span>
           <button
             className='close ml-1'
@@ -125,7 +125,7 @@ const Chat: NextPageWithLayout = () => {
   }, []);
 
   // Subscribe to a Pusher event
-  useSubscribeToEvent(
+  useSubscribeToChannelEvent(
     'message-sent',
     (data: Messages & { sender: { firstName: string | null; lastName: string | null } }) => {
       setMessages((oldData) => [
@@ -184,7 +184,7 @@ const Chat: NextPageWithLayout = () => {
           connectToChannel(data.id);
           localStorage.setItem('lastChannel', data.id);
         } else {
-          setSelectedConversationId(data);
+          setSelectedConversationId(data.id);
         }
       },
     });

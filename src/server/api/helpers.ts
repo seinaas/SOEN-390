@@ -37,10 +37,23 @@ export const triggerNotification = async ({ type, to, content, route, ctx }: Not
   }
 };
 
+export const triggerChatNotification = async ({
+  to,
+  ctx,
+}: {
+  to: string;
+  ctx: ReturnType<typeof createInnerTRPCContext>;
+}) => {
+  if (ctx.session?.user?.id && ctx.session.user.id !== to) {
+    await ctx.pusher.sendToUser(to, 'chat', {});
+  }
+};
+
 type NotificationRefreshParams = {
   ctx: ReturnType<typeof createInnerTRPCContext>;
   to: string;
 };
 export const triggerNotificationRefresh = async ({ to, ctx }: NotificationRefreshParams) => {
+  // TODO: Store in DB with conversation id
   await ctx.pusher.sendToUser(to, 'notification-refresh', {});
 };

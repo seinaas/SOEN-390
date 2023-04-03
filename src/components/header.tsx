@@ -8,6 +8,7 @@ import { api } from '../utils/api';
 import { FiMenu } from 'react-icons/fi';
 import { useSubscribeToUserEvent } from '../utils/pusher';
 import { NotificationsDropdown } from './notifications/notificationsDropdown';
+import { useRouter } from 'next/router';
 
 const NotificationBubble = ({ count }: { count: number }) => {
   return (
@@ -40,6 +41,7 @@ const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
 
+  const router = useRouter();
   const utils = api.useContext();
   api.notifications.getNotificationCount.useQuery(undefined, {
     onSuccess: (data) => {
@@ -56,7 +58,7 @@ const Header: React.FC = () => {
     void utils.notifications.getNotifications.refetch();
   });
   useSubscribeToUserEvent('chat', () => {
-    setChatNotifCount((prev) => prev + 1);
+    if (router.pathname !== '/chat') setChatNotifCount((prev) => prev + 1);
   });
 
   const { data } = useSession();
@@ -81,6 +83,11 @@ const Header: React.FC = () => {
       clearTimeout(timeout);
     };
   }, [searchQuery, refetch, searchRes]);
+
+  // TODO: Remove this and replace with a better solution
+  useEffect(() => {
+    if (router.pathname === '/chat') setChatNotifCount(0);
+  }, [router.pathname]);
 
   return (
     <>
