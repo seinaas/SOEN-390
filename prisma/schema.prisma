@@ -80,9 +80,9 @@ model User {
 
 model Connection {
     user1Id          String
-    user1            User              @relation("UserFriends", fields: [user1Id], references: [id], onDelete: Cascade)
+    user1            User              @relation("UserFriends", fields: [user1Id], references: [id])
     user2Id          String
-    user2            User              @relation("FriendsUser", fields: [user2Id], references: [id], onDelete: Cascade)
+    user2            User              @relation("FriendsUser", fields: [user2Id], references: [id])
     connectionStatus ConnectionStatus
 
     @@id([user1Id, user2Id])
@@ -97,7 +97,7 @@ model Job {
   startDate   DateTime
   endDate     DateTime?
   description String? @db.Text
-  User        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  User        User    @relation(fields: [userId], references: [id])
 }
 
 model Education {
@@ -109,7 +109,7 @@ model Education {
   startDate   DateTime
   endDate     DateTime?
   description String? @db.Text
-  User        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  User        User    @relation(fields: [userId], references: [id])
 }
 
 model VerificationToken {
@@ -135,16 +135,16 @@ model Comments {
     userId    String
     postId    String
     content   String? @db.Text
-    Post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
-    User      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    Post      Post    @relation(fields: [postId], references: [id])
+    User      User    @relation(fields: [userId], references: [id])
 }
 
 model Likes {
     likeId String @id @default(cuid())
     userId String
     postId String
-    Post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
-    User   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    Post   Post   @relation(fields: [postId], references: [id])
+    User   User    @relation(fields: [userId], references: [id])
     
 }
 

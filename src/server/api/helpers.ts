@@ -23,7 +23,7 @@ export const triggerNotification = async ({ type, to, content, route, ctx }: Not
     },
   });
 
-  if (ctx.session?.user?.id && !muted && ctx.session.user.id !== to) {
+  if (ctx.session?.user?.id && !muted) {
     await ctx.prisma.notification.create({
       data: {
         type,
