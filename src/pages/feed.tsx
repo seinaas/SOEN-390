@@ -1,28 +1,59 @@
 import { formatDistanceToNowStrict } from 'date-fns';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
-import { useState } from 'react';
-import { IoIosChatboxes, IoMdShare, IoMdThumbsUp } from 'react-icons/io';
+import React, { useState } from 'react';
+import { IoIosChatboxes, IoMdShare, IoMdThumbsUp, IoMdCreate, IoMdRemove } from 'react-icons/io';
 import MainLayout from '../components/mainLayout';
 import { type NextPageWithLayout } from './_app';
 import { motion } from 'framer-motion';
 import { type GetServerSidePropsContext } from 'next';
 import { getServerAuthSession } from '../server/auth';
 import { api } from '../utils/api';
+import { useEffect } from 'react';
+
+/* This file is responsible for showing all the posts for which the authors are connected with the logged user.
+This file also handles the likes on the posts, the comments (adding, editing, deleting) and the posts themselves (adding, editing,deleting) */
 
 const Feed: NextPageWithLayout = () => {
   const { data } = useSession();
-  const [likes, setLikes] = useState(0),
-    [isLike, setIsLike] = useState(false);
   const [shareCount, setShareCount] = useState(0);
   const [shared, setShared] = useState(false);
-  const [popup, setPop] = useState(false);
-  const [comment, setComment] = useState('');
   const [newPost, setNewPost] = useState('');
 
+  const currentUser = data?.user;
   const utils = api.useContext();
+
   const createPost = api.post.createPost.useMutation();
+  const deletePost = api.post.deletePost.useMutation();
+  const editPost = api.post.editPost.useMutation();
+  const [editingPost, setEditingPost] = useState('');
+  const [isEditingPost, setIsEditingPost] = useState(false);
+  const [selectedEditPost, setSelectedEditPost] = useState('');
+  const [selectedPost, setSelectedPost] = useState('');
+
   const posts = api.post.getPosts.useQuery().data;
+  const likes = api.post.getLikes.useQuery().data;
+  const comments = api.post.getComments.useQuery().data;
+
+  const createLike = api.post.createLike.useMutation();
+  const removeLike = api.post.removeLike.useMutation();
+  const [likedPosts, setLikedPosts] = useState({});
+
+  const createComment = api.post.createComment.useMutation();
+  const editComment = api.post.editComment.useMutation();
+  const deleteComment = api.post.deleteComment.useMutation();
+  const [newComment, setNewComment] = useState('');
+  const [editingComment, setEditingComment] = useState('');
+  const [isEditingComment, setIsEditingComment] = useState(false);
+  const [commentState, setCommentState] = useState(false);
+  const [selectedEditComment, setSelectedEditComment] = useState('');
+
+  const toggleLike = (postId, liked) => {
+    setLikedPosts((prevLikedPosts) => ({
+      ...prevLikedPosts,
+      [postId]: liked,
+    }));
+  };
 
   const addPost = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -41,25 +72,107 @@ const Feed: NextPageWithLayout = () => {
     }
   };
 
-  const handleLike = () => {
-    setLikes(likes + (isLike ? -1 : 1));
-    setIsLike(!isLike);
+  const removePost = (e: React.MouseEvent, postId: string) => {
+    e.preventDefault();
+
+    // If the post has comments, they must be deleted first!
+    const commentsOnPost = comments?.filter((comment) => comment?.postId === postId);
+
+    if (commentsOnPost) {
+      commentsOnPost.map((comment) => {
+        removeComment(e, comment.commentId);
+      });
+    }
+
+    if (deletePost) {
+      deletePost.mutate(
+        {
+          postId: postId,
+        },
+        {
+          onSuccess: () => {
+            void utils.post.getPosts.invalidate();
+          },
+        },
+      );
+    }
   };
 
-  const handleComment = () => {
-    setPop(!popup);
+  const modifyPost = (e: React.FormEvent<HTMLFormElement>, postId: string) => {
+    e.preventDefault();
+    if (editingPost) {
+      editPost.mutate(
+        {
+          postId: postId,
+          content: editingPost,
+        },
+        {
+          onSuccess: () => {
+            void utils.post.getPosts.invalidate();
+          },
+        },
+      );
+      setIsEditingPost(false);
+    }
   };
 
-  const closePopup = () => {
-    setPop(false);
+  const addComment = (e: React.FormEvent<HTMLFormElement>, comPostId: string) => {
+    e.preventDefault();
+    if (newComment) {
+      createComment.mutate(
+        {
+          postId: comPostId,
+          content: newComment,
+        },
+        {
+          onSuccess: () => {
+            void utils.post.getComments.invalidate();
+            setNewComment('');
+          },
+        },
+      );
+      setCommentState(false);
+    }
   };
+
+  const removeComment = (e: React.MouseEvent, commentId: string) => {
+    e.preventDefault();
+    if (deleteComment) {
+      deleteComment.mutate(
+        {
+          commentId: commentId,
+        },
+        {
+          onSuccess: () => {
+            void utils.post.getComments.invalidate();
+          },
+        },
+      );
+    }
+  };
+
+  const modifyComment = (e: React.FormEvent<HTMLFormElement>, commentId: string, postId: string) => {
+    e.preventDefault();
+    if (editingComment) {
+      editComment.mutate(
+        {
+          commentId: commentId,
+          postId: postId,
+          content: editingComment,
+        },
+        {
+          onSuccess: () => {
+            void utils.post.getComments.invalidate();
+          },
+        },
+      );
+      setIsEditingComment(false);
+    }
+  };
+
   const handleShare = () => {
     setShareCount(shareCount + 1);
     setShared(true);
-  };
-  const handleSubmit = (event: { preventDefault: () => void }) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    event.preventDefault();
   };
 
   return (
@@ -89,16 +202,32 @@ const Feed: NextPageWithLayout = () => {
         )}
 
         <div className='my-2 h-px w-full bg-primary-100/20' />
-        <div className='flex flex-col-reverse gap-4'>
-          {posts?.map((post) => (
-            <motion.div
-              layout
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              key={`${post.User.firstName || ''} ${post.User.lastName || ''} - ${post.createdAt.getTime()}`}
-              className='flex flex-col rounded-xl bg-primary-100/10 p-4'
-            >
-              <div className='flex gap-2'>
+
+        {posts?.map((post) => {
+          const isLiked =
+            likedPosts[post.id] || !!likes?.find((like) => like.userId === currentUser?.id && like.postId === post.id);
+
+          const buttonStyles = isLiked
+            ? {
+                backgroundColor: 'rgb(5 84 66)',
+                color: 'white',
+              }
+            : {
+                backgroundColor: 'white',
+                color: 'rgb(5 84 66)',
+              };
+
+          const postComments = comments?.filter((comment) => comment.postId === post.id);
+
+          const ownsPost = post.userId === currentUser?.id;
+          return (
+            <div key={post.id}>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                key={`${post.User.firstName || ''} ${post.User.lastName || ''} - ${post.createdAt.getTime()}`}
+                className='flex items-start gap-4 rounded-xl bg-primary-100/10 p-4 pr-8'
+              >
                 <div className='relative h-12 min-h-[48px] w-12 min-w-[48px]'>
                   <Image
                     alt='Logo'
@@ -117,69 +246,201 @@ const Feed: NextPageWithLayout = () => {
                       </p>
                       <p className='text-primary-400'>•</p>
                       <p className='text-primary-400'>
-                        {formatDistanceToNowStrict(post.createdAt, { addSuffix: true })}
+                        {formatDistance(post.createdAt, new Date(), { addSuffix: true })}
                       </p>
                     </div>
-                  </div>
-                  <p className='text-primary-500'>
-                    {post.content
-                      ? post.content
-                      : `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget consectetur lacinia,
-                nisl nisl aliquam nisl, eget ultricies nisl nisl sit amet nisl. Suspendisse potenti. Nulla facilisi.
-                Nulla facilisi. Nulla facilisi. Nulla facilisi.`}
-                  </p>
-                </div>
-              </div>
-              <div className='mt-2 flex items-center gap-2 border-t-2 border-t-primary-100/20 pt-2'>
-                <p className='{"" +(isLike ? "text-primary" : "")}'>
-                  <button
-                    onClick={handleLike}
-                    style={{
-                      backgroundColor: isLike ? 'rgb(5 84 66)' : 'white',
-                      color: isLike ? 'white' : 'rgb(5 84 66',
-                    }}
-                    className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'
-                  >
-                    <IoMdThumbsUp />
-                    <p>Like {likes}</p>
-                  </button>
-                </p>
-                <button
-                  className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'
-                  onClick={handleComment}
-                >
-                  <IoIosChatboxes />
-                  <p>Comment</p>
-                </button>
-                {popup ? (
-                  <div className='main'>
-                    <div className='popup'>
-                      <div className='popup-header'>
-                        <h1>Comment</h1>
-                        <h1 onClick={closePopup}>X</h1>
-                      </div>
-                      <form onSubmit={handleSubmit}>
-                        <label>
-                          <input type='text' value={comment} onChange={(e) => setComment(e.target.value)} />
-                        </label>
-                        <input type='submit' />
-                      </form>
+                    <div className='flex items-center gap-1'>
+                      {ownsPost && (
+                        <div>
+                          <button
+                            onClick={() => {
+                              setSelectedEditPost(post.id);
+                              setIsEditingPost(!isEditingPost);
+                            }}
+                          >
+                            <IoMdCreate />
+                          </button>
+                          <button onClick={(e) => removePost(e, post.id)}>
+                            <IoMdRemove />
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
-                ) : (
-                  ''
-                )}
-                <button
-                  onClick={handleShare}
-                  className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'
-                >
-                  <IoMdShare />
-                  <p> {shared ? 'Shared' : 'Share'}</p>
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+
+                  {isEditingPost && selectedEditPost === post.id ? (
+                    <form onSubmit={(e) => modifyPost(e, post.id)} className='w-full'>
+                      <input
+                        type='text'
+                        className='h-full w-full rounded-full bg-white py-2 px-6 text-primary-600 outline-none'
+                        placeholder={post.content}
+                        value={editingPost}
+                        onChange={(e) => setEditingPost(e.target.value)}
+                      />
+                    </form>
+                  ) : (
+                    <p className='text-primary-500'>
+                      {post.content
+                        ? post.content
+                        : `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget consectetur lacinia,
+                nisl nisl aliquam nisl, eget ultricies nisl nisl sit amet nisl. Suspendisse potenti. Nulla facilisi.
+                Nulla facilisi. Nulla facilisi. Nulla facilisi.`}
+                    </p>
+                  )}
+
+                  <div className='mt-2 flex items-center gap-2 border-t-2 border-t-primary-100/20 pt-2'>
+                    <p className='{"" +(isLike ? "text-primary" : "")}'>
+                      <button
+                        key={post.id}
+                        onClick={() => {
+                          const liked = likes?.find(
+                            (like) => like.userId === currentUser?.id && like.postId === post.id,
+                          );
+
+                          console.log(liked);
+                          if (!liked) {
+                            createLike.mutate(
+                              {
+                                postId: post.id,
+                                userId: currentUser?.id,
+                              },
+                              {
+                                onSuccess: () => {
+                                  toggleLike(post.id, true);
+                                  void utils.post.getLikes.invalidate();
+                                },
+                              },
+                            );
+                          } else {
+                            removeLike.mutate(
+                              {
+                                postId: post.id,
+                                likeId: likes.find((like) => like.userId === currentUser?.id && like.postId === post.id)
+                                  .likeId,
+                              },
+                              {
+                                onSuccess: () => {
+                                  toggleLike(post.id, false);
+                                  void utils.post.getLikes.invalidate();
+                                },
+                              },
+                            );
+                          }
+                        }}
+                        style={buttonStyles}
+                        className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'
+                      >
+                        <IoMdThumbsUp />
+                        <p>Like {likes.filter((like) => like.postId === post.id).length}</p>
+                      </button>
+                    </p>
+                    <button
+                      className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'
+                      onClick={() => {
+                        setCommentState(!commentState);
+                        setSelectedPost(post.id);
+                      }}
+                    >
+                      <IoIosChatboxes />
+                      <p>Comment</p>
+                    </button>
+                    <button
+                      onClick={handleShare}
+                      className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'
+                    >
+                      <IoMdShare />
+                      <p> {shared ? 'Shared' : 'Share'}</p>
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                <div>
+                  {commentState && selectedPost === post.id && (
+                    <div className='flex items-start gap-4 rounded-xl bg-primary-100/10 p-4 pr-8'>
+                      <Image
+                        alt='User Avatar'
+                        loader={() => data?.user?.image || 'placeholder.jpeg'}
+                        src={'placeholder.jpeg'}
+                        width={48}
+                        height={48}
+                        className='rounded-full'
+                        referrerPolicy='no-referrer'
+                      />
+                      <form onSubmit={(e) => addComment(e, post.id)} className='w-full'>
+                        <input
+                          type='text'
+                          className='h-full w-full rounded-full bg-white py-2 px-6 text-primary-600 outline-none'
+                          placeholder='Write a comment'
+                          value={newComment}
+                          onChange={(e) => setNewComment(e.target.value)}
+                        />
+                      </form>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+
+              {postComments.map((comment) => {
+                return (
+                  <motion.div
+                    key={comment.commentId}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className='flex items-start gap-4 bg-primary-100/5 p-4 pr-8'
+                  >
+                    <hr style={{ borderTop: '4px solid darkgreen', height: '10px' }}></hr>
+                    <div className='relative h-12 min-h-[48px] w-12 min-w-[48px]'>
+                      <Image
+                        alt='Logo'
+                        loader={() => comment.User.image || '/placeholder.jpeg'}
+                        src={comment.User.image || 'placeholder.jpeg'}
+                        fill
+                        className='rounded-md bg-white object-contain'
+                        referrerPolicy='no-referrer'
+                      />
+                    </div>
+                    <div className='flex flex-1 flex-col'>
+                      <div className='flex items-center justify-between'>
+                        <div className='flex items-center gap-2'>
+                          <p className='font-bold text-primary-500'>
+                            {comment.User.firstName} {comment.User.lastName} :
+                          </p>
+                          {isEditingComment && selectedEditComment === comment.commentId ? (
+                            <form onSubmit={(e) => modifyComment(e, comment.commentId, post.id)} className='w-full'>
+                              <input
+                                type='text'
+                                className='h-full w-full rounded-full bg-white py-2 px-6 text-primary-600 outline-none'
+                                placeholder={comment.content}
+                                value={editingComment}
+                                onChange={(e) => setEditingComment(e.target.value)}
+                              />
+                            </form>
+                          ) : (
+                            <p className='text-primary-500'>{comment.content ? comment.content : ''}</p>
+                          )}
+                        </div>
+                        <div className='flex items-center gap-1'>
+                          <button
+                            onClick={() => {
+                              setSelectedEditComment(comment.commentId);
+                              setIsEditingComment(!isEditingComment);
+                            }}
+                          >
+                            <IoMdCreate />
+                          </button>
+                          <button onClick={(e) => removeComment(e, comment.commentId)}>
+                            <IoMdRemove />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
