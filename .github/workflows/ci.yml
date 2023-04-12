@@ -110,7 +110,7 @@ jobs:
       - name: Set up MySQL
         run: |
           sudo /etc/init.d/mysql start
-          mysql -e 'CREATE DATABASE prospects;' -u root -p root -h 127.0.0.1
+          sudo mysql --user=root --password=root -h 127.0.0.1 -e 'CREATE DATABASE prospects;'
           npx prisma db push
 
       - name: Install Dependencies
