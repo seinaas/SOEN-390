@@ -185,7 +185,7 @@ enum NotificationType {
 model MutedNotificationTypes {
   userId String
   type   NotificationType
-  User   User @relation(fields: [userId], references: [id])
+  User   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, type])
 }

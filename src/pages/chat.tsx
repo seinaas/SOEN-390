@@ -295,6 +295,7 @@ const Chat: NextPageWithLayout = () => {
             <div className='flex flex-col'>
               {connections?.map((connection) => (
                 <button
+                  data-cy={`add-user-${connection.lastName || ''}`}
                   className='flex items-center justify-start rounded-md px-4 py-3 transition-colors duration-200 hover:bg-primary-100/10'
                   key={connection.id}
                   onClick={() => {
@@ -347,6 +348,7 @@ const Chat: NextPageWithLayout = () => {
                 )
                 ?.map((connection) => (
                   <button
+                    data-cy={`add-user-${connection.email}`}
                     className='flex items-center justify-start rounded-md px-4 py-3 transition-colors duration-200 hover:bg-primary-100/10'
                     key={connection.id}
                     onClick={() => {

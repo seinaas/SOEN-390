@@ -129,7 +129,7 @@ const Header: React.FC = () => {
             <NotificationBubble count={notifCount} />
             <IoIosNotifications size={28} />
           </Link>
-          <button onClick={() => signOut()} className='hover:text-primary-100'>
+          <button data-cy='signout-button-mobile' onClick={() => signOut()} className='hover:text-primary-100'>
             <IoMdLogOut size={28} />
           </button>
         </div>
@@ -173,6 +173,7 @@ const Header: React.FC = () => {
                           setSearchQuery('');
                           setIsFocused(false);
                         }}
+                        data-cy={`search-user-result-${user.lastName}`}
                         className='flex items-center gap-4 px-4 py-2 hover:bg-primary-100/20'
                       >
                         <div className='relative h-8 w-8'>
