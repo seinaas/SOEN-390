@@ -13,36 +13,27 @@ describe('Chat Page', () => {
 
     cy.dataCy('chat-input').should('not.exist');
   });
-  it('should show chat input if the user is in a channel', () => {
-    // TODO: Update this test once chat channels are implemented
-    cy.intercept('GET', '/api/auth/session', {
-      body: {
-        user: {
-          id: '1',
-          name: 'John Doe',
-        },
-      },
+  it('should create a chat with connection', () => {
+    cy.register().then(({ email, password }) => {
+      cy.dataCy('signout-button').click();
+      cy.register().then(({ email: email2, randomId }) => {
+        cy.visit(`/u/${email}`);
+        cy.dataCy('connect-button').click();
+        cy.dataCy('signout-button').click();
+
+        cy.visit('/auth/signin');
+        cy.dataCy('email-input').type(email);
+        cy.dataCy('password-input').type(password);
+        cy.dataCy('signin-btn').click();
+        cy.dataCy('signout-button').should('exist');
+
+        cy.visit(`/u/${email2}`);
+        cy.dataCy('accept-button').click();
+
+        cy.visit('/chat');
+        cy.dataCy('add-chat-btn').click();
+        cy.dataCy(`add-user-${randomId}`).should('exist');
+      });
     });
-
-    cy.visit('/chat');
-
-    cy.dataCy('join-channel-btn').click();
-    cy.dataCy('chat-input').should('exist');
-  });
-  it('should automatically join the last channel a user was in', () => {
-    // TODO: Update this test once chat channels are implemented
-    cy.intercept('GET', '/api/auth/session', {
-      body: {
-        user: {
-          id: '1',
-          name: 'John Doe',
-        },
-      },
-    });
-    localStorage.setItem('lastChannel', 'test-channel');
-
-    cy.visit('/chat');
-
-    cy.dataCy('channel-name').should('have.text', 'Current Channel: test-channel');
   });
 });

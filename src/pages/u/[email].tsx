@@ -178,6 +178,7 @@ const Profile: NextPageWithLayout = () => {
                   <>
                     <Button
                       fullWidth
+                      data-cy='accept-button'
                       iconLeft={<IoIosCheckmarkCircle size={20} />}
                       className='px-4 py-2'
                       onClick={() => data?.email && acceptMutation.mutate({ userEmail: data.email })}
@@ -198,6 +199,7 @@ const Profile: NextPageWithLayout = () => {
                 {connection.status === '' && (
                   <Button
                     fullWidth
+                    data-cy='connect-button'
                     iconLeft={<IoMdPersonAdd size={20} />}
                     variant='secondary'
                     className='px-4 py-2'
