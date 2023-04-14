@@ -3,12 +3,16 @@ import { api } from '../../utils/api';
 import Modal from '../modal';
 import { type NotificationType } from '@prisma/client';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 type Props = {
   onCancel?: () => unknown;
 };
 
+const TYPES = ['likes', 'comments', 'connections'] as const;
+
 const NotificationSettingsModal: React.FC<Props> = ({ onCancel }) => {
+  const t = useTranslations('notifications.settings');
   const [muted, setMuted] = useState<NotificationType[]>([]); // ['likes', 'comments'
 
   api.notifications.getMutedNotificationTypes.useQuery(undefined, {
@@ -25,14 +29,14 @@ const NotificationSettingsModal: React.FC<Props> = ({ onCancel }) => {
   };
 
   return (
-    <Modal onCancel={onCancel} onConfirm={onSave} confirmText='Save Changes'>
-      <h1 className='mb-4 text-2xl font-semibold'>Notification Settings</h1>
+    <Modal onCancel={onCancel} onConfirm={onSave}>
+      <h1 className='mb-4 text-2xl font-semibold'>{t('title')}</h1>
       <div className='flex flex-col gap-2'>
-        {['Likes', 'Comments', 'Connections'].map((type) => {
+        {TYPES.map((type) => {
           // Really convoluted way to get the correct types for the notification type
           // but whatever
           let correctTypes: NotificationType[];
-          if (type.toLowerCase() === 'connections') {
+          if (type === 'connections') {
             correctTypes = ['ConnectionRequest', 'ConnectionAccepted', 'ConnectionResponse'];
           } else {
             correctTypes = [type.slice(0, -1) as NotificationType];
@@ -63,7 +67,7 @@ const NotificationSettingsModal: React.FC<Props> = ({ onCancel }) => {
                   className='h-4 w-4 rounded-full bg-white'
                 />
               </button>
-              <h2 className='text-lg font-semibold text-primary-300'>Mute {type}</h2>
+              <h2 className='text-lg font-semibold text-primary-300'>{t(type)}</h2>
             </div>
           );
         })}

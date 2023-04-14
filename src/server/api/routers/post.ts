@@ -193,7 +193,7 @@ export const postRouter = createTRPCRouter({
         await triggerNotification({
           type: 'Comment',
           to: post.userId,
-          content: `Left a comment: ${input.content}`,
+          content: input.content,
           ctx,
         });
       }
@@ -335,7 +335,6 @@ export const postRouter = createTRPCRouter({
           await triggerNotification({
             type: 'Like',
             to: post.userId,
-            content: 'liked your post',
             ctx,
           });
         }

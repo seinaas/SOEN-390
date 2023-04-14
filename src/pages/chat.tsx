@@ -12,6 +12,9 @@ import type { RouterOutputs } from '../utils/api';
 import { api } from '../utils/api';
 import { connectToChannel, useSubscribeToChannelEvent } from '../utils/pusher';
 import { type NextPageWithLayout } from './_app';
+import { getServerAuthSession } from '../server/auth';
+import { type GetServerSidePropsContext } from 'next';
+import { useTranslations } from 'next-intl';
 
 function TagsInput({ tagList, setTagList }: { tagList: string[]; setTagList: Dispatch<SetStateAction<string[]>> }) {
   return (
@@ -78,6 +81,8 @@ function MessageItem({
 }
 
 const Chat: NextPageWithLayout = () => {
+  const t = useTranslations('chat');
+
   const [selectedConversationId, setSelectedConversationId] = useState<string>();
   const [message, setMessage] = useState('');
   const [openNewChatModal, setOpenNewChatModal] = useState(false);
@@ -191,21 +196,21 @@ const Chat: NextPageWithLayout = () => {
     setTags([]);
   };
 
-  // Connect to the last channel the user was in
-  // TODO: Store the channel whenever it is changed
   return (
     <main className='flex h-full max-h-screen w-full overflow-hidden'>
       <div className='flex h-full w-[350px] flex-col overflow-y-auto bg-primary-100/10'>
         <div className='flex items-center justify-between bg-primary-500 p-4 text-2xl font-semibold text-white'>
-          <h1>Your Conversations</h1>
+          <h1>{t('sidebar.title')}</h1>
           <EditButton name='chat' type='add' onClick={() => setOpenNewChatModal(true)} />
         </div>
         {!conversations?.length ? (
           <div className='flex h-full flex-col items-center justify-center'>
             <div className='text-2xl font-semibold text-primary-500' data-cy='no-convos'>
-              No conversations yet
+              {t('sidebar.empty')}
             </div>
-            <div className='text-lg font-semibold text-primary-500'>Create one to start chatting!</div>
+            <div className='text-center text-lg font-semibold leading-none text-primary-200'>
+              {t('sidebar.empty-sub')}
+            </div>
           </div>
         ) : (
           conversations?.map((conversation) => (
@@ -280,7 +285,7 @@ const Chat: NextPageWithLayout = () => {
             <input
               type='text'
               className='w-full rounded-md bg-primary-100/10 px-4 py-3 outline-none'
-              placeholder='Type a message...'
+              placeholder={t('message-placeholder')}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
             />
@@ -290,8 +295,12 @@ const Chat: NextPageWithLayout = () => {
 
       <AnimatePresence>
         {openNewChatModal && (
-          <Modal onCancel={() => setOpenNewChatModal(false)} onConfirm={() => confirmCreation()}>
-            <h1 className='mb-4 text-2xl font-semibold'>New Chat</h1>
+          <Modal
+            onCancel={() => setOpenNewChatModal(false)}
+            onConfirm={() => confirmCreation()}
+            confirmText={t('modals.confirm')}
+          >
+            <h1 className='mb-4 text-2xl font-semibold'>{t('modals.new')}</h1>
             <div className='flex flex-col'>
               {connections?.map((connection) => (
                 <button
@@ -334,9 +343,9 @@ const Chat: NextPageWithLayout = () => {
           <Modal
             onConfirm={() => confirmAddUsers(selectedConversationId || '')}
             onCancel={() => setShowAddUsers(false)}
-            confirmText='Yes'
+            confirmText={t('modals.confirm')}
           >
-            <h1 className='mb-4 text-2xl font-semibold'>Add users to conversation</h1>
+            <h1 className='mb-4 text-2xl font-semibold'>{t('modals.add-users')}</h1>
             <div className='flex flex-col'>
               {connections
                 ?.filter(
@@ -387,9 +396,9 @@ const Chat: NextPageWithLayout = () => {
           <Modal
             onConfirm={() => confirmLeaveGroup(selectedConversationId || '')}
             onCancel={() => setShowLeaveGroup(false)}
-            confirmText='Yes'
+            confirmText={t('modals.yes')}
           >
-            <h1 className='mb-4 text-2xl font-semibold'>Are you sure you want to leave the group?</h1>
+            <h1 className='mb-4 text-2xl font-semibold'>{t('modals.leave')}</h1>
           </Modal>
         )}
       </AnimatePresence>
@@ -400,3 +409,24 @@ const Chat: NextPageWithLayout = () => {
 Chat.getLayout = (page) => <MainLayout>{page}</MainLayout>;
 
 export default Chat;
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  const session = await getServerAuthSession(ctx);
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {
+      messages: JSON.parse(
+        JSON.stringify(await import(`../../public/locales/${ctx.locale || 'en'}.json`)),
+      ) as IntlMessages,
+    },
+  };
+};

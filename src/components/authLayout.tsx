@@ -3,6 +3,7 @@ import { signIn } from 'next-auth/react';
 import { LayoutGroup, motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 type AuthPageProps = {
   type: 'signIn' | 'register';
@@ -10,6 +11,8 @@ type AuthPageProps = {
 };
 
 const AuthLayout: React.FC<AuthPageProps> = ({ type, children }) => {
+  const t = useTranslations('auth');
+
   return (
     <>
       <Head>
@@ -30,14 +33,14 @@ const AuthLayout: React.FC<AuthPageProps> = ({ type, children }) => {
             >
               <motion.div layout className='relative mb-4 h-20 w-full'>
                 <Link href='/'>
-                  <Image alt='ProSpects Logo' src='/LogoAlt.png' fill className='object-contain' />
+                  <Image priority alt='ProSpects Logo' src='/LogoAlt.png' fill className='object-contain' />
                 </Link>
               </motion.div>
               {children}
 
               <motion.div layout className='flex items-center justify-center gap-4'>
                 <div className='h-0.5 min-w-full grow bg-primary-500' />
-                <span className='text-primary-500'>or</span>
+                <span className='text-primary-500'>{t('or')}</span>
                 <div className='h-0.5 min-w-full grow bg-primary-500' />
               </motion.div>
 
@@ -67,12 +70,12 @@ const AuthLayout: React.FC<AuthPageProps> = ({ type, children }) => {
               </motion.div>
 
               <p className='absolute bottom-4 w-full text-center'>
-                {type === 'register' ? 'Already Have an Account?' : 'No Account?'}
+                {type === 'register' ? t('have-account') : t('no-account')}
                 <Link
                   href={type === 'register' ? '/auth/signin' : '/auth/register'}
                   className='ml-1 font-bold text-primary-500'
                 >
-                  {type === 'register' ? 'Sign In' : 'Register'}
+                  {type === 'register' ? t('signin') : t('register')}
                 </Link>
               </p>
             </motion.div>

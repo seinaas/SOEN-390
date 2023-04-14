@@ -12,6 +12,7 @@ import { signIn } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import Input from '../../components/input';
+import { useTranslations } from 'next-intl';
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -22,6 +23,7 @@ const formSchema = z.object({
 type FormInputs = z.infer<typeof formSchema>;
 
 export const Register: NextPageWithLayout = () => {
+  const t = useTranslations('auth');
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
@@ -67,18 +69,18 @@ export const Register: NextPageWithLayout = () => {
 
   return (
     <motion.form layout className='flex w-full flex-col gap-4' onSubmit={onSubmit}>
-      <Input data-cy='email-input' type='email' placeholder='Email' autoComplete='email' {...register('email')} />
+      <Input data-cy='email-input' type='email' placeholder={t('email')} autoComplete='email' {...register('email')} />
       <Input
         data-cy='password-input'
         type='password'
-        placeholder='Password'
+        placeholder={t('password')}
         autoComplete='new-password'
         {...register('password')}
       />
       <Input
         data-cy='confirm-password-input'
         type='password'
-        placeholder='Confirm Password'
+        placeholder={t('confirm-password')}
         autoComplete='new-password'
         {...register('confirmPassword')}
       />
@@ -87,7 +89,7 @@ export const Register: NextPageWithLayout = () => {
       )}
 
       <Button layoutId='auth-btn' fullWidth data-cy='register-btn'>
-        Register
+        {t('signup')}
       </Button>
     </motion.form>
   );
@@ -118,5 +120,11 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     }
   }
 
-  return { props: {} };
+  return {
+    props: {
+      messages: JSON.parse(
+        JSON.stringify(await import(`../../../public/locales/${ctx.locale || 'en'}.json`)),
+      ) as IntlMessages,
+    },
+  };
 };

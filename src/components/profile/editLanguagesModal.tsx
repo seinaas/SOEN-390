@@ -8,6 +8,7 @@ import { api } from '../../utils/api';
 import Button from '../button';
 import Modal from '../modal';
 import { langsByCode, langsByName } from '../../utils/languages';
+import { useTranslations } from 'next-intl';
 
 type Props = {
   languages: string[];
@@ -21,6 +22,8 @@ const formSchema = z.object({
 type FormInputs = z.infer<typeof formSchema>;
 
 const EditLanguagesModal: React.FC<Props> = ({ languages, onCancel }) => {
+  const t = useTranslations('profile');
+
   const [newLanguages, setNewLanguages] = useState(languages);
 
   const updateMutation = api.user.update.useMutation();
@@ -46,14 +49,14 @@ const EditLanguagesModal: React.FC<Props> = ({ languages, onCancel }) => {
   };
 
   return (
-    <Modal onCancel={onCancel} onConfirm={onSave} confirmText='Save Changes'>
-      <h1 className='mb-4 text-2xl font-semibold'>Languages</h1>
+    <Modal onCancel={onCancel} onConfirm={onSave}>
+      <h1 className='mb-4 text-2xl font-semibold'>{t('languages')}</h1>
       <form onSubmit={onSubmit} className='flex flex-col items-center justify-between gap-2 p-2 py-4 xs:flex-row'>
         <input
           data-cy='lang-input'
           {...register('language')}
           list='languages'
-          placeholder='Add a language'
+          placeholder={t('modals.languages.placeholder')}
           className='w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500'
         />
         <datalist id='languages'>
@@ -61,7 +64,7 @@ const EditLanguagesModal: React.FC<Props> = ({ languages, onCancel }) => {
             <option key={code} value={name} />
           ))}
         </datalist>
-        <Button data-cy='lang-submit'>Add</Button>
+        <Button data-cy='lang-submit'>{t('modals.languages.add')}</Button>
       </form>
       <div className='h-screen max-h-[65vh] overflow-y-auto xs:h-[50vh] xs:max-h-[50vh]'>
         <AnimatePresence mode='popLayout'>
@@ -95,7 +98,7 @@ const EditLanguagesModal: React.FC<Props> = ({ languages, onCancel }) => {
         </AnimatePresence>
         {newLanguages.length === 0 && (
           <div className='flex h-full flex-col items-center justify-center p-4'>
-            <p className='text-lg font-semibold text-primary-500'>You haven&apos;t added any languages yet</p>
+            <p className='text-lg font-semibold text-primary-500'>{t('modals.languages.empty')}</p>
           </div>
         )}
       </div>
