@@ -11,7 +11,6 @@ import { getServerAuthSession } from '../server/auth';
 import { type RouterOutputs, api } from '../utils/api';
 import { Upload, uploadFile } from '../components/upload';
 import { FileDownloadPreview, FileUploadPreview } from '../components/filePreview';
-import { type Post } from '@prisma/client';
 import { useTranslations } from 'next-intl';
 import { enCA, fr } from 'date-fns/locale';
 import { useRouter } from 'next/router';
@@ -176,7 +175,6 @@ const Post: React.FC<PostProps> = ({
               </div>
             )}
           </motion.div>
-
           {editingPost ? (
             <form data-cy='edit-post-form' onSubmit={(e) => modifyPost(e, post.id)} className='w-full'>
               <input
@@ -191,6 +189,8 @@ const Post: React.FC<PostProps> = ({
           ) : (
             <p className='text-primary-500'>{post.content}</p>
           )}
+          {/* Preview of the attached file */}
+          {post.hasFiles && <FileDownloadPreview post={post} />}{' '}
         </div>
       </motion.div>
       <motion.div layout className='mt-2 flex items-center gap-2 border-t-2 border-t-primary-100/20 pt-2'>
@@ -400,8 +400,6 @@ const Feed: NextPageWithLayout = () => {
 
   const createPost = api.post.createPost.useMutation();
 
-  const createPost = api.post.createPost.useMutation();
-
   const getPreSignedPUTUrl = api.cloudFlare.getPresignedPUTUrl.useMutation();
 
   const addPost = (e: React.FormEvent<HTMLFormElement>) => {
@@ -416,14 +414,14 @@ const Feed: NextPageWithLayout = () => {
           onSuccess: (postData) => {
             void utils.post.getPosts.invalidate();
             setNewPost('');
-            void handleUploadFile(postData);
+            void handleUploadFile(postData as PostType);
           },
         },
       );
     }
   };
 
-  const handleUploadFile = async (postData: Post) => {
+  const handleUploadFile = async (postData: PostType) => {
     if (file && postData) {
       const url = await getPreSignedPUTUrl.mutateAsync({
         fileName: file.name,
@@ -492,8 +490,6 @@ const Feed: NextPageWithLayout = () => {
               setEditingPostId={setEditingPostId}
             />
           ))}
-          {/* Preview of the attached file */}
-          {post.hasFiles && <FileDownloadPreview post={post} />}
         </LayoutGroup>
       </div>
     </div>
