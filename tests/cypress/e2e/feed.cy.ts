@@ -93,4 +93,16 @@ describe('Feed Page', () => {
       });
     });
   });
+
+  describe('File Upload/Download', () => {
+    
+    it.only('should show the upload preview when selecting a file to upload', () => {
+      cy.register().then(() => {
+        cy.dataCy('post-input').type('This is a post to test file uploading preview');
+        cy.dataCy('upload-inner-input').selectFile('tests/cypress/fixtures/testUploadPreview.txt', {force: true}).then(() => {
+          cy.dataCy('file-upload-preview').should("exist");
+        });
+      })
+    })
+  })
 });

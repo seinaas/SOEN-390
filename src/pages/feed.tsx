@@ -190,7 +190,7 @@ const Post: React.FC<PostProps> = ({
             <p className='text-primary-500'>{post.content}</p>
           )}
           {/* Preview of the attached file */}
-          {post.hasFiles && <FileDownloadPreview post={post} />}{' '}
+          {post.hasFiles && <FileDownloadPreview post={post} data-cy='post-file-download-preview' />}{' '}
         </div>
       </motion.div>
       <motion.div layout className='mt-2 flex items-center gap-2 border-t-2 border-t-primary-100/20 pt-2'>
