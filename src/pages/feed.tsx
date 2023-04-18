@@ -1,4 +1,4 @@
-import { formatDistance } from 'date-fns';
+import { formatDistance, formatDistanceToNowStrict } from 'date-fns';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
@@ -9,6 +9,9 @@ import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
 import { type GetServerSidePropsContext } from 'next';
 import { getServerAuthSession } from '../server/auth';
 import { type RouterOutputs, api } from '../utils/api';
+import { useTranslations } from 'next-intl';
+import { enCA, fr } from 'date-fns/locale';
+import { useRouter } from 'next/router';
 
 type PostType = RouterOutputs['post']['getPosts'][number];
 
@@ -30,6 +33,9 @@ const Post: React.FC<PostProps> = ({
   setCommentingPostId,
   setEditingPostId,
 }) => {
+  const t = useTranslations('feed');
+  const router = useRouter();
+
   const [editingContent, setEditingContent] = useState('');
   const [shared, setShared] = useState(false);
   const [newComment, setNewComment] = useState('');
@@ -137,12 +143,17 @@ const Post: React.FC<PostProps> = ({
         </motion.div>
         <div className='flex flex-1 flex-col'>
           <motion.div layout className='flex items-center justify-between'>
-            <div className='flex items-center gap-2'>
+            <div className='flex flex-row items-center gap-2'>
               <p className='font-bold text-primary-500'>
                 {post.User.firstName} {post.User.lastName}
               </p>
               <p className='text-primary-400'>•</p>
-              <p className='text-primary-400'>{formatDistance(post.createdAt, new Date(), { addSuffix: true })}</p>
+              <p className='text-primary-400'>
+                {formatDistanceToNowStrict(post.createdAt, {
+                  addSuffix: true,
+                  locale: router.locale === 'fr' ? fr : enCA,
+                })}
+              </p>
             </div>
             {ownsPost && (
               <div className='flex items-center gap-1'>
@@ -177,53 +188,52 @@ const Post: React.FC<PostProps> = ({
           ) : (
             <p className='text-primary-500'>{post.content}</p>
           )}
-
-          <motion.div layout className='mt-2 flex items-center gap-2 border-t-2 border-t-primary-100/20 pt-2'>
-            <button
-              data-cy='like-btn'
-              onClick={() => {
-                toggleLike.mutate(
-                  {
-                    postId: post.id,
-                  },
-                  {
-                    onSuccess: () => {
-                      void refetchPost();
-                    },
-                  },
-                );
-              }}
-              className={`flex items-center gap-2 rounded-full px-3 py-1 transition-colors duration-200 ${
-                isLiked
-                  ? 'bg-primary-400 text-white hover:bg-primary-200'
-                  : 'bg-white text-primary-400 hover:bg-primary-100/10'
-              }`}
-            >
-              <IoMdThumbsUp />
-              <p>
-                {isLiked ? 'Liked' : 'Like'} {!!post.likes?.length && post.likes.length}
-              </p>
-            </button>
-            <button
-              data-cy='comment-btn'
-              className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'
-              onClick={() => {
-                setCommentingPostId(commentingPost ? '' : post.id);
-              }}
-            >
-              <IoIosChatboxes />
-              <p>Comment</p>
-            </button>
-            <button
-              data-cy='share-btn'
-              onClick={() => setShared(!shared)}
-              className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'
-            >
-              <IoMdShare />
-              <p> {shared ? 'Shared' : 'Share'}</p>
-            </button>
-          </motion.div>
         </div>
+      </motion.div>
+      <motion.div layout className='mt-2 flex items-center gap-2 border-t-2 border-t-primary-100/20 pt-2'>
+        <button
+          data-cy='like-btn'
+          onClick={() => {
+            toggleLike.mutate(
+              {
+                postId: post.id,
+              },
+              {
+                onSuccess: () => {
+                  void refetchPost();
+                },
+              },
+            );
+          }}
+          className={`flex items-center gap-2 rounded-full px-3 py-1 transition-colors duration-200 ${
+            isLiked
+              ? 'bg-primary-400 text-white hover:bg-primary-200'
+              : 'bg-white text-primary-400 hover:bg-primary-100/10'
+          }`}
+        >
+          <IoMdThumbsUp />
+          <p>
+            {isLiked ? t('liked') : t('like')} {!!post.likes?.length && post.likes.length}
+          </p>
+        </button>
+        <button
+          data-cy='comment-btn'
+          className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'
+          onClick={() => {
+            setCommentingPostId(commentingPost ? '' : post.id);
+          }}
+        >
+          <IoIosChatboxes />
+          <p>{t('comment')}</p>
+        </button>
+        <button
+          data-cy='share-btn'
+          onClick={() => setShared(!shared)}
+          className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'
+        >
+          <IoMdShare />
+          <p> {shared ? t('shared') : t('share')}</p>
+        </button>
       </motion.div>
       {post.comments?.map((comment) => {
         return <Comment key={comment.commentId} comment={comment} refetchPost={refetchPost} />;
@@ -257,7 +267,7 @@ const Post: React.FC<PostProps> = ({
                 data-cy='comment-input'
                 type='text'
                 className='h-full w-full rounded-full bg-white py-2 px-6 text-primary-600 outline-none'
-                placeholder='Write a comment'
+                placeholder={t('comment-placeholder')}
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 ref={commentRef}
@@ -374,6 +384,7 @@ const Comment: React.FC<CommentProps> = ({ comment, refetchPost }) => {
 
 const Feed: NextPageWithLayout = () => {
   const { data } = useSession();
+  const t = useTranslations('feed');
   const [newPost, setNewPost] = useState('');
   const [commentingPostId, setCommentingPostId] = useState('');
   const [editingPostId, setEditingPostId] = useState('');
@@ -421,7 +432,7 @@ const Feed: NextPageWithLayout = () => {
                 data-cy='post-input'
                 type='text'
                 className='h-full w-full rounded-full bg-white py-2 px-6 text-primary-600 outline-none'
-                placeholder='Start a post'
+                placeholder={t('post')}
                 value={newPost}
                 onChange={(e) => setNewPost(e.target.value)}
               />
@@ -466,5 +477,11 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     };
   }
 
-  return { props: {} };
+  return {
+    props: {
+      messages: JSON.parse(
+        JSON.stringify(await import(`../../public/locales/${ctx.locale || 'en'}.json`)),
+      ) as IntlMessages,
+    },
+  };
 };

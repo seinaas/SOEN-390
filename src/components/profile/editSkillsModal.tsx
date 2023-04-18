@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { api } from '../../utils/api';
 import Button from '../button';
 import Modal from '../modal';
+import { useTranslations } from 'next-intl';
 
 type Props = {
   skills: string[];
@@ -20,6 +21,8 @@ const formSchema = z.object({
 type FormInputs = z.infer<typeof formSchema>;
 
 const EditSkillsModal: React.FC<Props> = ({ skills, onCancel }) => {
+  const t = useTranslations('profile');
+
   const [newSkills, setNewSkills] = useState(skills);
 
   const updateMutation = api.user.update.useMutation();
@@ -45,16 +48,17 @@ const EditSkillsModal: React.FC<Props> = ({ skills, onCancel }) => {
   };
 
   return (
-    <Modal onCancel={onCancel} onConfirm={onSave} confirmText='Save Changes'>
-      <h1 className='mb-4 text-2xl font-semibold'>Skills</h1>
+    <Modal onCancel={onCancel} onConfirm={onSave}>
+      <h1 className='mb-4 text-2xl font-semibold'>{t('skills')}</h1>
       <form onSubmit={onSubmit} className='flex flex-col items-center justify-between gap-2 p-2 py-4 xs:flex-row'>
         <input
           data-cy='skill-input'
           type='text'
+          placeholder={t('modals.skills.placeholder')}
           className='flex-1 rounded-md border border-gray-300 py-2 px-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500'
           {...register('skill')}
         />
-        <Button data-cy='skill-submit'>Add Skill</Button>
+        <Button data-cy='skill-submit'>{t('modals.skills.add')}</Button>
       </form>
       <div className='h-screen max-h-[65vh] overflow-y-auto xs:h-[50vh] xs:max-h-[50vh]'>
         <AnimatePresence mode='popLayout'>
@@ -88,8 +92,8 @@ const EditSkillsModal: React.FC<Props> = ({ skills, onCancel }) => {
         </AnimatePresence>
         {newSkills.length === 0 && (
           <div className='flex h-full flex-col items-center justify-center p-4'>
-            <p className='text-lg font-semibold text-primary-500'>You haven&apos;t added any skills yet</p>
-            <p className='leading-[1] text-gray-500'>Add some skills to show off your talents!</p>
+            <p className='text-lg font-semibold text-primary-500'>{t('modals.skills.empty')}</p>
+            <p className='leading-[1] text-gray-500'>{t('modals.skills.empty-sub')}</p>
           </div>
         )}
       </div>

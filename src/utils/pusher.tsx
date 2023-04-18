@@ -68,7 +68,7 @@ export function initPusher() {
 export function connectToChannel(userId: string) {
   if (!pusherStore || pusherStore.getState().channel?.name === userId) return;
   pusherStore.setState(() => ({
-    channel: pusherStore.getState().pusherClient.subscribe(`private-encrypted-${userId}`),
+    channel: pusherStore.getState().pusherClient.subscribe(`${userId}`),
   }));
 }
 

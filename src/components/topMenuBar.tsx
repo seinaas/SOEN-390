@@ -3,9 +3,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import Button from '../components/button';
+import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/router';
+import { motion } from 'framer-motion';
 
 const TopMenuBar: React.FC = () => {
   const { data } = useSession();
+  const t = useTranslations();
+  const router = useRouter();
 
   return (
     <div
@@ -14,36 +19,36 @@ const TopMenuBar: React.FC = () => {
     >
       {/* Logo */}
       <Link href='/' className='relative h-16 w-36' data-cy='topMenuBar-logo'>
-        <Image alt='ProSpect Logo' src='/Logo.png' fill className='object-contain' />
+        <Image priority alt='ProSpect Logo' src='/Logo.png' fill className='object-contain' />
       </Link>
 
       {/* Links */}
-      <div className='flex items-center space-x-10 '>
-        <div className=' flex w-full justify-end space-x-7 text-lg font-semibold text-white'>
+      <div className='flex items-center gap-8 '>
+        <motion.div layout className=' flex w-full justify-end space-x-7 text-lg font-semibold text-white'>
           <Link href='/' data-cy='topMenuBar-link-about'>
-            ABOUT
+            {t('landing.header.about')}
           </Link>
           {!data && (
             <>
               <Link href='/' data-cy='topMenuBar-link-jobs'>
-                JOBS
+                {t('landing.header.jobs')}
               </Link>
-              <Link href='/' data-cy='topMenuBar-link-people'>
-                PEOPLE
+              <Link href='/' data-cy='topMenuBar-link-contact'>
+                {t('landing.header.contact')}
               </Link>
             </>
           )}
-          <Link href='/' data-cy='topMenuBar-link-language'>
-            FR
+          <Link href='/' locale={router.locale === 'fr' ? 'en' : 'fr'} data-cy='topMenuBar-link-language'>
+            {router.locale === 'fr' ? 'EN' : 'FR'}
           </Link>
-        </div>
+        </motion.div>
 
         {/* Buttons */}
 
         {data ? (
           <div className='flex justify-center space-x-5 whitespace-nowrap'>
             <Button data-cy='signout-button' variant='secondary' reverse onClick={() => signOut()}>
-              Sign Out
+              {t('auth.signout')}
             </Button>
             <div className='relative h-10 w-10'>
               <Image
@@ -57,18 +62,18 @@ const TopMenuBar: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div className='flex justify-center space-x-5 whitespace-nowrap'>
+          <motion.div layout className='flex justify-center space-x-5 whitespace-nowrap'>
             <Link href='/auth/signin'>
               <Button data-cy='signin-button' variant='secondary' reverse>
-                Login
+                {t('auth.login')}
               </Button>
             </Link>
             <Link href='/auth/register'>
               <Button data-cy='register-button' reverse>
-                Sign Up
+                {t('auth.signup')}
               </Button>
             </Link>
-          </div>
+          </motion.div>
         )}
       </div>
     </div>

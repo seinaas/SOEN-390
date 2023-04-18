@@ -38,6 +38,7 @@
     "framer-motion": "^8.5.4",
     "next": "13.1.1",
     "next-auth": "^4.18.7",
+    "next-intl": "^2.13.0",
     "pusher": "^5.1.2",
     "pusher-js": "^8.0.1",
     "react": "18.2.0",

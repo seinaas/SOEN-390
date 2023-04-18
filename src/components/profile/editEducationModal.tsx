@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { api } from '../../utils/api';
 import Modal from '../modal';
+import { useTranslations } from 'next-intl';
 
 const formSchema = z.object({
   school: z.string(),
@@ -22,6 +23,8 @@ type Props = {
 };
 
 const EditEducationModal: React.FC<Props> = ({ education, onCancel }) => {
+  const t = useTranslations('profile.modals.education');
+
   const updateMutation = api.user.updateEducation.useMutation();
   const addMutation = api.user.addEducation.useMutation();
 
@@ -67,34 +70,34 @@ const EditEducationModal: React.FC<Props> = ({ education, onCancel }) => {
   };
 
   return (
-    <Modal onCancel={onCancel} onConfirm={handleSubmit(onSubmit)} confirmText='Save Changes'>
-      <h1 className='mb-4 text-2xl font-semibold'>{education ? 'Edit Education' : 'Add Education'}</h1>
+    <Modal onCancel={onCancel} onConfirm={handleSubmit(onSubmit)}>
+      <h1 className='mb-4 text-2xl font-semibold'>{education ? t('edit') : t('new')}</h1>
       <form className='flex w-full flex-col gap-2'>
         <input
           data-cy='degree-input'
           type='text'
-          placeholder='Degree'
+          placeholder={t('degree')}
           className='text-md block w-full rounded-lg border border-gray-300 p-3 shadow-inner outline-0 ring-0 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-75'
           {...register('degree')}
         />
         <input
           data-cy='school-input'
           type='text'
-          placeholder='Institution Name'
+          placeholder={t('school')}
           className='text-md block w-full rounded-lg border border-gray-300 p-3 shadow-inner outline-0 ring-0 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-75'
           {...register('school')}
         />
         <input
           data-cy='location-input'
           type='text'
-          placeholder='Location'
+          placeholder={t('location')}
           className='text-md block w-full rounded-lg border border-gray-300 p-3 shadow-inner outline-0 ring-0 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-75'
           {...register('location')}
         />
 
         <textarea
           data-cy='description-input'
-          placeholder='Description'
+          placeholder={t('description')}
           className='text-md block h-32 w-full rounded-lg border border-gray-300 p-3 shadow-inner outline-0 ring-0 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-75'
           {...register('description')}
         />

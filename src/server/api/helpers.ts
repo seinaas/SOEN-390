@@ -9,7 +9,7 @@ import { type NotificationType } from '@prisma/client';
 type NotificationParams = {
   type: NotificationType;
   to: string;
-  content: string;
+  content?: string;
   route?: string;
   ctx: ReturnType<typeof createInnerTRPCContext>;
 };

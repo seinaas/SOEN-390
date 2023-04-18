@@ -43,7 +43,7 @@ describe('Landing Page', () => {
 
   it('should render the links in the Top Menu Bar', () => {
     cy.get('[data-cy=topMenuBar-link-about]').should('be.visible');
-    cy.get('[data-cy=topMenuBar-link-people]').should('be.visible');
+    cy.get('[data-cy=topMenuBar-link-contact]').should('be.visible');
     cy.get('[data-cy=topMenuBar-link-jobs]').should('be.visible');
     cy.get('[data-cy=topMenuBar-link-language]').should('be.visible');
   });
@@ -63,7 +63,7 @@ describe('Landing Page', () => {
     });
 
     cy.visit('/');
-    cy.get('[data-cy=topMenuBar-link-people]').should('not.be.visible');
+    cy.get('[data-cy=topMenuBar-link-contact]').should('not.be.visible');
     cy.get('[data-cy=topMenuBar-link-jobs]').should('not.be.visible');
   });
 

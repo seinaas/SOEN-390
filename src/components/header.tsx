@@ -9,6 +9,7 @@ import { FiMenu } from 'react-icons/fi';
 import { useSubscribeToUserEvent } from '../utils/pusher';
 import { NotificationsDropdown } from './notifications/notificationsDropdown';
 import { useRouter } from 'next/router';
+import { useTranslations } from 'next-intl';
 
 const NotificationBubble = ({ count }: { count: number }) => {
   return (
@@ -41,6 +42,7 @@ const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
 
+  const t = useTranslations('header');
   const router = useRouter();
   const utils = api.useContext();
   api.notifications.getNotificationCount.useQuery(undefined, {
@@ -132,6 +134,14 @@ const Header: React.FC = () => {
           <button data-cy='signout-button-mobile' onClick={() => signOut()} className='hover:text-primary-100'>
             <IoMdLogOut size={28} />
           </button>
+          <Link
+            className='font-bold'
+            href={router.asPath}
+            locale={router.locale === 'fr' ? 'en' : 'fr'}
+            data-cy='topMenuBar-link-language'
+          >
+            {router.locale === 'fr' ? 'EN' : 'FR'}
+          </Link>
         </div>
       </div>
       {/* Heading Menu */}
@@ -148,7 +158,7 @@ const Header: React.FC = () => {
               onFocus={() => setIsFocused(true)}
               onBlur={(e) => e.relatedTarget === null && setIsFocused(false)}
               type='text'
-              placeholder='Search'
+              placeholder={t('search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className='relative h-10 w-full max-w-sm rounded-md bg-primary-100/20 px-4 placeholder-primary-100 outline-none transition-colors duration-200 focus:bg-primary-100 focus:text-white focus:placeholder-white/50 lg:w-96'
@@ -230,6 +240,14 @@ const Header: React.FC = () => {
             >
               <IoMdLogOut size={28} />
             </button>
+            <Link
+              className='font-bold text-primary-500 hover:text-primary-600'
+              href={router.asPath}
+              locale={router.locale === 'fr' ? 'en' : 'fr'}
+              data-cy='topMenuBar-link-language'
+            >
+              {router.locale === 'fr' ? 'EN' : 'FR'}
+            </Link>
           </div>
           {data?.user && (
             <Link
