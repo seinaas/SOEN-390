@@ -116,9 +116,14 @@ describe('Feed Page', () => {
           'https://soen390-prospect-storage.fb208edad989edb49bc5da41e557c37b.r2.cloudflarestorage.com/*',
           { fixture: 'dummyListFilesResponse.xml' },
         ).as('getFilesInfo');
+
         cy.intercept('POST', '/api/trpc/cloudflare.getPresignedGETUrl.*', {
           fixture: 'testGetPresignedGETUrlResponse.json',
         }).as('getPresignedGETUrl');
+
+        cy.intercept('POST', '/api/trpc/cloudflare.getPresignedLISTUrl.*', {
+          fixture: 'testGetPresignedLISTUrlResponse.json',
+        }).as('getPresignedLISTUrl');
 
         cy.register().then(() => {
           cy.wait(['@getPosts', '@getFilesInfo']);
