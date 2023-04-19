@@ -10,7 +10,8 @@ export const FileUploadPreview: React.FC<FileUploadPreviewProps> = ({ file }) =>
   //const imgPreview = file?.type.includes('image') ? URL.createObjectURL(file) : undefined;
 
   return (
-    <div data-cy='file-upload-preview'
+    <div
+      data-cy='file-upload-preview'
       className={`${
         file ? 'flex' : 'hidden'
       } w-fit items-center rounded-full bg-white/50 py-2 pr-4 pl-2 text-primary-600`}
