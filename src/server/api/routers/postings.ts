@@ -177,6 +177,7 @@ export const JobPostingRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const JobPosting = await ctx.prisma.jobPosting.delete({
         where: {
+          recruiterId: input.jobPostingId,
           jobPostingId: input.jobPostingId,
         },
       });
@@ -215,12 +216,14 @@ export const JobPostingRouter = createTRPCRouter({
   deleteApplication: protectedProcedure
     .input(
       z.object({
+        userId: z.string().min(1),
         applicationId: z.string().min(1),
       }),
     )
     .mutation(async ({ input, ctx }) => {
       const application = await ctx.prisma.application.delete({
         where: {
+          userId: input.userId,
           applicationId: input.applicationId,
         },
       });
