@@ -142,7 +142,7 @@ export const postRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const comment = await ctx.prisma.comments.create({
+      const comment = await ctx.prisma.comment.create({
         data: {
           ...input,
           userId: ctx.session.user.id,
@@ -159,7 +159,7 @@ export const postRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input, ctx }) => {
-      const comments = await ctx.prisma.comments.findMany({
+      const comments = await ctx.prisma.comment.findMany({
         where: {
           postId: input.postId,
         },
@@ -191,7 +191,7 @@ export const postRouter = createTRPCRouter({
       };
       delete updateInput.commentId;
 
-      const comment = await ctx.prisma.comments.update({
+      const comment = await ctx.prisma.comment.update({
         where: {
           commentId: input.commentId,
         },
@@ -209,7 +209,7 @@ export const postRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const comment = await ctx.prisma.comments.delete({
+      const comment = await ctx.prisma.comment.delete({
         where: {
           commentId: input.commentId,
         },
@@ -227,7 +227,7 @@ export const postRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const like = await ctx.prisma.likes.create({
+      const like = await ctx.prisma.like.create({
         data: {
           ...input,
           userId: ctx.session.user.id,
@@ -246,7 +246,7 @@ export const postRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const like = await ctx.prisma.likes.delete({
+      const like = await ctx.prisma.like.delete({
         where: {
           likeId: input.likeId,
         },
@@ -262,7 +262,7 @@ export const postRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input, ctx }) => {
-      const likes = await ctx.prisma.likes.findMany({
+      const likes = await ctx.prisma.like.findMany({
         where: {
           postId: input.postId,
         },

@@ -56,8 +56,8 @@ model User {
     connections     Connection[] @relation("UserFriends")
     connectionOf    Connection[] @relation("FriendsUser")
     posts           Post[]
-    commments       Comments[]
-    likes           Likes[]
+    commments       Comment[]
+    likes           Like[]
     bio             String?      @db.Text
     volunteering    String? // TODO: Change to volunteering model
     skills          String? // TODO: Create skills table
@@ -72,6 +72,8 @@ model User {
     image           String?      @db.Text
     accounts        Account[]
     sessions        Session[]
+    jobPostings     JobPosting[]
+    Applications    Application[]
     password        String?
 }
 
@@ -122,21 +124,22 @@ model Post {
     userId    String
     createdAt DateTime @default(now())
     content   String?  @db.Text
-    comments  Comments[]
-    likes     Likes[]
+    comments  Comment[]
+    likes     Like[]
     User      User     @relation(fields: [userId], references: [id])
 }
 
-model Comments {    
+model Comment {    
     commentId String @id @default(cuid())
     userId    String
     postId    String
+    createdAt DateTime @default(now())
     content   String? @db.Text
     Post      Post    @relation(fields: [postId], references: [id])
     User      User    @relation(fields: [userId], references: [id])
 }
 
-model Likes {
+model Like {
     likeId String @id @default(cuid())
     userId String
     postId String
@@ -145,11 +148,28 @@ model Likes {
     
 }
 
+model JobPosting {
+    jobPostingId    String   @id @default(cuid())
+    userId    String
+    createdAt DateTime @default(now())
+    content   String?  @db.Text
+    saved     Boolean
+    applications Application []
+    User      User     @relation(fields: [userId], references: [id])
+}
+
+model Application  {
+    applicationId String @id @default(cuid())
+    userId        String
+    jobPostingId  String
+    resumeUpload  String? @db.Text //not sure of this
+    User          User   @relation(fields: [userId], references: [id])
+    JobPosting    JobPosting @relation(fields: [jobPostingId], references: [jobPostingId])
+}
+
 enum ConnectionStatus {
     Pending_1_To_2
     Pending_2_To_1
     Connected
     Blocked
 }
-
-
