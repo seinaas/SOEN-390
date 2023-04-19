@@ -72,8 +72,9 @@ model User {
     image           String?      @db.Text
     accounts        Account[]
     sessions        Session[]
-    jobPostings     JobPosting[]
+    PostedJobs      JobPosting[]
     Applications    Application[]
+    savedJobPostings SavedJobPosting[]
     password        String?
 }
 
@@ -150,19 +151,52 @@ model Like {
 
 model JobPosting {
     jobPostingId    String   @id @default(cuid())
-    userId    String
+    recruiterId    String   
     createdAt DateTime @default(now())
-    content   String?  @db.Text
-    saved     Boolean
+    jobTitle  String
+    company   String
+    location  String?
+    jobType   String
+    workplaceType String
+    description String? @db.Text
+    requiredDocuments String? @db.Text
+    jobSkills String? @db.Text
+    applicationLink String? @db.Text
     applications Application []
-    User      User     @relation(fields: [userId], references: [id])
+    savedJobPostings SavedJobPosting []
+    recruiter      User     @relation(fields: [recruiterId], references: [id]) //this will be the recruiters user Id since he/she's in charge of creating a Job Posting
+}
+
+model SavedJobPosting {
+    userId String
+    jobPostingId String
+    User User @relation(fields: [userId], references: [id])
+    JobPosting JobPosting @relation(fields: [jobPostingId], references: [jobPostingId])
+    @@id([userId, jobPostingId])
+}
+
+enum jobType {
+    Internship
+    PartTime
+    FullTime
+    Contract
+}
+
+enum workplaceType {
+    Pending_1_To_2
+    Pending_2_To_1
+    Connected
+    Blocked
 }
 
 model Application  {
     applicationId String @id @default(cuid())
     userId        String
     jobPostingId  String
-    resumeUpload  String? @db.Text //not sure of this
+    resumeUpload  String? //might need to be changed
+    coverLetter   String? //might need to be changed
+    portfolio     String? //might need to be changed
+    transcript    String? //might need to be changed
     User          User   @relation(fields: [userId], references: [id])
     JobPosting    JobPosting @relation(fields: [jobPostingId], references: [jobPostingId])
 }

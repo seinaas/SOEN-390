@@ -9,8 +9,20 @@ import { createTRPCRouter, protectedProcedure } from '../trpc';
  */
 
 export const JobPostingRouter = createTRPCRouter({
-  // Get all Job Postings created by a user and the associated applications (in this case a recruiter)
+  // Get all Job Postings (for the user's feed)
   getJobPostings: protectedProcedure
+    .input(
+      z.object({
+        userId: z.string().min(1),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      const jobPostings = await ctx.prisma.jobPosting.findMany({});
+      return jobPostings;
+    }),
+
+  // Get all Job Postings created by a user and the associated applications (in this case a recruiter)
+  getRecruiterJobPostings: protectedProcedure
     .input(
       z.object({
         userId: z.string().min(1),
@@ -19,17 +31,17 @@ export const JobPostingRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       const jobPostings = await ctx.prisma.jobPosting.findMany({
         where: {
-          userId: input.userId,
+          recruiterId: input.userId,
         },
         include: {
-          application: true,
+          applications: true,
         },
       });
       return jobPostings;
     }),
 
   //save a Job Posting
-  saveJobPosting: protectedProcedure
+  toggleSavedJobPosting: protectedProcedure
     .input(
       z.object({
         jobPostingId: z.string().min(1),
@@ -37,15 +49,23 @@ export const JobPostingRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const jobPosting = await ctx.prisma.jobPosting.update({
-        where: {
-          jobPostingId: input.jobPostingId,
-        },
-        data: {
-          saved: input.saved,
-        },
-      });
-      return jobPosting;
+      if (input.saved) {
+        await ctx.prisma.savedJobPosting.create({
+          data: {
+            userId: ctx.session.user.id,
+            jobPostingId: input.jobPostingId,
+          },
+        });
+      } else {
+        await ctx.prisma.savedJobPosting.delete({
+          where: {
+            userId_jobPostingId: {
+              userId: ctx.session.user.id,
+              jobPostingId: input.jobPostingId,
+            },
+          },
+        });
+      }
     }),
 
   // Get Saved Job Postings
@@ -56,27 +76,46 @@ export const JobPostingRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input, ctx }) => {
-      const jobPostings = await ctx.prisma.jobPosting.findMany({
+      const savedJobPostings = await ctx.prisma.savedJobPosting.findMany({
         where: {
           userId: input.userId,
-          saved: true,
+        },
+        include: {
+          JobPosting: true,
         },
       });
-      return jobPostings;
+      return savedJobPostings.map((s) => s.JobPosting);
     }),
 
   // Create a Job Posting (By a Recruiter)
   createJobPosting: protectedProcedure
     .input(
       z.object({
-        content: z.string().min(1).nullish(),
+        jobTitle: z.string().min(1),
+        company: z.string().min(1),
+        location: z.string().min(1).nullish(),
+        jobType: z.string().min(1),
+        workplaceType: z.string().min(1),
+        description: z.string().min(1).nullish(),
+        requiredDocuments: z.string().min(1).nullish(),
+        jobSkills: z.string().min(1).nullish(),
+        applicationLink: z.string().min(1).nullish(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
       const jobPosting = await ctx.prisma.jobPosting.create({
         data: {
           ...input,
-          userId: ctx.session.user.id,
+          recruiterId: ctx.session.user.id,
+          jobTitle: input.jobTitle,
+          company: input.company,
+          location: input.location,
+          jobType: input.jobType,
+          workplaceType: input.workplaceType,
+          description: input.description,
+          requiredDocuments: input.requiredDocuments,
+          jobSkills: input.jobSkills,
+          applicationLink: input.applicationLink,
         },
       });
       return jobPosting;
@@ -87,29 +126,43 @@ export const JobPostingRouter = createTRPCRouter({
     .input(
       z.object({
         jobPostingId: z.string().min(1),
-        content: z.string().min(1).nullish(),
+        jobTitle: z.string().min(1),
+        company: z.string().min(1),
+        location: z.string().min(1).nullish(),
+        jobType: z.string().min(1),
+        workplaceType: z.string().min(1),
+        description: z.string().min(1).nullish(),
+        requiredDocuments: z.string().min(1).nullish(),
+        jobSkills: z.string().min(1).nullish(),
+        applicationLink: z.string().min(1).nullish(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const updateInput: Omit<typeof input, 'jobPostingId '> & Partial<Pick<typeof input, 'jobPostingId '>> = {
+      const updateInput: Omit<typeof input, 'jobPosting'> & Partial<Pick<typeof input, 'jobPostingId'>> = {
         ...input,
       };
       delete updateInput.jobPostingId;
 
-      const jobPosting = await ctx.prisma.jobPosting.update({
+      const jobPosting = await ctx.prisma.post.update({
         select: {
-          jobPostingId: true,
+          id: true,
           userId: true,
-          content: true,
-          createdAt: true,
-          application: true,
+          jobPostingId: true,
+          jobTitle: true,
+          company: true,
+          location: true,
+          jobType: true,
+          workplaceType: true,
+          description: true,
+          requiredDocuments: true,
+          jobSkills: true,
+          applicationLink: true,
         },
         where: {
-          jobPostingId: input.jobPostingId,
+          id: input.jobPostingId,
         },
         data: updateInput,
       });
-
       return jobPosting;
     }),
 
@@ -117,6 +170,7 @@ export const JobPostingRouter = createTRPCRouter({
   deleteJobPosting: protectedProcedure
     .input(
       z.object({
+        recruiterId: z.string().min(1),
         jobPostingId: z.string().min(1),
       }),
     )
@@ -126,7 +180,6 @@ export const JobPostingRouter = createTRPCRouter({
           jobPostingId: input.jobPostingId,
         },
       });
-
       return JobPosting;
     }),
 
@@ -137,7 +190,10 @@ export const JobPostingRouter = createTRPCRouter({
     .input(
       z.object({
         jobPostingId: z.string().min(1),
-        content: z.string().min(1).nullish(), //need to discuss this with the team
+        resumeUpload: z.string().min(1).nullish(),
+        coverLetter: z.string().min(1).nullish(),
+        portfolio: z.string().min(1).nullish(),
+        transcript: z.string().min(1).nullish(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
@@ -146,6 +202,10 @@ export const JobPostingRouter = createTRPCRouter({
           ...input,
           userId: ctx.session.user.id,
           jobPostingId: input.jobPostingId,
+          resumeUpload: input.resumeUpload,
+          portfolio: input.portfolio,
+          transcript: input.transcript,
+          coverLetter: input.coverLetter,
         },
       });
       return application;
