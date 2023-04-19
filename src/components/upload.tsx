@@ -24,7 +24,7 @@ export const Upload: React.FC<UploadProps> = ({ setFile }) => {
         }}
         className={`h-6 w-6 cursor-pointer rounded-lg text-primary-600 hover:text-primary-300`}
       />
-      <input data-cy = 'upload-inner-input' ref={inputRef} type='file' onChange={handleInputChange} className='hidden' />
+      <input data-cy='upload-inner-input' ref={inputRef} type='file' onChange={handleInputChange} className='hidden' />
     </div>
   );
 };
