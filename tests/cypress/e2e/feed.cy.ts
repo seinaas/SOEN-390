@@ -104,7 +104,7 @@ describe('Feed Page', () => {
       })
     }),
 
-    it.only('should show the download file preview when a post with a file attached is shown', () => {
+    it('should show the download file preview when a post with a file attached is shown', () => {
 
       cy.intercept({
         method:'GET',
