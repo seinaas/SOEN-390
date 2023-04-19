@@ -96,12 +96,29 @@ describe('Feed Page', () => {
 
   describe('File Upload/Download', () => {
     
-    it.only('should show the upload preview when selecting a file to upload', () => {
+    it('should show the upload preview when selecting a file to upload', () => {
       cy.register().then(() => {
         cy.dataCy('post-input').type('This is a post to test file uploading preview');
-        cy.dataCy('upload-inner-input').selectFile('tests/cypress/fixtures/testUploadPreview.txt', {force: true}).then(() => {
-          cy.dataCy('file-upload-preview').should("exist");
-        });
+        cy.dataCy('upload-inner-input').selectFile('tests/cypress/fixtures/testUploadPreview.txt', {force: true});
+        cy.dataCy('file-upload-preview').should("exist");
+      })
+    }),
+
+    it.only('should show the download file preview when a post with a file attached is shown', () => {
+
+      cy.intercept({
+        method:'GET',
+        url: '/api/trpc/notifications.getNotificationCount,post.getPosts*'
+      }, {fixture: 'testGetPostsResponse.json'}).as("getPosts");
+      
+      cy.intercept('GET', 'https://soen390-prospect-storage.fb208edad989edb49bc5da41e557c37b.r2.cloudflarestorage.com/*',{fixture: 'dummyListFilesResponse.xml'}).as('getFilesInfo');
+      cy.intercept('POST', '/api/trpc/cloudflare.getPresignedGETUrl.*',{fixture: 'testGetPresignedGETUrlResponse.json'}).as("getPresignedGETUrl");
+
+      cy.register().then(() => {
+        
+        cy.wait(["@getPosts", '@getFilesInfo']);
+        cy.dataCy('file-download-preview').should('be.visible');
+      
       })
     })
   })
