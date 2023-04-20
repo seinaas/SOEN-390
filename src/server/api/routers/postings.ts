@@ -138,28 +138,14 @@ export const JobPostingRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const updateInput: Omit<typeof input, 'jobPosting'> & Partial<Pick<typeof input, 'jobPostingId'>> = {
+      const updateInput: Omit<typeof input, 'jobPostingId'> & Partial<Pick<typeof input, 'jobPostingId'>> = {
         ...input,
       };
       delete updateInput.jobPostingId;
 
-      const jobPosting = await ctx.prisma.post.update({
-        select: {
-          id: true,
-          userId: true,
-          jobPostingId: true,
-          jobTitle: true,
-          company: true,
-          location: true,
-          jobType: true,
-          workplaceType: true,
-          description: true,
-          requiredDocuments: true,
-          jobSkills: true,
-          applicationLink: true,
-        },
+      const jobPosting = await ctx.prisma.jobPosting.update({
         where: {
-          id: input.jobPostingId,
+          jobPostingId: input.jobPostingId,
         },
         data: updateInput,
       });
@@ -175,7 +161,7 @@ export const JobPostingRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const JobPosting = await ctx.prisma.jobPosting.delete({
+      const JobPosting = await ctx.prisma.jobPosting.deleteMany({
         where: {
           recruiterId: input.jobPostingId,
           jobPostingId: input.jobPostingId,
@@ -221,7 +207,7 @@ export const JobPostingRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const application = await ctx.prisma.application.delete({
+      const application = await ctx.prisma.application.deleteMany({
         where: {
           userId: input.userId,
           applicationId: input.applicationId,
