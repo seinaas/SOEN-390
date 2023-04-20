@@ -113,10 +113,11 @@ describe('Register Page', () => {
   });
   it('should fail to register if a user with the same email exists', () => {
     cy.intercept('POST', '/api/trpc/auth.register*').as('register');
-
+    cy.intercept('**/feed*').as('feed');
     // Create the first account
     cy.register().then(({ email }) => {
       // Try to create the second account
+      cy.wait('@feed');
       cy.dataCy('signout-button').click();
       cy.dataCy('signin-button').should('be.visible');
       cy.visit('/auth/register');
@@ -134,7 +135,6 @@ describe('Register Page', () => {
   });
   it('should fail to register if passwords do not match', () => {
     cy.intercept('POST', '/api/trpc/auth.register*').as('register');
-
     cy.visit('/auth/register');
     cy.dataCy('email-input').type(`testuser-${Cypress._.random(0, 1e6)}@test.com`);
     cy.dataCy('password-input').type('testpassword');

@@ -6,6 +6,7 @@ import { chatRouter } from './routers/chat';
 import { postRouter } from './routers/post';
 import { notificationsRouter } from './routers/notifications';
 import { conversationsRouter } from './routers/conversations';
+import { cloudFlareRouter } from './routers/cloudFlare';
 
 /**
  * This is the primary router for your server.
@@ -20,6 +21,7 @@ export const appRouter = createTRPCRouter({
   post: postRouter,
   notifications: notificationsRouter,
   conversation: conversationsRouter,
+  cloudFlare: cloudFlareRouter,
 });
 
 // export type definition of API
