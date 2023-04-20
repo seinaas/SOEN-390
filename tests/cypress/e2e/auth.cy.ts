@@ -111,7 +111,7 @@ describe('Register Page', () => {
 
     cy.get('@credentials').should('not.have.been.called');
   });
-  it.only('should fail to register if a user with the same email exists', () => {
+  it('should fail to register if a user with the same email exists', () => {
     cy.intercept('POST', '/api/trpc/auth.register*').as('register');
     cy.intercept('**/feed*').as('feed');
     // Create the first account
