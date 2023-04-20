@@ -22,3 +22,38 @@ Cypress.Commands.add('register', (em?: string, pass?: string, fn?: string, ln?: 
 
   return cy.wrap({ email, password, randomId: randomId.toString() });
 });
+
+Cypress.Commands.add('createChat', () => {
+  cy.intercept('**/feed*').as('feed');
+  cy.intercept('**/u/*').as('profile');
+  cy.intercept('POST', '/api/auth/signout').as('signout');
+  cy.register().then(({ email, password, randomId }) => {
+    cy.wait('@feed');
+    cy.dataCy('signout-button').click();
+    cy.wait('@signout');
+    cy.register().then(({ email: email2, randomId: randomId2 }) => {
+      cy.wait(['@feed', '@feed', '@feed']);
+      cy.visit(`/u/${email}`);
+      cy.wait('@profile');
+      cy.dataCy('connect-button').click();
+
+      cy.dataCy('signout-button').click();
+
+      cy.visit('/auth/signin');
+      cy.dataCy('email-input').type(email);
+      cy.dataCy('password-input').type(password);
+      cy.dataCy('signin-btn').click();
+      cy.dataCy('signout-button').should('exist');
+
+      cy.visit(`/u/${email2}`);
+      cy.dataCy('accept-button').click();
+
+      cy.visit('/chat');
+      cy.dataCy('add-chat-btn').click();
+      cy.dataCy(`add-user-${randomId2}`).should('exist');
+      cy.dataCy(`add-user-${randomId2}`).click();
+      cy.dataCy('modal-submit').click();
+      return cy.wrap({ randomId, randomId2 });
+    });
+  });
+});
