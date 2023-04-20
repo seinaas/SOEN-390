@@ -4,7 +4,7 @@ import { BsDownload } from 'react-icons/bs';
 import { IoDocumentAttachOutline } from 'react-icons/io5';
 
 type FileUploadPreviewProps = { file?: File };
-type FileDownloadPreviewProps = { post: Post };
+type PostFileDownloadPreviewProps = { post: Post };
 
 export const FileUploadPreview: React.FC<FileUploadPreviewProps> = ({ file }) => {
   //const imgPreview = file?.type.includes('image') ? URL.createObjectURL(file) : undefined;
@@ -24,7 +24,7 @@ export const FileUploadPreview: React.FC<FileUploadPreviewProps> = ({ file }) =>
   );
 };
 
-export const FileDownloadPreview: React.FC<FileDownloadPreviewProps> = ({ post }) => {
+export const PostFileDownloadPreview: React.FC<PostFileDownloadPreviewProps> = ({ post }) => {
   const [fileList] = usePostFiles(post);
 
   return (

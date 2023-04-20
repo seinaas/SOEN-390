@@ -115,6 +115,7 @@ model Messages {
     senderId       String
     createdAt      DateTime       @default(now())
     conversationId String
+    isFile         Boolean        @default(false)
     DirectMessages DirectMessages @relation("Messages", fields: [conversationId], references: [id])
 }
 

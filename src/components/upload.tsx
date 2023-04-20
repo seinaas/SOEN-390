@@ -4,9 +4,10 @@ import { BsFileEarmarkPlus } from 'react-icons/bs';
 type UploadProps = {
   file?: File;
   setFile: (file?: File) => void;
+  customClassname?: string;
 };
 
-export const Upload: React.FC<UploadProps> = ({ setFile }) => {
+export const Upload: React.FC<UploadProps> = ({ setFile, customClassname = '' }) => {
   // TODO: add multi-upload capabilities
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -22,7 +23,7 @@ export const Upload: React.FC<UploadProps> = ({ setFile }) => {
         onClick={() => {
           inputRef.current && inputRef.current.click();
         }}
-        className={`h-6 w-6 cursor-pointer rounded-lg text-primary-600 hover:text-primary-300`}
+        className={`h-6 w-6 cursor-pointer rounded-lg text-primary-600 hover:text-primary-300 ${customClassname}`}
       />
       <input data-cy='upload-inner-input' ref={inputRef} type='file' onChange={handleInputChange} className='hidden' />
     </div>
