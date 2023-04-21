@@ -208,7 +208,7 @@ const Chat: NextPageWithLayout = () => {
     setTags([]);
   };
 
-  const handleSendNewMessage = async (e) => {
+  const handleSendNewMessage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     newChatMutation.mutate({
