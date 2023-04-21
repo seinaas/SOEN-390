@@ -181,9 +181,12 @@ model JobPosting {
     jobType   jobType
     workplaceType workplaceType
     description String? @db.Text
-    requiredDocuments requiredDocuments?
     jobSkills String? @db.Text
     applicationLink String? @db.Text
+    requireResume Boolean @default(false)
+    requireCoverLetter Boolean @default(false)
+    requirePortfolio Boolean @default(false)
+    requireTranscript Boolean @default(false)
     applications Application []
     savedJobPostings SavedJobPosting []
     recruiter      User     @relation(fields: [recruiterId], references: [id]) //this will be the recruiters user Id since he/she's in charge of creating a Job Posting
@@ -214,13 +217,6 @@ enum jobType {
   PartTime
   FullTime
   Contract
-}
-
-enum requiredDocuments {
-  Resume
-  CoverLetter
-  Portfolio
-  Transcript
 }
 
 enum workplaceType {

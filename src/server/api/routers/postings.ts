@@ -1,7 +1,6 @@
-import { join } from 'path';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
-import { jobType, requiredDocuments, workplaceType } from '@prisma/client';
+import { jobType, workplaceType } from '@prisma/client';
 
 /**
  * This Job Posting Router contains all the API routes that need to be implemented for the Job Posting Feature.
@@ -9,7 +8,7 @@ import { jobType, requiredDocuments, workplaceType } from '@prisma/client';
  * This includes getting all job postings, creating/updating/deleting job postings.
  */
 
-export const JobPostingRouter = createTRPCRouter({
+export const jobPostingRouter = createTRPCRouter({
   // Get all Job Postings (for the user's feed)
   getJobPostings: protectedProcedure.query(async ({ ctx }) => {
     const jobPostings = await ctx.prisma.jobPosting.findMany({});
@@ -67,7 +66,7 @@ export const JobPostingRouter = createTRPCRouter({
         JobPosting: true,
       },
     });
-    return savedJobPostings.map((s) => s.JobPosting);
+    return savedJobPostings?.map((s) => s.JobPosting);
   }),
 
   // Create a Job Posting (By a Recruiter)
@@ -80,7 +79,10 @@ export const JobPostingRouter = createTRPCRouter({
         jobType: z.nativeEnum(jobType),
         workplaceType: z.nativeEnum(workplaceType),
         description: z.string().min(1).nullish(),
-        requiredDocuments: z.nativeEnum(requiredDocuments).nullish(),
+        requireResume: z.boolean().default(false),
+        requireCoverLetter: z.boolean().default(false),
+        requirePortfolio: z.boolean().default(false),
+        requireTranscript: z.boolean().default(false),
         jobSkills: z.string().min(1).nullish(),
         applicationLink: z.string().min(1).nullish(),
       }),
@@ -98,23 +100,24 @@ export const JobPostingRouter = createTRPCRouter({
   // Update a Job Posting (By a Recruiter)
   editJobPosting: protectedProcedure
     .input(
-      z
-        .object({
-          jobPostingId: z.string().min(1),
-          jobTitle: z.string().min(1),
-          company: z.string().min(1),
-          location: z.string().min(1).nullish(),
-          jobType: z.nativeEnum(jobType),
-          workplaceType: z.nativeEnum(workplaceType),
-          description: z.string().min(1).nullish(),
-          requiredDocuments: z.nativeEnum(requiredDocuments).nullish(),
-          jobSkills: z.string().min(1).nullish(),
-          applicationLink: z.string().min(1).nullish(),
-        })
-        .partial(),
+      z.object({
+        jobPostingId: z.string().min(1),
+        jobTitle: z.string().min(1).optional(),
+        company: z.string().min(1).optional(),
+        location: z.string().min(1).optional(),
+        jobType: z.nativeEnum(jobType).optional(),
+        workplaceType: z.nativeEnum(workplaceType).optional(),
+        description: z.string().min(1).optional(),
+        requireResume: z.boolean().optional(),
+        requireCoverLetter: z.boolean().optional(),
+        requirePortfolio: z.boolean().optional(),
+        requireTranscript: z.boolean().optional(),
+        jobSkills: z.string().min(1).optional(),
+        applicationLink: z.string().min(1).optional(),
+      }),
     )
     .mutation(async ({ input, ctx }) => {
-      const updateInput: Omit<typeof input, 'jobPostingId'> & Partial<Pick<typeof input, 'jobPostingId'>> = {
+      const updateInput: Omit<typeof input, 'jobPostingId'> & Pick<Partial<typeof input>, 'jobPostingId'> = {
         ...input,
       };
       delete updateInput.jobPostingId;
@@ -168,18 +171,30 @@ export const JobPostingRouter = createTRPCRouter({
       return application;
     }),
 
+  // Get all Job Applications (By a Candidate)
+  getApplications: protectedProcedure.query(async ({ ctx }) => {
+    const applications = await ctx.prisma.application.findMany({
+      where: {
+        userId: ctx.session.user.id,
+      },
+      include: {
+        JobPosting: true,
+      },
+    });
+    return applications;
+  }),
+
   // Delete a Job Application (By a Candidate)
   deleteApplication: protectedProcedure
     .input(
       z.object({
-        userId: z.string().min(1),
         applicationId: z.string().min(1),
       }),
     )
     .mutation(async ({ input, ctx }) => {
       const application = await ctx.prisma.application.deleteMany({
         where: {
-          userId: input.userId,
+          userId: ctx.session.user.id,
           applicationId: input.applicationId,
         },
       });
