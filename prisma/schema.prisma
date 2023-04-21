@@ -178,10 +178,10 @@ model JobPosting {
     jobTitle  String
     company   String
     location  String?
-    jobType   String
-    workplaceType String
+    jobType   jobType
+    workplaceType workplaceType
     description String? @db.Text
-    requiredDocuments String? @db.Text
+    requiredDocuments requiredDocuments
     jobSkills String? @db.Text
     applicationLink String? @db.Text
     applications Application []
@@ -201,10 +201,10 @@ model Application  {
     applicationId String @id @default(cuid())
     userId        String
     jobPostingId  String
-    resumeUpload  String? //might need to be changed
-    coverLetter   String? //might need to be changed
-    portfolio     String? //might need to be changed
-    transcript    String? //might need to be changed
+    resume  String? @db.Text
+    coverLetter   String? @db.Text
+    portfolio     String? @db.Text
+    transcript    String? @db.Text
     User          User   @relation(fields: [userId], references: [id])
     JobPosting    JobPosting @relation(fields: [jobPostingId], references: [jobPostingId])
 }
@@ -214,6 +214,13 @@ enum jobType {
   PartTime
   FullTime
   Contract
+}
+
+enum requiredDocuments {
+  Resume
+  CoverLetter
+  Portfolio
+  Transcript
 }
 
 enum workplaceType {
