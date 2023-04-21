@@ -13,5 +13,6 @@ declare namespace Cypress {
       fn?: string,
       ln?: string,
     ): Chainable<{ email: string; password: string; randomId: string }>;
+    createChat(): Chainable<{ randomId: string; randomId2: string }>;
   }
 }

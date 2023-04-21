@@ -9,6 +9,7 @@ export const chatRouter = createTRPCRouter({
       z.object({
         message: z.string(),
         conversationId: z.string(),
+        isFile: z.boolean().default(false),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -17,6 +18,7 @@ export const chatRouter = createTRPCRouter({
           senderId: ctx.session.user.id,
           message: input.message,
           conversationId: input.conversationId,
+          isFile: input.isFile,
         },
       });
       await ctx.pusher.trigger(input.conversationId, 'message-sent', {
@@ -49,7 +51,6 @@ export const chatRouter = createTRPCRouter({
           }),
         );
       }
-
       return messageToSend;
     }),
 });

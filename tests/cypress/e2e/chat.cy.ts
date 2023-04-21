@@ -14,26 +14,39 @@ describe('Chat Page', () => {
     cy.dataCy('chat-input').should('not.exist');
   });
   it('should create a chat with connection', () => {
-    cy.register().then(({ email, password }) => {
-      cy.dataCy('signout-button').click();
-      cy.register().then(({ email: email2, randomId }) => {
-        cy.visit(`/u/${email}`);
-        cy.dataCy('connect-button').click();
-        cy.dataCy('signout-button').click();
+    //after chat creation, you are logged in as email
+    cy.createChat();
+  });
+});
 
-        cy.visit('/auth/signin');
-        cy.dataCy('email-input').type(email);
-        cy.dataCy('password-input').type(password);
-        cy.dataCy('signin-btn').click();
-        cy.dataCy('signout-button').should('exist');
+describe('File Upload/Download', () => {
+  it('should show the upload preview when selecting a file to upload', () => {
+    cy.createChat().then(() => {
+      cy.dataCy('new-message-input').type('This is a post to test file uploading preview');
+      cy.dataCy('upload-inner-input').selectFile('tests/cypress/fixtures/testUploadPreview.txt', { force: true });
+      cy.dataCy('file-upload-preview').should('exist');
+    });
+  }),
+    it.only('should show the download file preview when a mesage containing a file is shown', () => {
+      cy.intercept(
+        {
+          method: 'GET',
+          url: '/api/trpc/conversation.getConversationMessages?*',
+        },
+        { fixture: 'testGetConversationMessages.json' },
+      ).as('getMessages');
 
-        cy.visit(`/u/${email2}`);
-        cy.dataCy('accept-button').click();
+      cy.intercept('POST', '/api/trpc/cloudflare.getPresignedGETUrl.*', {
+        fixture: 'testGetPresignedGETUrlResponse.json',
+      }).as('getPresignedGETUrl');
 
-        cy.visit('/chat');
-        cy.dataCy('add-chat-btn').click();
-        cy.dataCy(`add-user-${randomId}`).should('exist');
+      cy.intercept('POST', '/api/trpc/cloudflare.getPresignedLISTUrl.*', {
+        fixture: 'testGetPresignedLISTUrlResponse.json',
+      }).as('getPresignedLISTUrl');
+
+      cy.createChat().then(() => {
+        cy.wait('@getMessages');
+        cy.dataCy('file-download-preview').should('be.visible');
       });
     });
-  });
 });

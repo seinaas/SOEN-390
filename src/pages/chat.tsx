@@ -15,6 +15,9 @@ import { type NextPageWithLayout } from './_app';
 import { getServerAuthSession } from '../server/auth';
 import { type GetServerSidePropsContext } from 'next';
 import { useTranslations } from 'next-intl';
+import { Upload, uploadFile } from '../components/upload';
+import { FileDownloadPreview, FileUploadPreview } from '../components/filePreview';
+import { useFileUploading } from '../customHooks/useFileUploading';
 
 function TagsInput({ tagList, setTagList }: { tagList: string[]; setTagList: Dispatch<SetStateAction<string[]>> }) {
   return (
@@ -41,10 +44,12 @@ function MessageItem({
   message,
   userId,
   lastCreatedAt,
+  isFile,
 }: {
   message: RouterOutputs['chat']['sendMessage'] & { sender: { firstName: string | null; lastName: string | null } };
   userId: string;
   lastCreatedAt?: Date;
+  isFile: boolean;
 }) {
   const isSender = message?.senderId === userId;
   return (
@@ -66,11 +71,17 @@ function MessageItem({
       <div className={`flex flex-col gap-1 ${isSender ? 'items-end text-right' : 'items-start text-left'} max-w-[80%]`}>
         <div>{`${message?.sender?.firstName || ''} ${message?.sender?.lastName || ''}`}</div>
         <div
-          className={`rounded-md px-4 py-3 ${
+          className={`rounded-md ${isFile ? 'pl-2 pr-4' : 'px-4'} py-3 ${
             isSender ? 'bg-primary-500 text-white' : 'bg-primary-100/10 text-primary-500'
           }`}
         >
-          {message.message}
+          {(isFile && (
+            <FileDownloadPreview
+              fileName={message.message}
+              pathPrefixes={['conversations', message.conversationId, 'messages', message.id]}
+            />
+          )) ||
+            message.message}
         </div>
         {(!lastCreatedAt || differenceInMinutes(message.createdAt, lastCreatedAt) > 5) && (
           <div className='text-xs text-gray-500'>{format(message.createdAt, 'MMM. do, p')}</div>
@@ -85,6 +96,7 @@ const Chat: NextPageWithLayout = () => {
 
   const [selectedConversationId, setSelectedConversationId] = useState<string>();
   const [message, setMessage] = useState('');
+  const [newFile, setNewFile] = useState<File>();
   const [openNewChatModal, setOpenNewChatModal] = useState(false);
   const [messages, setMessages] = useState<
     (Messages & { sender: { firstName: string | null; lastName: string | null } })[]
@@ -114,7 +126,7 @@ const Chat: NextPageWithLayout = () => {
   const newChatMutation = api.chat.sendMessage.useMutation();
 
   const conversations = api.conversation.getUserConversations.useQuery().data;
-
+  const { getPreSignedPUTUrl } = useFileUploading();
   useEffect(() => {
     if (messagesToUse) {
       setMessages(messagesToUse);
@@ -196,6 +208,31 @@ const Chat: NextPageWithLayout = () => {
     setTags([]);
   };
 
+  const handleSendNewMessage = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    newChatMutation.mutate({
+      message: message,
+      conversationId: selectedConversationId as string,
+    });
+
+    setMessage('');
+
+    if (newFile) {
+      const newMessage: Messages = await newChatMutation.mutateAsync({
+        message: newFile.name,
+        conversationId: selectedConversationId as string,
+        isFile: true,
+      });
+      const url = await getPreSignedPUTUrl.mutateAsync({
+        fileName: newFile.name,
+        pathPrefixes: ['conversations', selectedConversationId as string, 'messages', newMessage.id],
+      });
+      await uploadFile({ file: newFile, url });
+      setNewFile(undefined);
+    }
+  };
+
   return (
     <main className='flex h-full max-h-screen w-full overflow-hidden'>
       <div className='flex h-full w-[350px] flex-col overflow-y-auto bg-primary-100/10'>
@@ -266,29 +303,32 @@ const Chat: NextPageWithLayout = () => {
                   message={message}
                   userId={session?.user?.id || ''}
                   lastCreatedAt={messages[0]?.createdAt}
+                  isFile={message.isFile}
                 />
               ))}
-              <div className='float-left clear-both' ref={messageEndRef} />
+              <div className='float-left clear-both' ref={messageEndRef} data-cy='new-message-form' />
             </div>
           </div>
-          <form
-            className='mt-8'
-            onSubmit={(e) => {
-              e.preventDefault();
-              newChatMutation.mutate({
-                message: message,
-                conversationId: selectedConversationId,
-              });
-              setMessage('');
-            }}
-          >
-            <input
-              type='text'
-              className='w-full rounded-md bg-primary-100/10 px-4 py-3 outline-none'
-              placeholder={t('message-placeholder')}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-            />
+          <form className='mt-8 flex items-center' onSubmit={handleSendNewMessage}>
+            <div className='flex h-fit w-full flex-col justify-center gap-3 rounded-md bg-primary-100/10 px-2 py-3 outline-none'>
+              <div className='flex w-full flex-row px-2'>
+                <input
+                  type='text'
+                  className='w-full rounded-md bg-transparent outline-none'
+                  placeholder={t('message-placeholder')}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  data-cy='new-message-input'
+                />
+                <Upload
+                  setFile={(newFile: File | undefined) => {
+                    setNewFile(newFile);
+                  }}
+                  className='h-8 w-8'
+                />
+              </div>
+              <FileUploadPreview file={newFile} />
+            </div>
           </form>
         </div>
       )}

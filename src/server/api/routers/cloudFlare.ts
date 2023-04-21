@@ -17,15 +17,25 @@ const S3 = new S3Client({
 
 export const cloudFlareRouter = createTRPCRouter({
   getPresignedPUTUrl: protectedProcedure
-    .input(z.object({ fileName: z.string(), userId: z.string(), containerType: z.string(), postId: z.string() }))
-    .mutation(async ({ input, ctx }) => {
-      const { fileName, userId, containerType, postId } = input;
+    .input(
+      z.object({
+        fileName: z.string(),
+        pathPrefixes: z.string().array().optional(),
+        userId: z.string().default(''),
+        containerType: z.string().default(''),
+        postId: z.string().default(''),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const { fileName, pathPrefixes, userId, containerType, postId } = input;
 
       const putUrl = await getSignedUrl(
         S3,
         new PutObjectCommand({
           Bucket: env.CLOUDFLARE_BUCKET_NAME,
-          Key: `${userId}/${containerType}/${postId}/${fileName}`,
+          Key: pathPrefixes
+            ? `${pathPrefixes.join('/')}/${fileName}`
+            : `${userId}/${containerType}/${postId}/${fileName}`,
         }),
         {
           expiresIn: 30,
