@@ -24,7 +24,7 @@ Cypress.Commands.add('register', (em?: string, pass?: string, fn?: string, ln?: 
 });
 
 Cypress.Commands.add('createChat', () => {
-  cy.intercept('**/feed*').as('feed');
+  cy.intercept('**/feed.json').as('feed');
   cy.intercept('**/u/*').as('profile');
   cy.intercept('POST', '/api/auth/signout').as('signout');
   cy.register().then(({ email, password, randomId }) => {
@@ -32,7 +32,7 @@ Cypress.Commands.add('createChat', () => {
     cy.dataCy('signout-button').click();
     cy.wait('@signout');
     cy.register().then(({ email: email2, randomId: randomId2 }) => {
-      cy.wait(['@feed', '@feed', '@feed']);
+      cy.wait('@feed');
       cy.visit(`/u/${email}`);
       cy.wait('@profile');
       cy.dataCy('connect-button').click();

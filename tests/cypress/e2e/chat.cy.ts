@@ -18,3 +18,35 @@ describe('Chat Page', () => {
     cy.createChat().then(({ randomId, randomId2 }) => {});
   });
 });
+
+describe('File Upload/Download', () => {
+  it('should show the upload preview when selecting a file to upload', () => {
+    cy.createChat().then(() => {
+      cy.dataCy('new-message-input').type('This is a post to test file uploading preview');
+      cy.dataCy('upload-inner-input').selectFile('tests/cypress/fixtures/testUploadPreview.txt', { force: true });
+      cy.dataCy('file-upload-preview').should('exist');
+    });
+  }),
+    it.only('should show the download file preview when a mesage containing a file is shown', () => {
+      cy.intercept(
+        {
+          method: 'GET',
+          url: '/api/trpc/conversation.getConversationMessages?*',
+        },
+        { fixture: 'testGetConversationMessages.json' },
+      ).as('getMessages');
+
+      cy.intercept('POST', '/api/trpc/cloudflare.getPresignedGETUrl.*', {
+        fixture: 'testGetPresignedGETUrlResponse.json',
+      }).as('getPresignedGETUrl');
+
+      cy.intercept('POST', '/api/trpc/cloudflare.getPresignedLISTUrl.*', {
+        fixture: 'testGetPresignedLISTUrlResponse.json',
+      }).as('getPresignedLISTUrl');
+
+      cy.createChat().then(() => {
+        cy.wait('@getMessages');
+        cy.dataCy('file-download-preview').should('be.visible');
+      });
+    });
+});

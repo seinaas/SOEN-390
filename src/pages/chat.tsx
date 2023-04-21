@@ -306,7 +306,7 @@ const Chat: NextPageWithLayout = () => {
                   isFile={message.isFile}
                 />
               ))}
-              <div className='float-left clear-both' ref={messageEndRef} />
+              <div className='float-left clear-both' ref={messageEndRef} data-cy='new-message-form' />
             </div>
           </div>
           <form className='mt-8 flex items-center' onSubmit={handleSendNewMessage}>
@@ -318,6 +318,7 @@ const Chat: NextPageWithLayout = () => {
                   placeholder={t('message-placeholder')}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
+                  data-cy='new-message-input'
                 />
                 <Upload
                   setFile={(newFile: File | undefined) => {
