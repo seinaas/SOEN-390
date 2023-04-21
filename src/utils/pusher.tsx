@@ -1,4 +1,4 @@
-import type { Channel } from 'pusher-js';
+import type { Channel, PresenceChannel } from 'pusher-js';
 
 import { useEffect, useRef } from 'react';
 import Pusher from 'pusher-js';
@@ -38,22 +38,6 @@ const createPusherStore = () => {
     };
   });
 
-  // TODO: Implement presence channel
-  // Update helper that sets 'members' to contents of presence channel's current members
-  // const updateMembers = () => {
-  //   console.log(presenceChannel);
-  //   store.setState(() => ({
-  //     members: new Map(Object.entries(presenceChannel.members)),
-  //   }));
-  // };
-
-  // Bind all "present users changed" events to trigger updateMembers
-  // presenceChannel.bind('pusher:subscription_succeeded', updateMembers);
-  // presenceChannel.bind('pusher:member_added', updateMembers);
-  // presenceChannel.bind('pusher:member_removed', updateMembers);
-
-  pusherClient.signin();
-
   return store;
 };
 
@@ -62,6 +46,31 @@ export function initPusher() {
   // Only initialize the store if it hasn't been initialized yet
   if (!pusherStore) {
     pusherStore = createPusherStore();
+  }
+}
+
+// Sign user into Pusher and subscribe to presence channel to track online activity
+export function pusherAuth() {
+  const pusherClient = pusherStore.getState().pusherClient;
+  if (!pusherClient.user.user_data) {
+    console.log('hereherhehrehrehrehrehrehrehreherherhere');
+    console.log(pusherClient.user.user_data);
+
+    const presenceChannel = pusherClient.subscribe('presence-channel') as PresenceChannel;
+
+    // Update helper that sets 'members' to contents of presence channel's current members
+    const updateMembers = () => {
+      pusherStore.setState(() => ({
+        members: new Map(Object.entries(presenceChannel.members.members as Record<string, string>)),
+      }));
+    };
+
+    // Bind all "present users changed" events to trigger updateMembers
+    presenceChannel.bind('pusher:subscription_succeeded', updateMembers);
+    presenceChannel.bind('pusher:member_added', updateMembers);
+    presenceChannel.bind('pusher:member_removed', updateMembers);
+
+    pusherClient.signin();
   }
 }
 

@@ -113,9 +113,6 @@ export const postRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      console.log(ctx.session.user);
-      console.log(input);
-
       const post = await ctx.prisma.post.create({
         data: {
           ...input,

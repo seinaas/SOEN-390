@@ -10,7 +10,7 @@ import Modal from '../components/modal';
 import EditButton from '../components/profile/editButton';
 import type { RouterOutputs } from '../utils/api';
 import { api } from '../utils/api';
-import { connectToChannel, useSubscribeToChannelEvent } from '../utils/pusher';
+import { connectToChannel, pusherStore, useSubscribeToChannelEvent } from '../utils/pusher';
 import { type NextPageWithLayout } from './_app';
 import { getServerAuthSession } from '../server/auth';
 import { type GetServerSidePropsContext } from 'next';
@@ -18,6 +18,7 @@ import { useTranslations } from 'next-intl';
 import { Upload, uploadFile } from '../components/upload';
 import { FileDownloadPreview, FileUploadPreview } from '../components/filePreview';
 import { useFileUploading } from '../customHooks/useFileUploading';
+import { useStore } from 'zustand';
 
 function TagsInput({ tagList, setTagList }: { tagList: string[]; setTagList: Dispatch<SetStateAction<string[]>> }) {
   return (
@@ -111,6 +112,9 @@ const Chat: NextPageWithLayout = () => {
 
   const { data: session } = useSession();
   const utils = api.useContext();
+
+  const members = useStore(pusherStore, (state) => state.members);
+
   const connections = api.connections.getUserConnections.useQuery(
     { userEmail: session?.user?.email || '' },
     {
@@ -127,6 +131,7 @@ const Chat: NextPageWithLayout = () => {
 
   const conversations = api.conversation.getUserConversations.useQuery().data;
   const { getPreSignedPUTUrl } = useFileUploading();
+
   useEffect(() => {
     if (messagesToUse) {
       setMessages(messagesToUse);
@@ -267,7 +272,20 @@ const Chat: NextPageWithLayout = () => {
                   loader={({ src }) => src}
                   src={conversation?.users[0]?.image || '/placeholder.jpeg'}
                   alt='User Image'
+                  referrerPolicy='no-referrer'
                 />
+
+                {/* Green activity bubble if user is online */}
+                <AnimatePresence initial={false}>
+                  {conversation.users.length === 1 && members.has(conversation.users[0]?.id || '') && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      className='absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500'
+                    ></motion.div>
+                  )}
+                </AnimatePresence>
               </div>
               <div className='text-left'>
                 <div className='text-ellipsis text-lg font-semibold'>
@@ -287,7 +305,7 @@ const Chat: NextPageWithLayout = () => {
         )}
       </div>
       {selectedConversationId && (
-        <div className='flex h-full max-w-[800px] flex-1 flex-col p-4'>
+        <div className='flex h-full max-w-[800px] flex-1 flex-col'>
           <div className='items-right flex justify-between bg-primary-500 p-4 text-2xl font-semibold text-white'>
             <h1>Messages</h1>
             <div className='flex'>
@@ -360,6 +378,7 @@ const Chat: NextPageWithLayout = () => {
                       loader={({ src }) => src}
                       src={connection.image || '/placeholder.jpeg'}
                       alt='User Image'
+                      referrerPolicy='no-referrer'
                     />
                   </div>
                   <div className='ml-4'>
@@ -413,6 +432,7 @@ const Chat: NextPageWithLayout = () => {
                         loader={({ src }) => src}
                         src={connection.image || '/placeholder.jpeg'}
                         alt='User Image'
+                        referrerPolicy='no-referrer'
                       />
                     </div>
                     <div className='ml-4'>
