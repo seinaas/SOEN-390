@@ -181,7 +181,7 @@ model JobPosting {
     jobType   jobType
     workplaceType workplaceType
     description String? @db.Text
-    requiredDocuments requiredDocuments
+    requiredDocuments requiredDocuments?
     jobSkills String? @db.Text
     applicationLink String? @db.Text
     applications Application []

@@ -1,6 +1,7 @@
 import { join } from 'path';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
+import { jobType, requiredDocuments, workplaceType } from '@prisma/client';
 
 /**
  * This Job Posting Router contains all the API routes that need to be implemented for the Job Posting Feature.
@@ -10,16 +11,10 @@ import { createTRPCRouter, protectedProcedure } from '../trpc';
 
 export const JobPostingRouter = createTRPCRouter({
   // Get all Job Postings (for the user's feed)
-  getJobPostings: protectedProcedure
-    .input(
-      z.object({
-        userId: z.string().min(1),
-      }),
-    )
-    .query(async ({ input, ctx }) => {
-      const jobPostings = await ctx.prisma.jobPosting.findMany({});
-      return jobPostings;
-    }),
+  getJobPostings: protectedProcedure.query(async ({ ctx }) => {
+    const jobPostings = await ctx.prisma.jobPosting.findMany({});
+    return jobPostings;
+  }),
 
   // Get all Job Postings created by a user and the associated applications (in this case a recruiter)
   getRecruiterJobPostings: protectedProcedure.query(async ({ ctx }) => {
@@ -82,10 +77,10 @@ export const JobPostingRouter = createTRPCRouter({
         jobTitle: z.string().min(1),
         company: z.string().min(1),
         location: z.string().min(1).nullish(),
-        jobType: z.string().min(1),
-        workplaceType: z.string().min(1),
+        jobType: z.nativeEnum(jobType),
+        workplaceType: z.nativeEnum(workplaceType),
         description: z.string().min(1).nullish(),
-        requiredDocuments: z.string().min(1).nullish(),
+        requiredDocuments: z.nativeEnum(requiredDocuments).nullish(),
         jobSkills: z.string().min(1).nullish(),
         applicationLink: z.string().min(1).nullish(),
       }),
@@ -103,18 +98,20 @@ export const JobPostingRouter = createTRPCRouter({
   // Update a Job Posting (By a Recruiter)
   editJobPosting: protectedProcedure
     .input(
-      z.object({
-        jobPostingId: z.string().min(1),
-        jobTitle: z.string().min(1),
-        company: z.string().min(1),
-        location: z.string().min(1).nullish(),
-        jobType: z.string().min(1),
-        workplaceType: z.string().min(1),
-        description: z.string().min(1).nullish(),
-        requiredDocuments: z.string().min(1).nullish(),
-        jobSkills: z.string().min(1).nullish(),
-        applicationLink: z.string().min(1).nullish(),
-      }),
+      z
+        .object({
+          jobPostingId: z.string().min(1),
+          jobTitle: z.string().min(1),
+          company: z.string().min(1),
+          location: z.string().min(1).nullish(),
+          jobType: z.nativeEnum(jobType),
+          workplaceType: z.nativeEnum(workplaceType),
+          description: z.string().min(1).nullish(),
+          requiredDocuments: z.nativeEnum(requiredDocuments).nullish(),
+          jobSkills: z.string().min(1).nullish(),
+          applicationLink: z.string().min(1).nullish(),
+        })
+        .partial(),
     )
     .mutation(async ({ input, ctx }) => {
       const updateInput: Omit<typeof input, 'jobPostingId'> & Partial<Pick<typeof input, 'jobPostingId'>> = {
