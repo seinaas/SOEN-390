@@ -15,7 +15,7 @@ describe('Chat Page', () => {
   });
   it('should create a chat with connection', () => {
     //after chat creation, you are logged in as email
-    cy.createChat().then(({ randomId, randomId2 }) => {});
+    cy.createChat();
   });
 });
 
