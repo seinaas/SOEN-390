@@ -235,13 +235,17 @@ const Chat: NextPageWithLayout = () => {
   const handleSendNewMessage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    newChatMutation.mutate({
-      message: message,
-      conversationId: selectedConversationId as string,
-    });
+    //Condition prevents sending empty messages
+    if (message) {
+      newChatMutation.mutate({
+        message: message,
+        conversationId: selectedConversationId as string,
+      });
 
-    setMessage('');
+      setMessage('');
+    }
 
+    //Sending files
     if (newFile) {
       const newMessage: Messages = await newChatMutation.mutateAsync({
         message: newFile.name,
@@ -252,7 +256,7 @@ const Chat: NextPageWithLayout = () => {
         fileName: newFile.name,
         pathPrefixes: ['conversations', selectedConversationId as string, 'messages', newMessage.id],
       });
-      await uploadFile({ file: newFile, url });
+      void uploadFile({ file: newFile, url });
       setNewFile(undefined);
     }
   };
