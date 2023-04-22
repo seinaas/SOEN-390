@@ -1,8 +1,14 @@
 import { z } from 'zod';
 
-import { createTRPCRouter, publicProcedure, protectedProcedure } from '../trpc';
+import { createTRPCRouter, protectedProcedure } from '../trpc';
 
-import { S3Client, PutObjectCommand, GetObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  ListObjectsV2Command,
+  DeleteObjectCommand,
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { env } from '../../../env/server.mjs';
 
@@ -79,4 +85,27 @@ export const cloudFlareRouter = createTRPCRouter({
 
     return putUrl;
   }),
+  getPresignedDELETEUrl: protectedProcedure
+    .input(
+      z.object({
+        fileName: z.string(),
+        pathPrefixes: z.string().array(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const { fileName, pathPrefixes } = input;
+
+      const deleteUrl = await getSignedUrl(
+        S3,
+        new DeleteObjectCommand({
+          Bucket: env.CLOUDFLARE_BUCKET_NAME,
+          Key: `${pathPrefixes.join('/')}/${fileName}`,
+        }),
+        {
+          expiresIn: 30,
+        },
+      );
+
+      return deleteUrl;
+    }),
 });
