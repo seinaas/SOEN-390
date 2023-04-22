@@ -1,5 +1,5 @@
 import { type Post } from '@prisma/client';
-import { usePostFiles } from '../customHooks/usePostFiles';
+import { usePostFiles } from '../customHooks/useFiles';
 import { BsDownload } from 'react-icons/bs';
 import { IoDocumentAttachOutline } from 'react-icons/io5';
 import { IoMdClose } from 'react-icons/io';

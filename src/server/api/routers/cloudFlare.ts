@@ -46,14 +46,21 @@ export const cloudFlareRouter = createTRPCRouter({
     }),
 
   getPresignedLISTUrl: protectedProcedure
-    .input(z.object({ userId: z.string(), containerType: z.string(), postId: z.string() }))
+    .input(
+      z.object({
+        pathPrefixes: z.string().array().optional(),
+        userId: z.string().default(''),
+        containerType: z.string().default(''),
+        postId: z.string().default(''),
+      }),
+    )
     .mutation(async ({ input, ctx }) => {
-      const { userId, containerType, postId } = input;
+      const { pathPrefixes, userId, containerType, postId } = input;
       const putUrl = await getSignedUrl(
         S3,
         new ListObjectsV2Command({
           Bucket: env.CLOUDFLARE_BUCKET_NAME,
-          Prefix: `${userId}/${containerType}/${postId}/`,
+          Prefix: pathPrefixes ? `${pathPrefixes.join('/')}` : `${userId}/${containerType}/${postId}`,
           Delimiter: '/',
         }),
         {

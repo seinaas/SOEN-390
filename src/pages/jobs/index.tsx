@@ -9,6 +9,10 @@ import Link from 'next/link';
 import TabSuggestedJobs from '../../components/jobs/tabSuggestedJobs';
 import TabSavedJobs from '../../components/jobs/tabSavedJobs';
 import TabAppliedJobs from '../../components/jobs/tabAppliedJobs';
+import { Upload, uploadFile } from '../../components/upload';
+import { useFileUploading } from '../../customHooks/useFileUploading';
+import { useSession } from 'next-auth/react';
+import { FileUploadPreview } from '../../components/filePreview';
 
 const TABS = [
   {
@@ -28,6 +32,10 @@ type Title = (typeof TABS)[number]['title'];
 
 const JobBoard: NextPageWithLayout = (props) => {
   const [selectedTab, setSelectedTab] = useState<Title>('Suggested Jobs');
+  const [fileList, setFileList] = useState<{ key: string; file: File }[]>([]);
+  const { data: session } = useSession();
+  const { getPreSignedPUTUrl } = useFileUploading();
+
   const iconStyles = { color: 'white', fontSize: '1.5em' };
   const hiddenFileInput = React.useRef(null);
 
@@ -38,6 +46,22 @@ const JobBoard: NextPageWithLayout = (props) => {
   const handleChange = (event) => {
     const fileUploaded = event.target.files[0];
     props.handleFile(fileUploaded);
+  };
+
+  const handleAddingNewFile = (newFile: File | undefined, newKey: string) => {
+    newFile && //Updates
+      setFileList([{ key: newKey, file: newFile }, ...fileList.filter((existingFile) => existingFile.key !== newKey)]);
+  };
+
+  const handleUploadFiles = async () => {
+    for (const { file, key } of fileList) {
+      const PUTPreSignedUrl = await getPreSignedPUTUrl.mutateAsync({
+        fileName: file.name,
+        pathPrefixes: [session?.user?.id as string, 'applicationProfile', key],
+      });
+      await uploadFile({ file: file, url: PUTPreSignedUrl });
+    }
+    setFileList([]);
   };
 
   return (
@@ -58,22 +82,24 @@ const JobBoard: NextPageWithLayout = (props) => {
           </div>
           <div>
             {/* TODO Replace array with real files */}
-            {['Resume/CV', 'Cover Letter', 'Portfolio', 'Transcript'].map((file, i) => (
+            {['Resume (CV)', 'Cover Letter', 'Portfolio', 'Transcript'].map((fileType, i) => (
               <div
                 className={`flex items-center justify-between py-4 text-primary-500 ${
                   i > 0 ? 'border-t-[1px] border-primary-500' : ''
                 }`}
-                key={file}
+                key={fileType}
               >
-                <p>{file}</p>
-                <div className='flex justify-start gap-4'>
-                  <IoDocumentAttachSharp size={24} onClick={handleClick} />
-                  <input type='file' ref={hiddenFileInput} onChange={handleChange} style={{ display: 'none' }} />
-                  <AiOutlineDownload size={24} />
-                  <AiFillDelete size={24} />
+                <p>{fileType}</p>
+                <div className='flex items-center justify-start gap-4'>
+                  {fileList.some((e) => e.key === fileType) && (
+                    <FileUploadPreview file={fileList.find((e) => e.key == fileType)?.file} />
+                  )}
+                  <Upload setFile={(file: File | undefined) => handleAddingNewFile(file, fileType)} />
                 </div>
               </div>
             ))}
+            {/* TODO: Change 'Upload File' to translated text */}
+            {fileList.length > 0 && <Button onClick={() => void handleUploadFiles()}>Upload File(s)</Button>}
           </div>
         </div>
 
