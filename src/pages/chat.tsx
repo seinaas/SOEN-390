@@ -52,6 +52,7 @@ function MessageItem({
   lastCreatedAt?: Date;
   isFile: boolean;
 }) {
+  const [messageText, setMessageText] = useState(message.message);
   const editMessageMutation = api.chat.editMessage.useMutation();
   const t = useTranslations('chat');
   const isSender = message?.senderId === userId;
@@ -64,6 +65,8 @@ function MessageItem({
       conversationId: message.conversationId,
       isFile: true,
     });
+
+    setMessageText('deleted');
   };
 
   return (
@@ -90,7 +93,7 @@ function MessageItem({
           } py-3 ${isSender ? 'bg-primary-500 text-white' : 'bg-primary-100/10 text-primary-500'}`}
         >
           {(isFile &&
-            ((message.message === 'deleted' && <span className='italic'>{t('files.file-deleted')}</span>) || (
+            ((messageText === 'deleted' && <span className='italic'>{t('files.file-deleted')}</span>) || (
               <FileDownloadPreview
                 fileName={message.message}
                 pathPrefixes={['conversations', message.conversationId, 'messages', message.id]}
@@ -98,7 +101,7 @@ function MessageItem({
                 onDeleteAsync={deleteFileFromMessage}
               />
             ))) ||
-            message.message}
+            messageText}
         </div>
         {(!lastCreatedAt || differenceInMinutes(message.createdAt, lastCreatedAt) > 5) && (
           <div className='text-xs text-gray-500'>{format(message.createdAt, 'MMM. do, p')}</div>
