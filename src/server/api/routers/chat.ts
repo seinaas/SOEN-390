@@ -73,6 +73,11 @@ export const chatRouter = createTRPCRouter({
         },
       });
 
+      await ctx.pusher.trigger(input.conversationId, 'message-updated', {
+        ...messageToEdit,
+        sender: { firstName: ctx.session.user.firstName, lastName: ctx.session.user.lastName },
+      });
+
       return messageToEdit;
     }),
 });

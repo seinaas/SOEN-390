@@ -52,7 +52,6 @@ function MessageItem({
   lastCreatedAt?: Date;
   isFile: boolean;
 }) {
-  const [messageContent, setMessageContent] = useState(message.message);
   const editMessageMutation = api.chat.editMessage.useMutation();
   const t = useTranslations('chat');
   const isSender = message?.senderId === userId;
@@ -65,8 +64,6 @@ function MessageItem({
       conversationId: message.conversationId,
       isFile: true,
     });
-
-    setMessageContent('deleted');
   };
 
   return (
@@ -89,11 +86,11 @@ function MessageItem({
         <div>{`${message?.sender?.firstName || ''} ${message?.sender?.lastName || ''}`}</div>
         <div
           className={`rounded-md ${
-            isFile && messageContent !== 'deleted' ? (isSender ? 'px-2' : 'pl-2 pr-4') : 'px-4'
+            isFile && message.message !== 'deleted' ? (isSender ? 'px-2' : 'pl-2 pr-4') : 'px-4'
           } py-3 ${isSender ? 'bg-primary-500 text-white' : 'bg-primary-100/10 text-primary-500'}`}
         >
           {(isFile &&
-            ((messageContent === 'deleted' && <span className='italic'>{t('files.file-deleted')}</span>) || (
+            ((message.message === 'deleted' && <span className='italic'>{t('files.file-deleted')}</span>) || (
               <FileDownloadPreview
                 fileName={message.message}
                 pathPrefixes={['conversations', message.conversationId, 'messages', message.id]}
@@ -101,7 +98,7 @@ function MessageItem({
                 onDeleteAsync={deleteFileFromMessage}
               />
             ))) ||
-            messageContent}
+            message.message}
         </div>
         {(!lastCreatedAt || differenceInMinutes(message.createdAt, lastCreatedAt) > 5) && (
           <div className='text-xs text-gray-500'>{format(message.createdAt, 'MMM. do, p')}</div>
@@ -175,6 +172,20 @@ const Chat: NextPageWithLayout = () => {
           createdAt: new Date(data.createdAt),
         },
         ...oldData,
+      ]);
+    },
+  );
+
+  useSubscribeToChannelEvent(
+    'message-updated',
+    (data: Messages & { sender: { firstName: string | null; lastName: string | null } }) => {
+      console.log('message updated');
+      setMessages((oldData) => [
+        {
+          ...data,
+          createdAt: new Date(data.createdAt),
+        },
+        ...oldData.filter((message) => message.id !== data.id),
       ]);
     },
   );
