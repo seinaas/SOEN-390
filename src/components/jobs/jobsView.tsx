@@ -96,7 +96,7 @@ export const JobsView: React.FC<Props> = ({ previews, currentJobId, setCurrentJo
               stiffness: 250,
               damping: 30,
             }}
-            className='flex h-full w-full min-w-full flex-col items-start gap-2 rounded-xl bg-primary-100/10 p-3 sm:min-w-0'
+            className='flex h-full w-full min-w-full flex-col items-start gap-2 overflow-y-auto rounded-xl bg-primary-100/10 p-3 sm:min-w-0'
           >
             <button
               onClick={() => setCurrentJobId('')}

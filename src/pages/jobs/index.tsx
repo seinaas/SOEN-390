@@ -56,7 +56,7 @@ const JobBoard: NextPageWithLayout = (props) => {
   };
 
   return (
-    <main className='relative flex w-full flex-col justify-center gap-4 xs:py-4 xs:px-4 sm:h-full lg:px-8 xl:flex-row'>
+    <main className='relative flex w-full flex-col justify-center gap-4 xs:py-4 xs:px-4 sm:min-h-full lg:px-8 xl:flex-row'>
       {/* Left Side */}
       <div className='flex flex-col gap-4 md:flex-row xl:max-w-sm xl:flex-col'>
         <div className='flex flex-col gap-4 rounded-xl bg-primary-100/20 px-6 pt-8 pb-4 xs:flex-row xl:flex-col'>
