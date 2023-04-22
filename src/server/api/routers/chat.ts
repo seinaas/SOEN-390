@@ -53,4 +53,26 @@ export const chatRouter = createTRPCRouter({
       }
       return messageToSend;
     }),
+  editMessage: protectedProcedure
+    .input(
+      z.object({
+        messageId: z.string(),
+        message: z.string(),
+        conversationId: z.string(),
+        isFile: z.boolean().default(false),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const messageToEdit = await ctx.prisma.messages.update({
+        where: {
+          id: input.messageId,
+        },
+        data: {
+          message: input.message,
+          isFile: input.isFile,
+        },
+      });
+
+      return messageToEdit;
+    }),
 });

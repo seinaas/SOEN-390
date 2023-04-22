@@ -137,6 +137,9 @@
       "add-users": "Ajouter des utilisateurs à la conversation",
       "confirm": "Confirmer",
       "yes": "Oui"
+    },
+    "files": {
+      "file-deleted": "Ce fichier as été supprimé."
     }
   }
 }

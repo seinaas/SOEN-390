@@ -8,7 +8,14 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 
 type FileUploadPreviewProps = { file?: File };
-type FileDownloadPreviewProps = { fileName: string; pathPrefixes: string[]; className?: string };
+type FileDownloadPreviewProps = {
+  fileName: string;
+  pathPrefixes: string[];
+  className?: string;
+  isOwner?: boolean;
+  onDelete?: () => void;
+  onDeleteAsync?: () => Promise<void>;
+};
 type PostFileDownloadPreviewProps = { post: Post; isOwner?: boolean };
 
 export const FileUploadPreview: React.FC<FileUploadPreviewProps> = ({ file }) => {
@@ -79,9 +86,20 @@ export const PostFileDownloadPreview: React.FC<PostFileDownloadPreviewProps> = (
 };
 
 //Generalized file download preview for a single file
-export const FileDownloadPreview: React.FC<FileDownloadPreviewProps> = ({ fileName, pathPrefixes, className = '' }) => {
+export const FileDownloadPreview: React.FC<FileDownloadPreviewProps> = ({
+  fileName,
+  pathPrefixes,
+  className = '',
+  isOwner = false,
+  onDelete = () => {
+    return;
+  },
+  onDeleteAsync = () => {
+    return;
+  },
+}) => {
   const [downloadUrl, setDownloadUrl] = useState<string>();
-  const { getPreSignedGETUrl } = useFileUploading();
+  const { getPreSignedGETUrl, getPreSignedDELETEUrl } = useFileUploading();
   const loadFile = async () => {
     const url = await getPreSignedGETUrl.mutateAsync({ key: `${pathPrefixes.join('/')}/${fileName}` });
     setDownloadUrl(url);
@@ -91,15 +109,36 @@ export const FileDownloadPreview: React.FC<FileDownloadPreviewProps> = ({ fileNa
     void loadFile();
   }, []);
 
+  const handleDeleteFile = async () => {
+    onDelete();
+    void onDeleteAsync();
+    const deleteUrl: string = await getPreSignedDELETEUrl.mutateAsync({
+      fileName: fileName,
+      pathPrefixes: pathPrefixes,
+    });
+    const response = await axios.delete(deleteUrl);
+    console.log(response);
+  };
+
   return (
     <div data-cy='file-download-preview' className={`flex items-center justify-between gap-x-4  ${className} `}>
       <div className='flex gap-x-1 font-bold'>
         <IoDocumentAttachOutline className='h-6 w-6' />
         <span>{fileName}</span>
       </div>
-      <a href={downloadUrl}>
-        <BsDownload className='h-5 w-5 hover:opacity-50' />
-      </a>
+      <div className='flex items-center gap-x-1 '>
+        <a href={downloadUrl}>
+          <BsDownload className='h-5 w-5 hover:opacity-50' />
+        </a>
+        {isOwner && (
+          <MdDeleteForever
+            className='h-6 w-6 hover:cursor-pointer hover:opacity-50'
+            onClick={() => {
+              void handleDeleteFile();
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 };
