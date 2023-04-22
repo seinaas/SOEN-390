@@ -56,16 +56,16 @@ const JobBoard: NextPageWithLayout = (props) => {
   };
 
   return (
-    <main className='relative flex w-full flex-col justify-center gap-4 xs:py-4 xs:px-4 lg:px-8 xl:flex-row'>
+    <main className='relative flex w-full flex-col justify-center gap-4 xs:py-4 xs:px-4 sm:h-full lg:px-8 xl:flex-row'>
       {/* Left Side */}
-      <div className='flex flex-col gap-4 md:max-w-xs md:flex-row xl:flex-col'>
+      <div className='flex flex-col gap-4 md:flex-row xl:max-w-sm xl:flex-col'>
         <div className='flex flex-col gap-4 rounded-xl bg-primary-100/20 px-6 pt-8 pb-4 xs:flex-row xl:flex-col'>
           <div>
-            <div className='flex items-center justify-between'>
-              <h1 className='mb-4 text-2xl font-semibold'>Application Profile</h1>
+            <div className='flex items-center justify-start gap-4'>
               <div className='relative h-20 w-20 rounded-full bg-primary-100 p-10'>
                 <Image alt={''} src={'/application-profile.png'} fill className='object-contain' />
               </div>
+              <h1 className='mb-4 text-2xl font-semibold'>Application Profile</h1>
             </div>
             <div className='rounded-xl py-4'>
               <p>Upload all necessary documents to share you skills and experiences with the recruiters.</p>
@@ -107,12 +107,12 @@ const JobBoard: NextPageWithLayout = (props) => {
 
         <div className='flex flex-col rounded-xl bg-primary-100/20 px-6 pt-8 pb-4'>
           <div className='flex items-center justify-between'>
-            <h1 className='mb-4 text-2xl font-semibold'>Are you recruiting?</h1>
+            <h1 className='mb-2 text-2xl font-semibold'>Are you recruiting?</h1>
           </div>
           <div className='rounded-xl py-4'>
             <p>Create a job post to reach out to aspiring work profesionals</p>
           </div>
-          <Link href='/jobs/createjobpost'>
+          <Link href='/jobs/createJobPost'>
             <Button className='p-2'>Create Job Post</Button>
           </Link>
           <div></div>
@@ -121,11 +121,11 @@ const JobBoard: NextPageWithLayout = (props) => {
 
       {/* Right Side */}
       <div className='flex flex-1 flex-col gap-4 overflow-hidden rounded-xl bg-primary-100/10 p-4'>
-        <div className='flex gap-2 border-b-4 border-primary-100/50'>
+        <div className='flex gap-2 border-b-4 border-primary-100'>
           {TABS.map((tab, index) => (
             <Button
               className={`rounded-b-none border-none p-3 hover:bg-primary-100 active:bg-primary-100 ${
-                selectedTab === tab.title ? 'bg-primary-100' : 'bg-primary-100/50'
+                selectedTab === tab.title ? 'bg-primary-100' : 'bg-primary-100/60'
               }`}
               key={index}
               onClick={() => setSelectedTab(tab.title)}

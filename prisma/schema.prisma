@@ -43,40 +43,41 @@ model Session {
 }
 
 model User {
-  id                String                   @id @default(cuid())
-  firstName         String?
-  lastName          String?
-  headline          String?
-  bio               String?                  @db.Text
-  volunteering      String?
-  skills            String?
-  recommendations   String?
-  courses           String?
-  projects          String?
-  awards            String?
-  languages         String?
-  email             String                   @unique
-  emailVerified     DateTime?
-  phone             String?                  @unique
-  image             String?                  @db.Text
-  password          String?
-  education         Education[]
-  jobs              Job[]
-  connections       Connection[]             @relation("UserFriends")
-  connectionOf      Connection[]             @relation("FriendsUser")
-  posts             Post[]
-  commments         Comment[]
-  likes             Like[]
-  accounts          Account[]
-  sessions          Session[]
-  PostedJobs        JobPosting[]
-  Applications      Application[]
-  savedJobPostings  SavedJobPosting[]
-  notifications     Notification[]
-  sentNotifications Notification[]           @relation("Sender")
-  mutedNotifTypes   MutedNotificationTypes[]
-  DirectMessages    DirectMessages[]
-  MessagesTo        Messages[]               @relation("Sender")
+    id              String       @id @default(cuid())
+    firstName       String?
+    lastName        String?
+    headline        String?
+    education       Education[]
+    jobs            Job[]
+    connections     Connection[] @relation("UserFriends")
+    connectionOf    Connection[] @relation("FriendsUser")
+    posts           Post[]
+    commments       Comment[]
+    likes           Like[]
+    bio             String?      @db.Text
+    volunteering    String? // TODO: Change to volunteering model
+    skills          String? // TODO: Create skills table
+    recommendations String? // TODO: Create recommendations table
+    courses         String? // TODO: Create courses table
+    projects        String? // TODO: Create projects table
+    awards          String? // TODO: Create awards table
+    languages       String? // TODO: Create languages table
+    email           String       @unique
+    emailVerified   DateTime?
+    phone           String?      @unique
+    image           String?      @db.Text
+    accounts        Account[]
+    sessions        Session[]
+    PostedJobs      JobPosting[]
+    Applications    Application[]
+    savedJobPostings SavedJobPosting[]
+    appliedJobPostings AppliedJobPosting[]
+    password        String?
+    notifications   Notification[]
+    sentNotifications Notification[] @relation("Sender")
+    mutedNotifTypes MutedNotificationTypes[]
+    DirectMessages   DirectMessages[]
+    MessagesTo       Messages[]       @relation("Sender")
 }
 
 model Connection {
@@ -167,24 +168,25 @@ model Like {
 }
 
 model JobPosting {
-  jobPostingId       String            @id @default(cuid())
-  recruiterId        String
-  createdAt          DateTime          @default(now())
-  jobTitle           String
-  company            String
-  location           String?
-  jobType            jobType
-  workplaceType      workplaceType
-  description        String?           @db.Text
-  jobSkills          String?           @db.Text
-  applicationLink    String?           @db.Text
-  requireResume      Boolean           @default(false)
-  requireCoverLetter Boolean           @default(false)
-  requirePortfolio   Boolean           @default(false)
-  requireTranscript  Boolean           @default(false)
-  applications       Application[]
-  savedJobPostings   SavedJobPosting[]
-  recruiter          User              @relation(fields: [recruiterId], references: [id])
+    jobPostingId    String   @id @default(cuid())
+    recruiterId    String   
+    createdAt DateTime @default(now())
+    jobTitle  String
+    company   String
+    location  String?
+    jobType   jobType
+    workplaceType workplaceType
+    description String? @db.Text
+    jobSkills String? @db.Text
+    applicationLink String? @db.Text
+    requireResume Boolean @default(false)
+    requireCoverLetter Boolean @default(false)
+    requirePortfolio Boolean @default(false)
+    requireTranscript Boolean @default(false)
+    applications Application []
+    savedJobPostings SavedJobPosting []
+    appliedJobPostings AppliedJobPosting []
+    recruiter      User     @relation(fields: [recruiterId], references: [id]) //this will be the recruiters user Id since he/she's in charge of creating a Job Posting
 }
 
 model SavedJobPosting {
@@ -228,17 +230,26 @@ model Notification {
   Sender    User             @relation("Sender", fields: [senderId], references: [id])
   User      User             @relation(fields: [userId], references: [id])
 }
+model AppliedJobPosting {
+    userId String
+    jobPostingId String
+    User User @relation(fields: [userId], references: [id])
+    JobPosting JobPosting @relation(fields: [jobPostingId], references: [jobPostingId])
+    @@id([userId, jobPostingId])
+}
 
 enum jobType {
   Internship
   PartTime
   FullTime
   Contract
+  Volunteer
+  Temporary
 }
 
 enum workplaceType {
   Remote
-  OnSite
+  Onsite
   Hybrid
 }
 
