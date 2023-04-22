@@ -27,7 +27,7 @@ describe('File Upload/Download', () => {
       cy.dataCy('file-upload-preview').should('exist');
     });
   }),
-    it.only('should show the download file preview when a mesage containing a file is shown', () => {
+    it('should show the download file preview when a mesage containing a file is shown', () => {
       cy.intercept(
         {
           method: 'GET',
