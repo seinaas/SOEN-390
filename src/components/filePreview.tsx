@@ -1,14 +1,15 @@
 import { type Post } from '@prisma/client';
-import { usePostFiles } from '../customHooks/usePostFiles';
+import { PostFile, usePostFiles } from '../customHooks/usePostFiles';
 import { BsDownload } from 'react-icons/bs';
 import { IoDocumentAttachOutline } from 'react-icons/io5';
-import { IoMdClose } from 'react-icons/io';
+import { MdDeleteForever } from 'react-icons/md';
 import { useFileUploading } from '../customHooks/useFileUploading';
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 type FileUploadPreviewProps = { file?: File };
 type FileDownloadPreviewProps = { fileName: string; pathPrefixes: string[]; className?: string };
-type PostFileDownloadPreviewProps = { post: Post };
+type PostFileDownloadPreviewProps = { post: Post; isOwner?: boolean };
 
 export const FileUploadPreview: React.FC<FileUploadPreviewProps> = ({ file }) => {
   //const imgPreview = file?.type.includes('image') ? URL.createObjectURL(file) : undefined;
@@ -29,25 +30,47 @@ export const FileUploadPreview: React.FC<FileUploadPreviewProps> = ({ file }) =>
 };
 
 //Only for previewing file in posts
-export const PostFileDownloadPreview: React.FC<PostFileDownloadPreviewProps> = ({ post }) => {
-  const [fileList] = usePostFiles(post);
+export const PostFileDownloadPreview: React.FC<PostFileDownloadPreviewProps> = ({ post, isOwner = false }) => {
+  const [fileList, removeFile] = usePostFiles(post);
+  const { getPreSignedDELETEUrl } = useFileUploading();
 
+  const handleDeleteFile = async (file: PostFile) => {
+    removeFile(file);
+    const deleteUrl = await getPreSignedDELETEUrl.mutateAsync({
+      fileName: file.fileName as string,
+      pathPrefixes: [post.userId, 'posts', post.id],
+    });
+    const response = await axios.delete(deleteUrl);
+    console.log(response);
+  };
   return (
     <div data-cy='file-download-preview'>
       {fileList &&
         fileList.map((file) => {
           return (
             <div
-              className={`mt-4 flex items-center justify-between rounded-lg bg-white/50 py-2 pr-4 pl-2 text-primary-600`}
+              className={`mt-4 flex items-center justify-between rounded-lg bg-white/50 py-2 ${
+                isOwner ? 'pr-2' : 'pr-4'
+              }  pl-2 text-primary-600`}
               key={file.url}
             >
               <div className='flex items-center gap-x-2 '>
                 <IoDocumentAttachOutline className='h-6 w-6' />
                 <span>{file.fileName}</span>
               </div>
-              <a href={file.url}>
-                <BsDownload className='h-5 w-5 hover:text-primary-300' />
-              </a>
+              <div className='flex items-center gap-3'>
+                <a href={file.url}>
+                  <BsDownload className='h-5 w-5 hover:opacity-70' />
+                </a>
+                {isOwner && (
+                  <MdDeleteForever
+                    className='h-6 w-6 hover:cursor-pointer hover:opacity-50'
+                    onClick={() => {
+                      void handleDeleteFile(file);
+                    }}
+                  />
+                )}
+              </div>
             </div>
           );
         })}

@@ -10,7 +10,7 @@ import { type GetServerSidePropsContext } from 'next';
 import { getServerAuthSession } from '../server/auth';
 import { type RouterOutputs, api } from '../utils/api';
 import { Upload, uploadFile } from '../components/upload';
-import { PostFileDownloadPreview, FileUploadPreview } from '../components/filePreview';
+import { PostFileDownloadPreview, FileUploadPreview, FileDownloadPreview } from '../components/filePreview';
 import { useTranslations } from 'next-intl';
 import { enCA, fr } from 'date-fns/locale';
 import { useRouter } from 'next/router';
@@ -190,7 +190,9 @@ const Post: React.FC<PostProps> = ({
             <p className='text-primary-500'>{post.content}</p>
           )}
           {/* Preview of the attached file */}
-          {post.hasFiles && <PostFileDownloadPreview post={post} data-cy='post-file-download-preview' />}{' '}
+          {post.hasFiles && (
+            <PostFileDownloadPreview post={post} isOwner={ownsPost} data-cy='post-file-download-preview' />
+          )}{' '}
         </div>
       </motion.div>
       <motion.div layout className='mt-2 flex items-center gap-2 border-t-2 border-t-primary-100/20 pt-2'>

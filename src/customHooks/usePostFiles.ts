@@ -7,7 +7,7 @@ export type PostFile = {
   fileName: string | undefined;
   url: string;
 };
-export const usePostFiles = (post: Post) => {
+export const usePostFiles = (post: Post): [PostFile[] | undefined, (fileToRemove: PostFile) => void] => {
   const [fileList, setFileList] = useState<PostFile[]>();
   const getPreSignedLISTUrl = api.cloudFlare.getPresignedLISTUrl.useMutation();
   const getPreSignedGETUrl = api.cloudFlare.getPresignedGETUrl.useMutation();
@@ -43,5 +43,9 @@ export const usePostFiles = (post: Post) => {
     void loadFile();
   }, []);
 
-  return [fileList];
+  const removeFile = (fileToRemove: PostFile) => {
+    setFileList(fileList?.filter((file) => file.fileName !== fileToRemove.fileName && file.url !== fileToRemove.url));
+  };
+
+  return [fileList, removeFile];
 };
