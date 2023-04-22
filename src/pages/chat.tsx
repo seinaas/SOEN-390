@@ -19,6 +19,9 @@ import { Upload, uploadFile } from '../components/upload';
 import { FileDownloadPreview, FileUploadPreview } from '../components/filePreview';
 import { useFileUploading } from '../customHooks/useFileUploading';
 import { useStore } from 'zustand';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { env } from '../env/client.mjs';
 
 function TagsInput({ tagList, setTagList }: { tagList: string[]; setTagList: Dispatch<SetStateAction<string[]>> }) {
   return (
@@ -132,6 +135,38 @@ const Chat: NextPageWithLayout = () => {
   const conversations = api.conversation.getUserConversations.useQuery().data;
   const { getPreSignedPUTUrl } = useFileUploading();
 
+  const moderateMessage = async (message: string): Promise<boolean> => {
+    const openaiApiKey = env.NEXT_PUBLIC_OPENAI_KEY;
+    const response = await fetch('https://api.openai.com/v1/moderations', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${openaiApiKey}`,
+      },
+      body: JSON.stringify({ input: message }),
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const data = await response.json();
+    if (
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      data.results[0].categories['hate'] ||
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      data.results[0].categories['hate/threatening'] ||
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      data.results[0].categories['sexual'] ||
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      data.results[0].categories['violence']
+    ) {
+      toast.warning(
+        'Prospects does not tolerate hate speech or anything associated to it. Please refrain from using it.',
+      );
+      return false;
+    } else {
+      return true;
+    }
+  };
+
   useEffect(() => {
     if (messagesToUse) {
       setMessages(messagesToUse);
@@ -216,12 +251,18 @@ const Chat: NextPageWithLayout = () => {
   const handleSendNewMessage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    newChatMutation.mutate({
-      message: message,
-      conversationId: selectedConversationId as string,
-    });
-
-    setMessage('');
+    if (message) {
+      const isModerated = await moderateMessage(message);
+      if (isModerated) {
+        newChatMutation.mutate({
+          message: message,
+          conversationId: selectedConversationId || '',
+        });
+        setMessage('');
+      } else {
+        setMessage('');
+      }
+    }
 
     if (newFile) {
       const newMessage: Messages = await newChatMutation.mutateAsync({
@@ -348,6 +389,7 @@ const Chat: NextPageWithLayout = () => {
               <FileUploadPreview file={newFile} />
             </div>
           </form>
+          <ToastContainer />
         </div>
       )}
 
