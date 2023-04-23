@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MainLayout from '../../components/mainLayout';
 import Image from 'next/image';
 import type { NextPageWithLayout } from '../_app';
@@ -12,7 +12,8 @@ import TabAppliedJobs from '../../components/jobs/tabAppliedJobs';
 import { Upload, uploadFile } from '../../components/upload';
 import { useFileUploading } from '../../customHooks/useFileUploading';
 import { useSession } from 'next-auth/react';
-import { FileUploadPreview } from '../../components/filePreview';
+import { FileDownloadPreview, FileUploadPreview } from '../../components/filePreview';
+import { useJobPostFiles } from '../../customHooks/useFiles';
 
 const TABS = [
   {
@@ -35,18 +36,8 @@ const JobBoard: NextPageWithLayout = (props) => {
   const [fileList, setFileList] = useState<{ key: string; file: File }[]>([]);
   const { data: session } = useSession();
   const { getPreSignedPUTUrl } = useFileUploading();
-
-  const iconStyles = { color: 'white', fontSize: '1.5em' };
-  const hiddenFileInput = React.useRef(null);
-
-  const handleClick = (event) => {
-    hiddenFileInput.current.click();
-  };
-
-  const handleChange = (event) => {
-    const fileUploaded = event.target.files[0];
-    props.handleFile(fileUploaded);
-  };
+  const userId = session?.user?.id;
+  const [uploadedFileList] = useJobPostFiles(userId);
 
   const handleAddingNewFile = (newFile: File | undefined, newKey: string) => {
     newFile && //Updates
@@ -91,10 +82,21 @@ const JobBoard: NextPageWithLayout = (props) => {
               >
                 <p>{fileType}</p>
                 <div className='flex items-center justify-start gap-4'>
-                  {fileList.some((e) => e.key === fileType) && (
-                    <FileUploadPreview file={fileList.find((e) => e.key == fileType)?.file} />
+                  {(uploadedFileList?.some((uploadedFile) => uploadedFile.fileType === fileType) && (
+                    <FileDownloadPreview
+                      fileName={
+                        uploadedFileList.find((uploadedFile) => uploadedFile.fileType === fileType)?.fileName as string
+                      }
+                      url={uploadedFileList.find((uploadedFile) => uploadedFile.fileType === fileType)?.url}
+                    />
+                  )) || (
+                    <div className='flex items-center justify-start gap-4'>
+                      {fileList.some((e) => e.key === fileType) && (
+                        <FileUploadPreview file={fileList.find((e) => e.key == fileType)?.file} />
+                      )}
+                      <Upload setFile={(file: File | undefined) => handleAddingNewFile(file, fileType)} />
+                    </div>
                   )}
-                  <Upload setFile={(file: File | undefined) => handleAddingNewFile(file, fileType)} />
                 </div>
               </div>
             ))}

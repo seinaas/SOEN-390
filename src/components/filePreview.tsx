@@ -7,7 +7,7 @@ import { useFileUploading } from '../customHooks/useFileUploading';
 import { useEffect, useState } from 'react';
 
 type FileUploadPreviewProps = { file?: File };
-type FileDownloadPreviewProps = { fileName: string; pathPrefixes: string[]; className?: string };
+type FileDownloadPreviewProps = { fileName: string; pathPrefixes?: string[]; className?: string; url?: string };
 type PostFileDownloadPreviewProps = { post: Post };
 
 export const FileUploadPreview: React.FC<FileUploadPreviewProps> = ({ file }) => {
@@ -56,7 +56,12 @@ export const PostFileDownloadPreview: React.FC<PostFileDownloadPreviewProps> = (
 };
 
 //Generalized file download preview for a single file
-export const FileDownloadPreview: React.FC<FileDownloadPreviewProps> = ({ fileName, pathPrefixes, className = '' }) => {
+export const FileDownloadPreview: React.FC<FileDownloadPreviewProps> = ({
+  fileName,
+  pathPrefixes = [],
+  className = '',
+  url = '',
+}) => {
   const [downloadUrl, setDownloadUrl] = useState<string>();
   const { getPreSignedGETUrl } = useFileUploading();
   const loadFile = async () => {
@@ -65,7 +70,7 @@ export const FileDownloadPreview: React.FC<FileDownloadPreviewProps> = ({ fileNa
   };
 
   useEffect(() => {
-    void loadFile();
+    pathPrefixes.length > 0 && void loadFile();
   }, []);
 
   return (
@@ -74,7 +79,7 @@ export const FileDownloadPreview: React.FC<FileDownloadPreviewProps> = ({ fileNa
         <IoDocumentAttachOutline className='h-6 w-6' />
         <span>{fileName}</span>
       </div>
-      <a href={downloadUrl}>
+      <a href={url ? url : downloadUrl}>
         <BsDownload className='h-5 w-5 hover:opacity-50' />
       </a>
     </div>

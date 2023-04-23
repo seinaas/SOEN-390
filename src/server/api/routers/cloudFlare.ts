@@ -60,7 +60,7 @@ export const cloudFlareRouter = createTRPCRouter({
         S3,
         new ListObjectsV2Command({
           Bucket: env.CLOUDFLARE_BUCKET_NAME,
-          Prefix: pathPrefixes ? `${pathPrefixes.join('/')}` : `${userId}/${containerType}/${postId}`,
+          Prefix: pathPrefixes ? `${pathPrefixes.join('/')}/` : `${userId}/${containerType}/${postId}/`,
           Delimiter: '/',
         }),
         {
