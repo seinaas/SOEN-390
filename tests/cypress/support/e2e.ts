@@ -8,6 +8,7 @@ Cypress.Commands.add('register', (em?: string, pass?: string, fn?: string, ln?: 
   const password = pass || 'testpassword';
 
   cy.visit('/auth/register');
+  cy.dataCy('email-input').should('exist');
   cy.dataCy('email-input').type(email);
 
   cy.dataCy('password-input').type(password);
