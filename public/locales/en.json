@@ -11,7 +11,6 @@
     "button": "Become a member",
     "header": {
       "about": "About",
-      "jobs": "Jobs",
       "contact": "Contact"
     }
   },
@@ -205,5 +204,29 @@
       "link": "External Application Link",
       "post": "Post Job"
     }
+  },
+  "about": {
+    "title": "Our Purpose",
+    "welcome": {
+      "1": "Welcome to our professional networking platform ProSpects, designed to connect you with like-minded individuals and help you build a successful career.",
+      "2": "At our core, we believe in the power of networking and building meaningful relationships to further your personal and professional goals. We understand that in today's fast-paced world, it can be challenging to make those connections, which is why we have created a platform that makes it easier than ever to connect with other professionals in your field.",
+      "3": "Our platform is designed to be user-friendly and intuitive, with features that allow you to showcase your skills and experience, connect with other professionals in your industry, and stay up-to-date on the latest news and trends in your field.",
+      "4": "Whether you're looking for a new job opportunity, seeking mentorship or looking to expand your professional network, our platform can help. We believe that everyone has something valuable to offer, and we are committed to creating a diverse and inclusive community where everyone can thrive. We welcome professionals from all backgrounds and industries, and our goal is to help you achieve your career goals, whatever they may be.",
+      "5": "Join us today and start building your professional network. We can't wait to see where your career takes you!"
+    },
+    "header": {
+      "about": "About",
+      "contact": "Contact"
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "form": {
+      "1": "Fill out the form below to contact us.",
+      "2": "Name",
+      "3": "Email",
+      "4": "Write Something..."
+    },
+    "button": "Send"
   }
 }
