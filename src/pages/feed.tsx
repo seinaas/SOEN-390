@@ -27,6 +27,8 @@ type PostProps = {
   editingPost: boolean;
   setCommentingPostId: React.Dispatch<React.SetStateAction<string>>;
   setEditingPostId: React.Dispatch<React.SetStateAction<string>>;
+  setSharePostModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setPostToShare: React.Dispatch<React.SetStateAction<PostMessage>>;
 };
 const Post: React.FC<PostProps> = ({
   initialPost,
@@ -36,6 +38,8 @@ const Post: React.FC<PostProps> = ({
   editingPost,
   setCommentingPostId,
   setEditingPostId,
+  setSharePostModal,
+  setPostToShare,
 }) => {
   const t = useTranslations('feed');
   const router = useRouter();
@@ -233,7 +237,10 @@ const Post: React.FC<PostProps> = ({
         </button>
         <button
           data-cy='share-btn'
-          onClick={() => setShared(!shared)}
+          onClick={() => {
+            setPostToShare(post);
+            setSharePostModal(true);
+          }}
           className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'
         >
           <IoMdShare />
@@ -499,69 +506,6 @@ const Feed: NextPageWithLayout = () => {
           </div>
         )}
         <div className='my-2 h-px w-full bg-primary-100/20' />
-
-        {posts?.map((post) => (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            key={`${post.User.firstName || ''} ${post.User.lastName || ''} - ${post.createdAt.getTime()}`}
-            className='flex items-start gap-4 rounded-xl bg-primary-100/10 p-4 pr-8'
-          >
-            <div className='relative h-12 min-h-[48px] w-12 min-w-[48px]'>
-              <Image
-                alt='Logo'
-                loader={() => post.User.image || '/placeholder.jpeg'}
-                src={post.User.image || 'placeholder.jpeg'}
-                fill
-                className='rounded-md bg-white object-contain'
-                referrerPolicy='no-referrer'
-              />
-            </div>
-            <div className='flex flex-1 flex-col'>
-              <div className='flex items-center justify-between'>
-                <div className='flex items-center gap-2'>
-                  <p className='font-bold text-primary-500'>
-                    {post.User.firstName} {post.User.lastName}
-                  </p>
-                  <p className='text-primary-400'>•</p>
-                  <p className='text-primary-400'>{formatDistance(post.createdAt, new Date(), { addSuffix: true })}</p>
-                </div>
-                <div className='flex items-center gap-1'>
-                  <span className='h-[2px] w-[2px] rounded-full bg-primary-600' />
-                  <div className='h-[2px] w-[2px] rounded-full bg-primary-600' />
-                  <div className='h-[2px] w-[2px] rounded-full bg-primary-600' />
-                </div>
-              </div>
-              <p className='text-primary-500'>
-                {post.content
-                  ? post.content
-                  : `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget consectetur lacinia,
-                nisl nisl aliquam nisl, eget ultricies nisl nisl sit amet nisl. Suspendisse potenti. Nulla facilisi.
-                Nulla facilisi. Nulla facilisi. Nulla facilisi.`}
-              </p>
-              <div className='mt-2 flex items-center gap-2 border-t-2 border-t-primary-100/20 pt-2'>
-                <button className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'>
-                  <IoMdThumbsUp />
-                  <p>Like</p>
-                </button>
-                <button className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'>
-                  <IoIosChatboxes />
-                  <p>Comment</p>
-                </button>
-                <button
-                  className='flex items-center gap-2 rounded-full bg-white px-3 py-1 text-primary-400 transition-colors duration-200 hover:bg-primary-100/10'
-                  onClick={() => {
-                    setPostToShare(post);
-                    setSharePostModal(true);
-                  }}
-                >
-                  <IoMdShare />
-                  <p>Share</p>
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        ))}
         <LayoutGroup>
           {posts?.map((post) => (
             <Post
@@ -573,6 +517,8 @@ const Feed: NextPageWithLayout = () => {
               editingPost={editingPostId === post.id}
               setCommentingPostId={setCommentingPostId}
               setEditingPostId={setEditingPostId}
+              setPostToShare={setPostToShare}
+              setSharePostModal={setSharePostModal}
             />
           ))}
         </LayoutGroup>
