@@ -60,7 +60,7 @@ export const useJobPostFiles = (userId: string | undefined) => {
   const loadFile = async () => {
     //Gets presigned url to list all files key of a post
     const fileUrlList: FileDownloadInfo[] = [];
-    for (const fileType of ['Resume (CV)', 'Cover Letter', 'Portfolio', 'Transcript']) {
+    for (const fileType of ['resume', 'cover-letter', 'portfolio', 'transcript'] as const) {
       const listUrl = await getPreSignedLISTUrl.mutateAsync({
         pathPrefixes: [session?.user?.id as string, 'applicationProfile', fileType],
       });
