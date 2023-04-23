@@ -16,18 +16,42 @@ export const jobPostingRouter = createTRPCRouter({
   }),
 
   getJobPostingPreviews: protectedProcedure.query(async ({ ctx }) => {
+    const userSkills = await ctx.prisma.user.findUnique({
+      where: {
+        id: ctx.session.user.id,
+      },
+      select: {
+        skills: true,
+      },
+    });
+
+    const skills = new Set(userSkills?.skills ? userSkills.skills.toLowerCase().split(',') : []);
+
     const jobPostings = await ctx.prisma.jobPosting.findMany({
       select: {
         jobPostingId: true,
         jobTitle: true,
         company: true,
         location: true,
+        jobSkills: true,
       },
       orderBy: {
         createdAt: 'desc',
       },
     });
-    return jobPostings;
+
+    // Sort job postings by number of matching skills
+    const jobPostingsSorted = jobPostings.sort((a, b) => {
+      const aSkills = new Set(a.jobSkills ? a.jobSkills.toLowerCase().split(',') : []);
+      const bSkills = new Set(b.jobSkills ? b.jobSkills.toLowerCase().split(',') : []);
+
+      const aScore = [...skills].filter((skill) => aSkills.has(skill)).length;
+      const bScore = [...skills].filter((skill) => bSkills.has(skill)).length;
+
+      return bScore - aScore;
+    });
+
+    return jobPostingsSorted;
   }),
 
   getJobPosting: protectedProcedure
