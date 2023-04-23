@@ -90,6 +90,7 @@ jobs:
       CLOUDFLARE_ACCESS_KEY_ID: ${{secrets.CLOUDFLARE_ACCESS_KEY_ID}}
       CLOUDFLARE_SECRET_ACCESS_KEY: ${{secrets.CLOUDFLARE_SECRET_ACCESS_KEY}}
       CLOUDFLARE_BUCKET_NAME: ${{secrets.CLOUDFLARE_BUCKET_NAME}}
+      NEXT_PUBLIC_OPENAI_KEY: ${{secrets.NEXT_PUBLIC_OPENAI_KEY}}
     environment: Preview
     steps:
       - uses: actions/checkout@v3

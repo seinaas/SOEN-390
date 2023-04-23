@@ -150,13 +150,13 @@ const Chat: NextPageWithLayout = () => {
     const data = await response.json();
     if (
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      data.results[0].categories['hate'] ||
+      data?.results?.[0].categories['hate'] ||
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      data.results[0].categories['hate/threatening'] ||
+      data?.results?.[0].categories['hate/threatening'] ||
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      data.results[0].categories['sexual'] ||
+      data?.results?.[0].categories['sexual'] ||
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      data.results[0].categories['violence']
+      data?.results?.[0].categories['violence']
     ) {
       toast.warning(
         'Prospects does not tolerate hate speech or anything associated to it. Please refrain from using it.',
