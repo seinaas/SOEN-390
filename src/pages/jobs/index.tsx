@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import MainLayout from '../../components/mainLayout';
 import Image from 'next/image';
 import type { NextPageWithLayout } from '../_app';
 import Button from '../../components/button';
-import { AiFillDelete, AiOutlineDownload } from 'react-icons/ai';
-import { IoDocumentAttachSharp } from 'react-icons/io5';
 import Link from 'next/link';
 import TabSuggestedJobs from '../../components/jobs/tabSuggestedJobs';
 import TabSavedJobs from '../../components/jobs/tabSavedJobs';
@@ -34,14 +32,14 @@ const TABS = [
 ] as const;
 type Title = (typeof TABS)[number]['title'];
 
-const JobBoard: NextPageWithLayout = (props) => {
+const JobBoard: NextPageWithLayout = () => {
+  const [selectedTab, setSelectedTab] = useState<Title>('suggested');
   const [fileList, setFileList] = useState<{ key: string; file: File }[]>([]);
   const { data: session } = useSession();
   const { getPreSignedPUTUrl } = useFileUploading();
   const userId = session?.user?.id;
   const [uploadedFileList] = useJobPostFiles(userId);
   const t = useTranslations('jobs');
-  const [selectedTab, setSelectedTab] = useState<Title>('suggested');
   const hiddenFileInput = React.useRef(null);
 
   const handleAddingNewFile = (newFile: File | undefined, newKey: string) => {
