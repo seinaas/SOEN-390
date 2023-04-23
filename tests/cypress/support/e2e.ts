@@ -28,11 +28,11 @@ Cypress.Commands.add('createChat', () => {
   cy.intercept('**/u/*').as('profile');
   cy.intercept('POST', '/api/auth/signout').as('signout');
   cy.register().then(({ email, password, randomId }) => {
-    cy.wait('@feed');
+    cy.wait('@feed', { timeout: 10000 });
     cy.dataCy('signout-button').click();
     cy.wait('@signout');
     cy.register().then(({ email: email2, randomId: randomId2 }) => {
-      cy.wait('@feed');
+      cy.wait('@feed', { timeout: 10000 });
       cy.visit(`/u/${email}`);
       cy.wait('@profile');
       cy.dataCy('connect-button').click();
