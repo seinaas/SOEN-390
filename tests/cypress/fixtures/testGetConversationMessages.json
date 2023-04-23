@@ -4,6 +4,25 @@
       "data": {
         "json": [
           {
+            "users": [
+              {
+                "id": "fakeUserId",
+                "firstName": "Testy",
+                "lastName": "test",
+                "email": "",
+                "image": ""
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "result": {
+      "data": {
+        "json": [
+          {
             "id": "fakeMessageId",
             "message": "test.txt",
             "senderId": "fakeSenderId",
