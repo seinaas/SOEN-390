@@ -39,6 +39,7 @@ Cypress.Commands.add('createChat', () => {
       cy.dataCy('connect-button').click();
 
       cy.dataCy('signout-button').click();
+      cy.wait('@signout');
 
       cy.visit('/auth/signin');
       cy.dataCy('email-input').type(email);
