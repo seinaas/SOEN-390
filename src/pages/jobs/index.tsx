@@ -15,6 +15,7 @@ import { useJobPostFiles } from '../../customHooks/useFiles';
 import { getServerAuthSession } from '../../server/auth';
 import { type GetServerSidePropsContext } from 'next';
 import { useTranslations } from 'next-intl';
+import { api } from '../../utils/api';
 
 const TABS = [
   {
@@ -38,7 +39,7 @@ const JobBoard: NextPageWithLayout = () => {
   const { data: session } = useSession();
   const { getPreSignedPUTUrl } = useFileUploading();
   const userId = session?.user?.id;
-  const [uploadedFileList] = useJobPostFiles(userId);
+  const uploadedFileList = useJobPostFiles(userId);
   const t = useTranslations('jobs');
   const hiddenFileInput = React.useRef(null);
 
@@ -74,36 +75,37 @@ const JobBoard: NextPageWithLayout = () => {
               <p>{t('profile.description')}</p>
             </div>
           </div>
-          <div>
+          <div className='min-w-[10rem]'>
             {(['resume', 'cover-letter', 'portfolio', 'transcript'] as const).map((fileType, i) => (
               <div
-                className={`flex items-center justify-between py-4 text-primary-500 ${
+                className={`flex flex-col gap-2 py-4 text-primary-500 ${
                   i > 0 ? 'border-t-[1px] border-primary-500' : ''
                 }`}
                 key={fileType}
               >
-                <p>{t(`files.${fileType}`)}</p>
-                <div className='flex items-center justify-start gap-4'>
-                  {(uploadedFileList?.some((uploadedFile) => uploadedFile.fileType === fileType) && (
-                    <FileDownloadPreview
-                      fileName={
-                        uploadedFileList.find((uploadedFile) => uploadedFile.fileType === fileType)?.fileName as string
-                      }
-                      url={uploadedFileList.find((uploadedFile) => uploadedFile.fileType === fileType)?.url}
-                    />
-                  )) || (
-                    <div className='flex items-center justify-start gap-4'>
-                      {fileList.some((e) => e.key === fileType) && (
-                        <FileUploadPreview file={fileList.find((e) => e.key == fileType)?.file} />
-                      )}
-                      <Upload setFile={(file: File | undefined) => handleAddingNewFile(file, fileType)} />
-                    </div>
-                  )}
+                <div className='flex items-center justify-between'>
+                  <p>{t(`files.${fileType}`)}</p>
+                  <Upload setFile={(file: File | undefined) => handleAddingNewFile(file, fileType)} />
                 </div>
+                {fileList.some((e) => e.key === fileType) ? (
+                  <FileUploadPreview file={fileList.find((e) => e.key == fileType)?.file} />
+                ) : (
+                  uploadedFileList?.some((uploadedFile) => uploadedFile.fileType === fileType) && (
+                    <div className='rounded-md bg-primary-100 px-2 py-2 text-white'>
+                      <FileDownloadPreview
+                        fileName={
+                          uploadedFileList.find((uploadedFile) => uploadedFile.fileType === fileType)
+                            ?.fileName as string
+                        }
+                        url={uploadedFileList.find((uploadedFile) => uploadedFile.fileType === fileType)?.url}
+                      />
+                    </div>
+                  )
+                )}
               </div>
             ))}
             {/* TODO: Change 'Upload File' to translated text */}
-            {fileList.length > 0 && <Button onClick={() => void handleUploadFiles()}>Upload File(s)</Button>}
+            {fileList.length > 0 && <Button onClick={() => void handleUploadFiles()}>{t('profile.upload')}</Button>}
           </div>
         </div>
 

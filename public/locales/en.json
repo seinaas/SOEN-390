@@ -148,7 +148,8 @@
     },
     "profile": {
       "title": "Application Profile",
-      "description": "Upload all necessary documents to share you skills and experiences with the recruiters."
+      "description": "Upload all necessary documents to share you skills and experiences with the recruiters.",
+      "upload": "Confirm Upload"
     },
     "recruiting": {
       "title": "Are you recruiting?",

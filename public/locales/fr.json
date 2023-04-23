@@ -148,7 +148,8 @@
     },
     "profile": {
       "title": "Profile d'Emploi",
-      "description": "Ajoutez tous les documents nécessaires pour partager vos compétences et expériences avec les recruteurs."
+      "description": "Ajoutez tous les documents nécessaires pour partager vos compétences et expériences avec les recruteurs.",
+      "upload": "Ajouter"
     },
     "recruiting": {
       "title": "Recrutez-vous?",

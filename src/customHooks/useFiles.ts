@@ -46,7 +46,7 @@ export const usePostFiles = (post: Post) => {
     void loadFile();
   }, []);
 
-  return [fileList];
+  return fileList;
 };
 
 // TODO: Add useJobPostFiles
@@ -91,5 +91,5 @@ export const useJobPostFiles = (userId: string | undefined) => {
     session?.user?.id && void loadFile();
   }, [session?.user?.id]);
 
-  return [fileList];
+  return fileList;
 };
