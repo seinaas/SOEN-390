@@ -11,6 +11,7 @@ import { type GetServerSidePropsContext } from 'next';
 import { getServerAuthSession } from '../../server/auth';
 import { api } from '../../utils/api';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/router';
 
 const formSchema = z.object({
   jobTitle: z.string().min(1),
@@ -54,6 +55,7 @@ const WORKPLACE_TYPES = ['Remote', 'Onsite', 'Hybrid'] as const;
 
 const CreateJobPost: NextPageWithLayout = () => {
   const t = useTranslations('jobs');
+  const router = useRouter();
 
   const {
     register,
@@ -69,7 +71,11 @@ const CreateJobPost: NextPageWithLayout = () => {
     e.preventDefault();
 
     await handleSubmit((data) => {
-      createPosting.mutate(data);
+      createPosting.mutate(data, {
+        onSuccess: () => {
+          void router.push('/jobs');
+        },
+      });
     })(e);
   };
 

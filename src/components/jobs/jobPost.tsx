@@ -40,6 +40,14 @@ const JobPost: React.FC<Props> = ({ jobData }) => {
     },
   });
 
+  const deleteJob = api.jobPosting.deleteJobPosting.useMutation({
+    onSuccess: () => {
+      void utils.jobPosting.getJobPostingPreviews.refetch();
+      void utils.jobPosting.getSavedJobPostingPreviews.refetch();
+      void utils.jobPosting.getAppliedJobPostingPreviews.refetch();
+    },
+  });
+
   return (
     <motion.div
       exit={{ opacity: 0, y: 20 }}
@@ -77,7 +85,7 @@ const JobPost: React.FC<Props> = ({ jobData }) => {
 
         <div className='flex flex-col gap-1'>
           {/* Job Skills */}
-          {jobData.jobSkills?.length && (
+          {!!jobData.jobSkills?.length && (
             <div>
               <div className='flex items-center gap-2 text-primary-500'>
                 <IoBarbellSharp />
@@ -96,7 +104,7 @@ const JobPost: React.FC<Props> = ({ jobData }) => {
           )}
 
           {/* Required Documents */}
-          {jobData.requiredDocuments.length && (
+          {!!jobData.requiredDocuments.length && (
             <div>
               <div className='flex items-center gap-2 text-primary-500'>
                 <IoDocumentAttachSharp />
@@ -121,6 +129,7 @@ const JobPost: React.FC<Props> = ({ jobData }) => {
           {jobData.recruiterId === session?.user?.id ? (
             <Button
               layout={false}
+              onClick={() => deleteJob.mutate({ jobPostingId: jobData.jobPostingId || '' })}
               className='hover-red-600 flex border-red-600 bg-red-600 p-1 py-2 px-4 text-white hover:border-red-300 hover:bg-red-300'
             >
               <AiFillDelete />

@@ -73,7 +73,7 @@ export const jobPostingRouter = createTRPCRouter({
 
       return {
         ...jobPosting,
-        jobSkills: jobPosting?.jobSkills?.split(','),
+        jobSkills: jobPosting?.jobSkills ? jobPosting.jobSkills.split(',') : [],
         requiredDocuments,
         isSaved: !!isSaved,
         isApplied: !!isApplied,
