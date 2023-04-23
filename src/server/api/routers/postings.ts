@@ -57,29 +57,23 @@ export const jobPostingRouter = createTRPCRouter({
         },
       });
 
-      const requiredDocuments = [];
+      const requiredDocuments: ('resume' | 'cover-letter' | 'portfolio' | 'transcript')[] = [];
       if (jobPosting?.requireResume) {
-        requiredDocuments.push('Resume');
+        requiredDocuments.push('resume');
       }
       if (jobPosting?.requireCoverLetter) {
-        requiredDocuments.push('Cover Letter');
+        requiredDocuments.push('cover-letter');
       }
       if (jobPosting?.requirePortfolio) {
-        requiredDocuments.push('Portfolio');
+        requiredDocuments.push('portfolio');
       }
       if (jobPosting?.requireTranscript) {
-        requiredDocuments.push('Transcript');
+        requiredDocuments.push('transcript');
       }
 
       return {
         ...jobPosting,
         jobSkills: jobPosting?.jobSkills?.split(','),
-        jobType:
-          jobPosting?.jobType === 'FullTime'
-            ? 'Full-Time'
-            : jobPosting?.jobType === 'PartTime'
-            ? 'Part-Time'
-            : jobPosting?.jobType,
         requiredDocuments,
         isSaved: !!isSaved,
         isApplied: !!isApplied,

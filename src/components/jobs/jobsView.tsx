@@ -4,6 +4,7 @@ import { type RouterOutputs, api } from '../../utils/api';
 import { AnimatePresence, motion } from 'framer-motion';
 import { IoIosArrowBack, IoIosBriefcase } from 'react-icons/io';
 import JobPost from './jobPost';
+import { useTranslations } from 'next-intl';
 
 type Props = {
   previews?: RouterOutputs['jobPosting']['getJobPostingPreviews'];
@@ -13,6 +14,7 @@ type Props = {
 
 export const JobsView: React.FC<Props> = ({ previews, currentJobId, setCurrentJobId }) => {
   const { width } = useWindowSize();
+  const t = useTranslations('jobs');
 
   const { data: currentJob } = api.jobPosting.getJobPosting.useQuery(
     { jobPostingId: currentJobId },
@@ -103,7 +105,7 @@ export const JobsView: React.FC<Props> = ({ previews, currentJobId, setCurrentJo
               className='flex items-center justify-start gap-1 rounded-md bg-primary-100 py-1 pl-1 pr-3 font-semibold text-white sm:hidden'
             >
               <IoIosArrowBack size={20} />
-              Back
+              {t('job-view.back')}
             </button>
             <AnimatePresence>{currentJob && <JobPost jobData={currentJob} />}</AnimatePresence>
           </motion.div>

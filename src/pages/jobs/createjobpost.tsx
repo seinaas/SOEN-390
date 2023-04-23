@@ -10,6 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { type GetServerSidePropsContext } from 'next';
 import { getServerAuthSession } from '../../server/auth';
 import { api } from '../../utils/api';
+import { useTranslations } from 'next-intl';
 
 const formSchema = z.object({
   jobTitle: z.string().min(1),
@@ -30,51 +31,30 @@ type FormInputs = z.infer<typeof formSchema>;
 
 const REQUIRED_DOCUMENTS = [
   {
-    name: 'Resume/CV',
+    name: 'resume',
     value: 'Resume',
   },
   {
-    name: 'Cover Letter',
+    name: 'cover-letter',
     value: 'CoverLetter',
   },
   {
-    name: 'Portfolio',
+    name: 'portfolio',
     value: 'Portfolio',
   },
   {
-    name: 'Transcript',
+    name: 'transcript',
     value: 'Transcript',
   },
 ] as const;
 
-const JOB_TYPES = [
-  {
-    name: 'Full Time',
-    value: 'FullTime',
-  },
-  {
-    name: 'Part Time',
-    value: 'PartTime',
-  },
-  {
-    name: 'Contract',
-    value: 'Contract',
-  },
-  {
-    name: 'Internship',
-    value: 'Internship',
-  },
-  {
-    name: 'Temporary',
-    value: 'Temporary',
-  },
-  {
-    name: 'Volunteer',
-    value: 'Volunteer',
-  },
-] as const;
+const JOB_TYPES = ['FullTime', 'PartTime', 'Contract', 'Internship', 'Temporary', 'Volunteer'] as const;
 
-const CreateJobPost: NextPageWithLayout = (props) => {
+const WORKPLACE_TYPES = ['Remote', 'Onsite', 'Hybrid'] as const;
+
+const CreateJobPost: NextPageWithLayout = () => {
+  const t = useTranslations('jobs');
+
   const {
     register,
     handleSubmit,
@@ -88,8 +68,6 @@ const CreateJobPost: NextPageWithLayout = (props) => {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    console.log('here');
-
     await handleSubmit((data) => {
       createPosting.mutate(data);
     })(e);
@@ -102,13 +80,13 @@ const CreateJobPost: NextPageWithLayout = (props) => {
           <div className='relative h-20 w-20 rounded-full bg-primary-100'>
             <Image alt={''} src={'/job-posts.png'} fill className='object-contain' />
           </div>
-          <h1 className='items-center align-middle text-3xl font-semibold'>Create a Job Post</h1>
+          <h1 className='items-center align-middle text-3xl font-semibold'>{t('create.title')}</h1>
         </div>
         <form className='flex flex-col gap-4 text-primary-600' onSubmit={onSubmit}>
           <div className='flex flex-1 flex-col gap-1'>
             <label className='font-semibold text-primary-300' htmlFor='company'>
-              Company
-              <span className='ml-1 font-normal text-primary-300/50'>(required)</span>
+              {t('create.company')}
+              <span className='ml-1 font-normal text-primary-300/50'>({t('create.required')})</span>
             </label>
             <input
               className='rounded-md p-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500'
@@ -121,28 +99,28 @@ const CreateJobPost: NextPageWithLayout = (props) => {
           </div>
           <div className='flex flex-1 flex-col gap-1'>
             <label className='font-semibold text-primary-300' htmlFor='jobtitle'>
-              Job Title
-              <span className='ml-1 font-normal text-primary-300/50'>(required)</span>
+              {t('create.job-title')}
+              <span className='ml-1 font-normal text-primary-300/50'>({t('create.required')})</span>
             </label>
             <input
               className='rounded-md p-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500'
               type='text'
               id='jobtitle'
-              placeholder='e.g. Software Engineer, Product Manager, etc.'
+              placeholder={t('create.job-title-placeholder')}
               {...register('jobTitle')}
             />
             {errors.jobTitle && <span className='text-sm text-red-400'>{errors.jobTitle.message}</span>}
           </div>
           <div className='flex flex-1 flex-col gap-1'>
             <label className='font-semibold text-primary-300' htmlFor='joblocation'>
-              Job Location
-              <span className='ml-1 font-normal text-primary-300/50'>(required)</span>
+              {t('create.location')}
+              <span className='ml-1 font-normal text-primary-300/50'>({t('create.required')})</span>
             </label>
             <input
               className='rounded-md p-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500'
               type='text'
               id='joblocation'
-              placeholder='e.g. San Francisco, CA, USA'
+              placeholder='e.g. San Francisco, CA'
               {...register('location')}
             />
             {errors.location && <span className='text-sm text-red-400'>{errors.location.message}</span>}
@@ -151,8 +129,8 @@ const CreateJobPost: NextPageWithLayout = (props) => {
           <div className='flex items-center gap-4'>
             <div className='flex flex-1 flex-col gap-1'>
               <label className='font-semibold text-primary-300' htmlFor='jobtype'>
-                Job Type
-                <span className='ml-1 font-normal text-primary-300/50'>(required)</span>
+                {t('create.job-type')}
+                <span className='ml-1 font-normal text-primary-300/50'>({t('create.required')})</span>
               </label>
               <select
                 className='rounded-md p-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500'
@@ -162,10 +140,10 @@ const CreateJobPost: NextPageWithLayout = (props) => {
                 {JOB_TYPES.map((jobtype, i) => (
                   <option
                     className={`rounded-md ${i > 0 ? 'border-t-[1px] border-primary-500' : ''}`}
-                    key={jobtype.value}
-                    value={jobtype.value}
+                    key={jobtype}
+                    value={jobtype}
                   >
-                    {jobtype.name}
+                    {t(`job-types.${jobtype}`)}
                   </option>
                 ))}
               </select>
@@ -174,21 +152,21 @@ const CreateJobPost: NextPageWithLayout = (props) => {
 
             <div className='flex flex-1 flex-col gap-1'>
               <label className='font-semibold text-primary-300' htmlFor='workplacetype'>
-                Workplace Type
-                <span className='ml-1 font-normal text-primary-300/50'>(required)</span>
+                {t('create.workplace-type')}
+                <span className='ml-1 font-normal text-primary-300/50'>({t('create.required')})</span>
               </label>
               <select
                 className='rounded-md p-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500'
                 id='workplacetype'
                 {...register('workplaceType')}
               >
-                {['Remote', 'Onsite', 'Hybrid'].map((workplacetype, i) => (
+                {WORKPLACE_TYPES.map((workplacetype, i) => (
                   <option
                     className={`rounded-md ${i > 0 ? 'border-t-[1px] border-primary-500' : ''}`}
                     key={workplacetype}
                     value={workplacetype}
                   >
-                    {workplacetype}
+                    {t(`workplace-types.${workplacetype}`)}
                   </option>
                 ))}
               </select>
@@ -198,12 +176,12 @@ const CreateJobPost: NextPageWithLayout = (props) => {
 
           <div className='flex flex-1 flex-col gap-1'>
             <label className='font-semibold text-primary-300' htmlFor='jobdescription'>
-              Job Description
-              <span className='ml-1 font-normal text-primary-300/50'>(required)</span>
+              {t('create.description')}
+              <span className='ml-1 font-normal text-primary-300/50'>({t('create.required')})</span>
             </label>
             <textarea
               {...register('description')}
-              placeholder='e.g. What will you be doing?'
+              placeholder={t('create.description-placeholder')}
               className='h-32 w-full flex-1 rounded-md py-2 px-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500'
             />
             {errors.description && <span className='text-sm text-red-400'>{errors.description.message}</span>}
@@ -211,7 +189,7 @@ const CreateJobPost: NextPageWithLayout = (props) => {
 
           <div className='flex flex-1 flex-col gap-1'>
             <label className='font-semibold text-primary-300' htmlFor='requireddocuments'>
-              Required Documents
+              {t('create.documents')}
             </label>
             <div className='flex flex-row flex-wrap gap-4'>
               {REQUIRED_DOCUMENTS.map((doc) => (
@@ -221,7 +199,7 @@ const CreateJobPost: NextPageWithLayout = (props) => {
                     type='checkbox'
                     {...register(`require${doc.value}`)}
                   />
-                  <p className='select-none'>{doc.name}</p>
+                  <p className='select-none'>{t(`files.${doc.name}`)}</p>
                 </label>
               ))}
             </div>
@@ -229,8 +207,8 @@ const CreateJobPost: NextPageWithLayout = (props) => {
 
           <div className='flex flex-1 flex-col gap-1'>
             <label className='font-semibold text-primary-300' htmlFor='jobskills'>
-              Job Skills
-              <span className='ml-1 font-normal text-primary-300/50'>(comma-separated)</span>
+              {t('create.skills')}
+              <span className='ml-1 font-normal text-primary-300/50'>({t('create.comma')})</span>
             </label>
             <input
               className='rounded-md p-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500'
@@ -243,19 +221,19 @@ const CreateJobPost: NextPageWithLayout = (props) => {
 
           <div className='flex flex-1 flex-col gap-1'>
             <label className='font-semibold text-primary-300' htmlFor='externallink'>
-              External Application Link
+              {t('create.link')}
             </label>
             <input
               className='rounded-md p-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500'
               type='text'
               id='externallink'
-              placeholder='e.g. https://example.com'
+              placeholder='e.g. https://google.com'
               {...register('applicationLink')}
             />
           </div>
           <div className='mt-6 flex w-48 justify-center self-center'>
             <Button fullWidth type='submit'>
-              Post Job
+              {t('create.post')}
             </Button>
           </div>
         </form>

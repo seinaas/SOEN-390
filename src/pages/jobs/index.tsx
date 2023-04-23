@@ -14,30 +14,35 @@ import { useFileUploading } from '../../customHooks/useFileUploading';
 import { useSession } from 'next-auth/react';
 import { FileDownloadPreview, FileUploadPreview } from '../../components/filePreview';
 import { useJobPostFiles } from '../../customHooks/useFiles';
+import { getServerAuthSession } from '../../server/auth';
+import { type GetServerSidePropsContext } from 'next';
+import { useTranslations } from 'next-intl';
 
 const TABS = [
   {
-    title: 'Suggested Jobs',
+    title: 'suggested',
     component: <TabSuggestedJobs />,
   },
   {
-    title: 'Saved Jobs',
+    title: 'saved',
     component: <TabSavedJobs />,
   },
   {
-    title: 'Applied Jobs',
+    title: 'applied',
     component: <TabAppliedJobs />,
   },
 ] as const;
 type Title = (typeof TABS)[number]['title'];
 
 const JobBoard: NextPageWithLayout = (props) => {
-  const [selectedTab, setSelectedTab] = useState<Title>('Suggested Jobs');
   const [fileList, setFileList] = useState<{ key: string; file: File }[]>([]);
   const { data: session } = useSession();
   const { getPreSignedPUTUrl } = useFileUploading();
   const userId = session?.user?.id;
   const [uploadedFileList] = useJobPostFiles(userId);
+  const t = useTranslations('jobs');
+  const [selectedTab, setSelectedTab] = useState<Title>('suggested');
+  const hiddenFileInput = React.useRef(null);
 
   const handleAddingNewFile = (newFile: File | undefined, newKey: string) => {
     newFile && //Updates
@@ -65,22 +70,21 @@ const JobBoard: NextPageWithLayout = (props) => {
               <div className='relative h-20 w-20 rounded-full bg-primary-100 p-10'>
                 <Image alt={''} src={'/application-profile.png'} fill className='object-contain' />
               </div>
-              <h1 className='mb-4 text-2xl font-semibold'>Application Profile</h1>
+              <h1 className='mb-4 text-2xl font-semibold'>{t('profile.title')}</h1>
             </div>
             <div className='rounded-xl py-4'>
-              <p>Upload all necessary documents to share you skills and experiences with the recruiters.</p>
+              <p>{t('profile.description')}</p>
             </div>
           </div>
           <div>
-            {/* TODO Replace array with real files */}
-            {['Resume (CV)', 'Cover Letter', 'Portfolio', 'Transcript'].map((fileType, i) => (
+            {(['resume', 'cover-letter', 'portfolio', 'transcript'] as const).map((fileType, i) => (
               <div
                 className={`flex items-center justify-between py-4 text-primary-500 ${
                   i > 0 ? 'border-t-[1px] border-primary-500' : ''
                 }`}
                 key={fileType}
               >
-                <p>{fileType}</p>
+                <p>{t(`files.${fileType}`)}</p>
                 <div className='flex items-center justify-start gap-4'>
                   {(uploadedFileList?.some((uploadedFile) => uploadedFile.fileType === fileType) && (
                     <FileDownloadPreview
@@ -107,13 +111,15 @@ const JobBoard: NextPageWithLayout = (props) => {
 
         <div className='flex flex-col rounded-xl bg-primary-100/20 px-6 pt-8 pb-4'>
           <div className='flex items-center justify-between'>
-            <h1 className='mb-2 text-2xl font-semibold'>Are you recruiting?</h1>
+            <h1 className='mb-2 text-2xl font-semibold'>{t('recruiting.title')}</h1>
           </div>
           <div className='rounded-xl py-4'>
-            <p>Create a job post to reach out to aspiring work profesionals</p>
+            <p>{t('recruiting.description')}</p>
           </div>
           <Link href='/jobs/createJobPost'>
-            <Button className='p-2'>Create Job Post</Button>
+            <Button className='p-2' layout={false}>
+              {t('recruiting.button')}
+            </Button>
           </Link>
           <div></div>
         </div>
@@ -124,13 +130,14 @@ const JobBoard: NextPageWithLayout = (props) => {
         <div className='flex gap-2 border-b-4 border-primary-100'>
           {TABS.map((tab, index) => (
             <Button
+              layout={false}
               className={`rounded-b-none border-none p-3 hover:bg-primary-100 active:bg-primary-100 ${
                 selectedTab === tab.title ? 'bg-primary-100' : 'bg-primary-100/60'
               }`}
               key={index}
               onClick={() => setSelectedTab(tab.title)}
             >
-              {tab.title}
+              {t(`tabs.${tab.title}`)}
             </Button>
           ))}
         </div>
@@ -142,3 +149,24 @@ const JobBoard: NextPageWithLayout = (props) => {
 
 JobBoard.getLayout = (page) => <MainLayout>{page}</MainLayout>;
 export default JobBoard;
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  const session = await getServerAuthSession(ctx);
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {
+      messages: JSON.parse(
+        JSON.stringify(await import(`../../../public/locales/${ctx.locale || 'en'}.json`)),
+      ) as IntlMessages,
+    },
+  };
+};

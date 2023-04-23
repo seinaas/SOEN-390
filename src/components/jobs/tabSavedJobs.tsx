@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useWindowSize } from '../../utils/useWindowSize';
 import { api } from '../../utils/api';
 import { JobsView } from './jobsView';
+import { useTranslations } from 'next-intl';
 
 const TabSavedJobs: React.FC = () => {
+  const t = useTranslations('jobs');
   const { width } = useWindowSize();
 
   const [currentJobId, setCurrentJobId] = useState('');
@@ -22,7 +24,7 @@ const TabSavedJobs: React.FC = () => {
   if (!previews?.length)
     return (
       <div className='flex h-full flex-col items-center justify-center font-semibold text-primary-400'>
-        You have not saved any jobs yet 😔
+        {t('job-view.no-saved')}
       </div>
     );
   return <JobsView previews={previews} currentJobId={currentJobId} setCurrentJobId={setCurrentJobId} />;

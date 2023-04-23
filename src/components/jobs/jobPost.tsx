@@ -15,6 +15,7 @@ import { api, type RouterOutputs } from '../../utils/api';
 import { useSession } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import { IoIosBookmark } from 'react-icons/io';
+import { useTranslations } from 'next-intl';
 
 type Props = {
   jobData: RouterOutputs['jobPosting']['getJobPosting'];
@@ -23,6 +24,7 @@ type Props = {
 const JobPost: React.FC<Props> = ({ jobData }) => {
   const { data: session } = useSession();
   const utils = api.useContext();
+  const t = useTranslations('jobs');
 
   const saveJobToggle = api.jobPosting.toggleSavedJobPosting.useMutation({
     onSuccess: () => {
@@ -58,15 +60,19 @@ const JobPost: React.FC<Props> = ({ jobData }) => {
             <div>{jobData.location}</div>
           </div>
           {/* Job Type */}
-          <div className='flex items-center gap-2 rounded-full bg-primary-600 py-1 pl-3 pr-4 text-sm text-white'>
-            <IoBriefcaseSharp />
-            <div>{jobData.jobType}</div>
-          </div>
+          {jobData.jobType && (
+            <div className='flex items-center gap-2 rounded-full bg-primary-600 py-1 pl-3 pr-4 text-sm text-white'>
+              <IoBriefcaseSharp />
+              <div>{t(`job-types.${jobData.jobType}`)}</div>
+            </div>
+          )}
           {/* Workplace Type */}
-          <div className='flex items-center gap-2 rounded-full bg-primary-600 py-1 pl-3 pr-4 text-sm text-white'>
-            <IoHomeSharp />
-            <div>{jobData.workplaceType}</div>
-          </div>
+          {jobData.workplaceType && (
+            <div className='flex items-center gap-2 rounded-full bg-primary-600 py-1 pl-3 pr-4 text-sm text-white'>
+              <IoHomeSharp />
+              <div>{t(`workplace-types.${jobData.workplaceType}`)}</div>
+            </div>
+          )}
         </div>
 
         <div className='flex flex-col gap-1'>
@@ -75,7 +81,7 @@ const JobPost: React.FC<Props> = ({ jobData }) => {
             <div>
               <div className='flex items-center gap-2 text-primary-500'>
                 <IoBarbellSharp />
-                <div>Job Skills</div>
+                <div>{t('job-view.skills')}</div>
               </div>
               <div className='flex flex-wrap space-y-2 text-primary-100'>
                 <div className='flex flex-row gap-1'>
@@ -94,13 +100,13 @@ const JobPost: React.FC<Props> = ({ jobData }) => {
             <div>
               <div className='flex items-center gap-2 text-primary-500'>
                 <IoDocumentAttachSharp />
-                <div>Required Documents</div>
+                <div>{t('job-view.documents')}</div>
               </div>
               <div className='flex flex-wrap space-y-2 text-primary-100'>
                 <div className='flex flex-row gap-1'>
                   {jobData.requiredDocuments?.map((doc, i) => (
                     <div key={i} className='rounded-md bg-primary-100/20 px-2 py-1 text-xs font-semibold'>
-                      {doc}
+                      {t(`files.${doc}`)}
                     </div>
                   ))}
                 </div>
@@ -113,13 +119,17 @@ const JobPost: React.FC<Props> = ({ jobData }) => {
         <div className='mt-6 flex justify-start gap-3'>
           {/* Can see/use the delete job button only if it's a recruiter */}
           {jobData.recruiterId === session?.user?.id ? (
-            <Button className='hover-red-600 flex border-red-600 bg-red-600 p-1 py-2 px-4 text-white hover:border-red-300 hover:bg-red-300'>
+            <Button
+              layout={false}
+              className='hover-red-600 flex border-red-600 bg-red-600 p-1 py-2 px-4 text-white hover:border-red-300 hover:bg-red-300'
+            >
               <AiFillDelete />
-              Delete
+              {t('job-view.delete')}
             </Button>
           ) : (
             <>
               <Button
+                layout={false}
                 onClick={() => {
                   if (jobData.applicationLink) void window.open(jobData.applicationLink, '_blank');
                   else applyJobToggle.mutate({ jobPostingId: jobData.jobPostingId || '', applied: !jobData.isApplied });
@@ -130,17 +140,18 @@ const JobPost: React.FC<Props> = ({ jobData }) => {
                 {jobData.isApplied ? (
                   <>
                     <IoCheckmarkSharp />
-                    Applied
+                    {t('job-view.applied')}
                   </>
                 ) : (
                   <>
                     <IoPencilSharp />
-                    Apply
+                    {t('job-view.apply')}
                   </>
                 )}
               </Button>
               {/* Save Job Button */}
               <Button
+                layout={false}
                 className='flex py-2 px-4'
                 variant={jobData.isSaved ? 'secondary' : 'primary'}
                 onClick={() =>
@@ -150,12 +161,12 @@ const JobPost: React.FC<Props> = ({ jobData }) => {
                 {jobData.isSaved ? (
                   <>
                     <IoCheckmarkSharp />
-                    Saved
+                    {t('job-view.saved')}
                   </>
                 ) : (
                   <>
                     <IoIosBookmark />
-                    Save
+                    {t('job-view.save')}
                   </>
                 )}
               </Button>
@@ -165,8 +176,8 @@ const JobPost: React.FC<Props> = ({ jobData }) => {
       </div>
       {/* Job Description */}
       <div className='flex flex-col gap-2 rounded-lg bg-white p-4'>
-        <h2 className='text-xl font-bold'>Job Description</h2>
-        <p>{jobData.description || 'A description was not provided for this job posting!'}</p>
+        <h2 className='text-xl font-bold'>{t('job-view.description')}</h2>
+        <p>{jobData.description || t('job-view.no-description')}</p>
       </div>
     </motion.div>
   );
