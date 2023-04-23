@@ -80,6 +80,7 @@ jobs:
     needs: [lint, prettier]
     env:
       SKIP_ENV_VALIDATION: 1
+      NODE_ENV: test
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
