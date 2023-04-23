@@ -64,6 +64,7 @@ export const serverEnv = {
 export const clientSchema = z.object({
   NEXT_PUBLIC_PUSHER_KEY: z.string(),
   NEXT_PUBLIC_PUSHER_CLUSTER: z.string(),
+  NEXT_PUBLIC_OPENAI_KEY: z.string(),
   // NEXT_PUBLIC_CLIENTVAR: z.string(),
 });
 
@@ -76,5 +77,6 @@ export const clientSchema = z.object({
 export const clientEnv = {
   NEXT_PUBLIC_PUSHER_KEY: process.env.NEXT_PUBLIC_PUSHER_KEY,
   NEXT_PUBLIC_PUSHER_CLUSTER: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
+  NEXT_PUBLIC_OPENAI_KEY: process.env.NEXT_PUBLIC_OPENAI_KEY,
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 };
