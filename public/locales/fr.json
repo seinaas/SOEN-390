@@ -11,7 +11,6 @@
     "button": "Devenez membre",
     "header": {
       "about": "À propos",
-      "jobs": "Emplois",
       "contact": "Contact"
     }
   },
@@ -205,5 +204,29 @@
       "link": "Lien vers le Poste",
       "post": "Publier"
     }
+  },
+  "about": {
+    "title": "Notre Objectif",
+    "welcome": {
+      "1": "Bienvenue sur notre plateforme de réseautage professionnel ProSpects, conçue pour vous mettre en contact avec des personnes partageant les mêmes idées et vous aider à bâtir une carrière réussie.",
+      "2": "À la base, nous croyons au pouvoir du réseautage et de l'établissement de relations significatives pour atteindre vos objectifs personnels et professionnels. Nous comprenons que dans le monde trépidant d'aujourd'hui, il peut être difficile d'établir ces connexions, c'est pourquoi nous avons créé une plate-forme qui facilite plus que jamais la connexion avec d'autres professionnels de votre domaine.",
+      "3": "Notre plateforme est conçue pour être conviviale et intuitive, avec des fonctionnalités qui vous permettent de mettre en valeur vos compétences et votre expérience, de vous connecter avec d'autres professionnels de votre secteur et de rester au courant des dernières nouvelles et tendances dans votre domaine.",
+      "4": "Que vous recherchiez une nouvelle opportunité d'emploi, recherchiez un mentorat ou cherchiez à élargir votre réseau professionnel, notre plateforme peut vous aider. Nous pensons que chacun a quelque chose de précieux à offrir et nous nous engageons à créer une communauté diversifiée et inclusive où chacun peut s'épanouir. Nous accueillons des professionnels de tous horizons et de toutes industries, et notre objectif est de vous aider à atteindre vos objectifs de carrière, quels qu'ils soient.",
+      "5": "Rejoignez-nous aujourd'hui et commencez à construire votre réseau professionnel. Nous avons hâte de voir où votre carrière vous mènera!"
+    },
+    "header": {
+      "about": "À propos",
+      "contact": "Contact"
+    }
+  },
+  "contact": {
+    "title": "Contactez-Nous",
+    "form": {
+      "1": "Remplissez le formulaire ci-dessous pour nous contacter.",
+      "2": "Nom",
+      "3": "Email",
+      "4": "Écris quelque chose..."
+    },
+    "button": "Envoyer"
   }
 }
