@@ -150,13 +150,13 @@ const Chat: NextPageWithLayout = () => {
     const data = await response.json();
     if (
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      data.results[0].categories['hate'] ||
+      data?.results?.[0].categories['hate'] ||
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      data.results[0].categories['hate/threatening'] ||
+      data?.results?.[0].categories['hate/threatening'] ||
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      data.results[0].categories['sexual'] ||
+      data?.results?.[0].categories['sexual'] ||
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      data.results[0].categories['violence']
+      data?.results?.[0].categories['violence']
     ) {
       toast.warning(
         'Prospects does not tolerate hate speech or anything associated to it. Please refrain from using it.',
@@ -355,7 +355,11 @@ const Chat: NextPageWithLayout = () => {
             </div>
           </div>
           <div className='relative h-full w-full'>
-            <div className='absolute inset-0 flex flex-col-reverse overflow-auto px-4' ref={messagesRef}>
+            <div
+              data-cy='messages-box'
+              className='absolute inset-0 flex flex-col-reverse overflow-auto px-4'
+              ref={messagesRef}
+            >
               {messages?.map((message) => (
                 <MessageItem
                   key={message.id}
@@ -365,10 +369,10 @@ const Chat: NextPageWithLayout = () => {
                   isFile={message.isFile}
                 />
               ))}
-              <div className='float-left clear-both' ref={messageEndRef} data-cy='new-message-form' />
+              <div className='float-left clear-both' ref={messageEndRef} />
             </div>
           </div>
-          <form className='mt-8 flex items-center' onSubmit={handleSendNewMessage}>
+          <form className='mt-8 flex items-center' onSubmit={handleSendNewMessage} data-cy='new-message-form'>
             <div className='flex h-fit w-full flex-col justify-center gap-3 rounded-md bg-primary-100/10 px-2 py-3 outline-none'>
               <div className='flex w-full flex-row px-2'>
                 <input
@@ -458,7 +462,7 @@ const Chat: NextPageWithLayout = () => {
                 )
                 ?.map((connection) => (
                   <button
-                    data-cy={`add-user-${connection.email}`}
+                    data-cy={`add-user-${connection.lastName || ''}`}
                     className='flex items-center justify-start rounded-md px-4 py-3 transition-colors duration-200 hover:bg-primary-100/10'
                     key={connection.id}
                     onClick={() => {

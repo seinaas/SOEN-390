@@ -138,5 +138,72 @@
       "confirm": "Confirm",
       "yes": "Yes"
     }
+  },
+  "jobs": {
+    "files": {
+      "resume": "Resume/CV",
+      "cover-letter": "Cover Letter",
+      "portfolio": "Portfolio",
+      "transcript": "Transcript"
+    },
+    "profile": {
+      "title": "Application Profile",
+      "description": "Upload all necessary documents to share you skills and experiences with the recruiters.",
+      "upload": "Confirm Upload"
+    },
+    "recruiting": {
+      "title": "Are you recruiting?",
+      "description": "Create a job post to reach out to aspiring work professionals",
+      "button": "Create Job Post"
+    },
+    "tabs": {
+      "suggested": "Suggested Jobs",
+      "saved": "Saved Jobs",
+      "applied": "Applied Jobs"
+    },
+    "job-view": {
+      "back": "Back",
+      "delete": "Delete",
+      "apply": "Apply",
+      "applied": "Applied",
+      "save": "Save",
+      "saved": "Saved",
+      "description": "Job Description",
+      "no-description": "No description provided",
+      "skills": "Job Skills",
+      "documents": "Required Documents",
+      "no-saved": "You have not saved any jobs yet 😔",
+      "no-applied": "You have not applied to any jobs yet 😔"
+    },
+    "job-types": {
+      "FullTime": "Full Time",
+      "PartTime": "Part Time",
+      "Internship": "Internship",
+      "Contract": "Contract",
+      "Temporary": "Temporary",
+      "Volunteer": "Volunteer"
+    },
+    "workplace-types": {
+      "Remote": "Remote",
+      "Onsite": "Onsite",
+      "Hybrid": "Hybrid"
+    },
+    "create": {
+      "title": "Create a Job Post",
+      "required": "required",
+      "company": "Company",
+      "job-title": "Job Title",
+      "job-title-placeholder": "e.g. Software Engineer, Data Scientist, etc.",
+      "location": "Job Location",
+      "job-type": "Job Type",
+      "workplace-type": "Workplace Type",
+      "description": "Job Description",
+      "description-placeholder": "e.g. What will you be doing?",
+      "documents": "Required Documents",
+      "skills": "Job Skills",
+      "comma": "comma-separated",
+      "link": "External Application Link",
+      "post": "Post Job"
+    }
   }
 }

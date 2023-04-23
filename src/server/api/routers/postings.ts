@@ -15,6 +15,95 @@ export const jobPostingRouter = createTRPCRouter({
     return jobPostings;
   }),
 
+  getJobPostingPreviews: protectedProcedure.query(async ({ ctx }) => {
+    const userSkills = await ctx.prisma.user.findUnique({
+      where: {
+        id: ctx.session.user.id,
+      },
+      select: {
+        skills: true,
+      },
+    });
+
+    const skills = new Set(userSkills?.skills ? userSkills.skills.toLowerCase().split(',') : []);
+
+    const jobPostings = await ctx.prisma.jobPosting.findMany({
+      select: {
+        jobPostingId: true,
+        jobTitle: true,
+        company: true,
+        location: true,
+        jobSkills: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    // Sort job postings by number of matching skills
+    const jobPostingsSorted = jobPostings.sort((a, b) => {
+      const aSkills = new Set(a.jobSkills ? a.jobSkills.toLowerCase().split(',') : []);
+      const bSkills = new Set(b.jobSkills ? b.jobSkills.toLowerCase().split(',') : []);
+
+      const aScore = [...skills].filter((skill) => aSkills.has(skill)).length;
+      const bScore = [...skills].filter((skill) => bSkills.has(skill)).length;
+
+      return bScore - aScore;
+    });
+
+    return jobPostingsSorted;
+  }),
+
+  getJobPosting: protectedProcedure
+    .input(z.object({ jobPostingId: z.string().min(1) }))
+    .query(async ({ input, ctx }) => {
+      const jobPosting = await ctx.prisma.jobPosting.findUnique({
+        where: {
+          jobPostingId: input.jobPostingId,
+        },
+      });
+
+      const isSaved = await ctx.prisma.savedJobPosting.findUnique({
+        where: {
+          userId_jobPostingId: {
+            userId: ctx.session.user.id,
+            jobPostingId: input.jobPostingId,
+          },
+        },
+      });
+
+      const isApplied = await ctx.prisma.appliedJobPosting.findUnique({
+        where: {
+          userId_jobPostingId: {
+            userId: ctx.session.user.id,
+            jobPostingId: input.jobPostingId,
+          },
+        },
+      });
+
+      const requiredDocuments: ('resume' | 'cover-letter' | 'portfolio' | 'transcript')[] = [];
+      if (jobPosting?.requireResume) {
+        requiredDocuments.push('resume');
+      }
+      if (jobPosting?.requireCoverLetter) {
+        requiredDocuments.push('cover-letter');
+      }
+      if (jobPosting?.requirePortfolio) {
+        requiredDocuments.push('portfolio');
+      }
+      if (jobPosting?.requireTranscript) {
+        requiredDocuments.push('transcript');
+      }
+
+      return {
+        ...jobPosting,
+        jobSkills: jobPosting?.jobSkills ? jobPosting.jobSkills.split(',') : [],
+        requiredDocuments,
+        isSaved: !!isSaved,
+        isApplied: !!isApplied,
+      };
+    }),
+
   // Get all Job Postings created by a user and the associated applications (in this case a recruiter)
   getRecruiterJobPostings: protectedProcedure.query(async ({ ctx }) => {
     const jobPostings = await ctx.prisma.jobPosting.findMany({
@@ -28,7 +117,7 @@ export const jobPostingRouter = createTRPCRouter({
     return jobPostings;
   }),
 
-  //save a Job Posting
+  // Toggle save a Job Posting
   toggleSavedJobPosting: protectedProcedure
     .input(
       z.object({
@@ -56,17 +145,74 @@ export const jobPostingRouter = createTRPCRouter({
       }
     }),
 
-  // Get Saved Job Postings
-  getSavedJobPostings: protectedProcedure.query(async ({ ctx }) => {
+  // Get Saved Job Posting Previews
+  getSavedJobPostingPreviews: protectedProcedure.query(async ({ ctx }) => {
     const savedJobPostings = await ctx.prisma.savedJobPosting.findMany({
       where: {
         userId: ctx.session.user.id,
       },
       include: {
-        JobPosting: true,
+        JobPosting: {
+          select: {
+            jobPostingId: true,
+            jobTitle: true,
+            company: true,
+            location: true,
+            jobSkills: true,
+          },
+        },
       },
     });
     return savedJobPostings?.map((s) => s.JobPosting);
+  }),
+
+  // Toggle apply to Job Posting
+  toggleAppliedJobPosting: protectedProcedure
+    .input(
+      z.object({
+        jobPostingId: z.string().min(1),
+        applied: z.boolean(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      if (input.applied) {
+        await ctx.prisma.appliedJobPosting.create({
+          data: {
+            userId: ctx.session.user.id,
+            jobPostingId: input.jobPostingId,
+          },
+        });
+      } else {
+        await ctx.prisma.appliedJobPosting.delete({
+          where: {
+            userId_jobPostingId: {
+              userId: ctx.session.user.id,
+              jobPostingId: input.jobPostingId,
+            },
+          },
+        });
+      }
+    }),
+
+  // Get Applied Job Posting Previews
+  getAppliedJobPostingPreviews: protectedProcedure.query(async ({ ctx }) => {
+    const appliedJobPostings = await ctx.prisma.appliedJobPosting.findMany({
+      where: {
+        userId: ctx.session.user.id,
+      },
+      include: {
+        JobPosting: {
+          select: {
+            jobPostingId: true,
+            jobTitle: true,
+            company: true,
+            location: true,
+            jobSkills: true,
+          },
+        },
+      },
+    });
+    return appliedJobPostings?.map((s) => s.JobPosting);
   }),
 
   // Create a Job Posting (By a Recruiter)
@@ -83,14 +229,18 @@ export const jobPostingRouter = createTRPCRouter({
         requireCoverLetter: z.boolean().default(false),
         requirePortfolio: z.boolean().default(false),
         requireTranscript: z.boolean().default(false),
-        jobSkills: z.string().min(1).nullish(),
-        applicationLink: z.string().min(1).nullish(),
+        jobSkills: z.string().nullish(),
+        applicationLink: z.string().nullish(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
       const jobPosting = await ctx.prisma.jobPosting.create({
         data: {
           ...input,
+          jobSkills: input.jobSkills
+            ?.split(',')
+            .map((s) => s.trim())
+            .join(','),
           recruiterId: ctx.session.user.id,
         },
       });

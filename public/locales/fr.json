@@ -138,5 +138,72 @@
       "confirm": "Confirmer",
       "yes": "Oui"
     }
+  },
+  "jobs": {
+    "files": {
+      "resume": "Curiuculum Vitae",
+      "cover-letter": "Lettre de Motivation",
+      "portfolio": "Portfolio",
+      "transcript": "Relevé de Notes"
+    },
+    "profile": {
+      "title": "Profile d'Emploi",
+      "description": "Ajoutez tous les documents nécessaires pour partager vos compétences et expériences avec les recruteurs.",
+      "upload": "Ajouter"
+    },
+    "recruiting": {
+      "title": "Recrutez-vous?",
+      "description": "Créez une demande d'emploi pour trouver les meilleurs candidats pour votre entreprise.",
+      "button": "Créer Une Demande"
+    },
+    "tabs": {
+      "suggested": "Postes Suggérés",
+      "saved": "Postes Sauvegardés",
+      "applied": "Postes Postulés"
+    },
+    "job-view": {
+      "back": "Retour",
+      "delete": "Supprimer",
+      "apply": "Postuler",
+      "applied": "Postulé",
+      "save": "Sauvegarder",
+      "saved": "Sauvegardé",
+      "description": "Description du Poste",
+      "no-description": "Aucune description",
+      "skills": "Compétences Requises",
+      "documents": "Documents Requis",
+      "no-saved": "Vous n'avez pas encore sauvegardé de poste 😔",
+      "no-applied": "Vous n'avez pas encore postulé à un poste 😔"
+    },
+    "job-types": {
+      "FullTime": "Temps Plein",
+      "PartTime": "Temps Partiel",
+      "Internship": "Stage",
+      "Contract": "Contrat",
+      "Temporary": "Temporaire",
+      "Volunteer": "Bénévole"
+    },
+    "workplace-types": {
+      "Remote": "À Distance",
+      "Onsite": "Sur Place",
+      "Hybrid": "Hybride"
+    },
+    "create": {
+      "title": "Créer une Demande d'Emploi",
+      "required": "requis",
+      "company": "Nom de l'Entreprise",
+      "job-title": "Titre du Poste",
+      "job-title-placeholder": "e.g. Développeur Web, Ingénieur Logiciel, etc.",
+      "location": "Lieu",
+      "job-type": "Type de Poste",
+      "workplace-type": "Type de Lieu de Travail",
+      "description": "Description du Poste",
+      "description-placeholder": "e.g. Décrivez le poste, les responsabilités, les compétences requises, etc.",
+      "documents": "Documents Requis",
+      "skills": "Compétences Requises",
+      "comma": "séparées par des virgules",
+      "link": "Lien vers le Poste",
+      "post": "Publier"
+    }
   }
 }

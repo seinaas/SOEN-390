@@ -12,7 +12,7 @@ type Props = {
 const Button: React.FC<Props> = ({ reverse, variant = 'primary', fullWidth, iconLeft, className, ...props }) => {
   return (
     <motion.button
-      layout='position'
+      layout={props.layout != null ? props.layout : 'position'}
       type='submit'
       {...props}
       className={`flex items-center justify-center gap-x-2 rounded-md border-2 text-sm font-semibold uppercase disabled:opacity-75 ${
@@ -27,9 +27,12 @@ const Button: React.FC<Props> = ({ reverse, variant = 'primary', fullWidth, icon
       ${className || 'px-4 py-3'}`}
       {...props}
     >
-      {iconLeft && <motion.span layout='position'>{iconLeft}</motion.span>}
+      {iconLeft && <motion.span layout={props.layout != null ? props.layout : 'position'}>{iconLeft}</motion.span>}
       {props.children && (
-        <motion.div layout='position' className='flex items-center justify-center gap-x-1 leading-[0.8]'>
+        <motion.div
+          layout={props.layout != null ? props.layout : 'position'}
+          className='flex items-center justify-center gap-x-1 leading-[0.8]'
+        >
           {props.children}
         </motion.div>
       )}

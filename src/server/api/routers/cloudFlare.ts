@@ -1,6 +1,7 @@
+/* istanbul ignore file */
 import { z } from 'zod';
 
-import { createTRPCRouter, publicProcedure, protectedProcedure } from '../trpc';
+import { createTRPCRouter, protectedProcedure } from '../trpc';
 
 import { S3Client, PutObjectCommand, GetObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
@@ -46,14 +47,21 @@ export const cloudFlareRouter = createTRPCRouter({
     }),
 
   getPresignedLISTUrl: protectedProcedure
-    .input(z.object({ userId: z.string(), containerType: z.string(), postId: z.string() }))
+    .input(
+      z.object({
+        pathPrefixes: z.string().array().optional(),
+        userId: z.string().default(''),
+        containerType: z.string().default(''),
+        postId: z.string().default(''),
+      }),
+    )
     .mutation(async ({ input, ctx }) => {
-      const { userId, containerType, postId } = input;
+      const { pathPrefixes, userId, containerType, postId } = input;
       const putUrl = await getSignedUrl(
         S3,
         new ListObjectsV2Command({
           Bucket: env.CLOUDFLARE_BUCKET_NAME,
-          Prefix: `${userId}/${containerType}/${postId}/`,
+          Prefix: pathPrefixes ? `${pathPrefixes.join('/')}/` : `${userId}/${containerType}/${postId}/`,
           Delimiter: '/',
         }),
         {
