@@ -15,7 +15,6 @@ import { useJobPostFiles } from '../../customHooks/useFiles';
 import { getServerAuthSession } from '../../server/auth';
 import { type GetServerSidePropsContext } from 'next';
 import { useTranslations } from 'next-intl';
-import { api } from '../../utils/api';
 
 const TABS = [
   {
@@ -41,7 +40,6 @@ const JobBoard: NextPageWithLayout = () => {
   const userId = session?.user?.id;
   const uploadedFileList = useJobPostFiles(userId);
   const t = useTranslations('jobs');
-  const hiddenFileInput = React.useRef(null);
 
   const handleAddingNewFile = (newFile: File | undefined, newKey: string) => {
     newFile && //Updates
