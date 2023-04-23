@@ -30,6 +30,7 @@ import EditJobsModal from '../../components/profile/editJobsModal';
 import EditEducationModal from '../../components/profile/editEducationModal';
 import EditLanguagesModal from '../../components/profile/editLanguagesModal';
 import { langsByCode } from '../../utils/languages';
+import { useTranslations } from 'next-intl';
 
 const variants: Variants = {
   hidden: { opacity: 0, y: 10 },
@@ -45,6 +46,8 @@ const Profile: NextPageWithLayout = () => {
   const [showBioModal, setShowBioModal] = useState(false);
   const [edittingJobId, setEdittingJobId] = useState('');
   const [edittingEducationId, setEdittingEducationId] = useState('');
+
+  const t = useTranslations('profile');
 
   const updateQueries = async () => {
     await utils.user.getByEmail.invalidate();
@@ -114,7 +117,7 @@ const Profile: NextPageWithLayout = () => {
                 >
                   <div className='flex items-center gap-1'>
                     {viewConnections ? (
-                      <span>View Profile</span>
+                      <span>{t('view-profile')}</span>
                     ) : (
                       <>
                         <IoMdPeople size={20} />
@@ -135,7 +138,7 @@ const Profile: NextPageWithLayout = () => {
                             </motion.span>
                           )}
                         </AnimatePresence>
-                        <span> {data?.numConnections === 1 ? 'Connection' : 'Connections'}</span>
+                        <span> {data?.numConnections === 1 ? t('connection') : t('connections')}</span>
                       </>
                     )}
                   </div>
@@ -162,15 +165,16 @@ const Profile: NextPageWithLayout = () => {
                       className='px-4 py-2'
                       disabled
                     >
-                      Sent
+                      {t('sent')}
                     </Button>
                     <Button
+                      fullWidth
                       iconLeft={<IoIosCloseCircle size={20} />}
                       variant='secondary'
                       className='px-4 py-2'
                       onClick={() => data?.email && cancelMutation.mutate({ userEmail: data.email })}
                     >
-                      Cancel
+                      {t('cancel')}
                     </Button>
                   </>
                 )}
@@ -178,11 +182,12 @@ const Profile: NextPageWithLayout = () => {
                   <>
                     <Button
                       fullWidth
+                      data-cy='accept-button'
                       iconLeft={<IoIosCheckmarkCircle size={20} />}
                       className='px-4 py-2'
                       onClick={() => data?.email && acceptMutation.mutate({ userEmail: data.email })}
                     >
-                      Accept
+                      {t('accept')}
                     </Button>
                     <Button
                       fullWidth
@@ -191,24 +196,27 @@ const Profile: NextPageWithLayout = () => {
                       className='px-4 py-2'
                       onClick={() => data?.email && cancelMutation.mutate({ userEmail: data.email })}
                     >
-                      Ignore
+                      {t('ignore')}
                     </Button>
                   </>
                 )}
                 {connection.status === '' && (
                   <Button
                     fullWidth
+                    data-cy='connect-button'
                     iconLeft={<IoMdPersonAdd size={20} />}
                     variant='secondary'
                     className='px-4 py-2'
                     onClick={() => data?.email && requestMutation.mutate({ userEmail: data.email })}
                   >
-                    Connect
+                    {t('connect')}
                   </Button>
                 )}
-                <Button reverse fullWidth iconLeft={<IoMdChatboxes size={20} />} className='max-w-[50%] px-4 py-2'>
-                  Message
-                </Button>
+                {connection.status === 'Connected' && (
+                  <Button reverse fullWidth iconLeft={<IoMdChatboxes size={20} />} className='max-w-[50%] px-4 py-2'>
+                    {t('message')}
+                  </Button>
+                )}
               </div>
             )}
 
@@ -216,7 +224,7 @@ const Profile: NextPageWithLayout = () => {
 
             {/* Contact Information Section */}
             <div className='flex w-full flex-col gap-2'>
-              <h1 className='mb-2 font-semibold'>Contact Information</h1>
+              <h1 className='mb-2 font-semibold'>{t('contact')}</h1>
               <div className='flex items-center gap-2 rounded-md bg-primary-100/20 p-3 text-primary-600'>
                 <IoMdMail />
                 <div className='text-sm font-semibold'>{data?.email}</div>
@@ -233,7 +241,7 @@ const Profile: NextPageWithLayout = () => {
 
             <div className='flex w-full flex-col gap-2'>
               <div className='flex justify-between'>
-                <h1 className='mb-2 font-semibold'>Languages</h1>
+                <h1 className='mb-2 font-semibold'>{t('languages')}</h1>
                 {canEdit && (
                   <EditButton name='langs' data-cy='edit-langs-btn' onClick={() => setShowLanguagesModal(true)} />
                 )}
@@ -253,7 +261,7 @@ const Profile: NextPageWithLayout = () => {
             {/* Skills Section */}
             <div className='flex w-full flex-col gap-2'>
               <div className='flex justify-between'>
-                <h1 className='mb-2 font-semibold'>Skills</h1>
+                <h1 className='mb-2 font-semibold'>{t('skills')}</h1>
                 {canEdit && <EditButton name='skills' onClick={() => setShowSkillsModal(true)} />}
               </div>
               <div data-cy='skills' className='flex flex-wrap gap-2 text-primary-100'>
@@ -276,7 +284,7 @@ const Profile: NextPageWithLayout = () => {
             className='flex flex-1 flex-col gap-6 overflow-auto rounded-xl bg-primary-100/10 p-8'
           >
             <motion.h1 layout className='text-2xl font-semibold'>
-              {data?.firstName}&apos;s Connections
+              {t('connection-side.title', { name: data?.firstName })}
             </motion.h1>
             {connections?.length ? (
               <motion.div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3'>
@@ -294,16 +302,14 @@ const Profile: NextPageWithLayout = () => {
                       className='flex items-center gap-4 rounded-xl bg-primary-100/10 p-4'
                     >
                       <div className='relative h-12 w-12 overflow-hidden rounded-full bg-primary-100/20'>
-                        {connection.image && (
-                          <Image
-                            loader={() => connection.image || ''}
-                            src={connection.image}
-                            alt={`${connection.firstName || ''}-image`}
-                            fill
-                            className='object-cover'
-                            referrerPolicy='no-referrer'
-                          />
-                        )}
+                        <Image
+                          loader={() => connection.image || '/placeholder.jpeg'}
+                          src={connection.image || '/placeholder.jpeg'}
+                          alt={`${connection.firstName || ''}-image`}
+                          fill
+                          className='object-cover'
+                          referrerPolicy='no-referrer'
+                        />
                       </div>
                       <div className='flex flex-col gap-1'>
                         <h1 className='text-lg font-semibold'>{connection.firstName}</h1>
@@ -315,9 +321,9 @@ const Profile: NextPageWithLayout = () => {
               </motion.div>
             ) : (
               <motion.div layout className='flex flex-col gap-2'>
-                <h1 className='text-lg font-semibold'>No Connections</h1>
+                <h1 className='text-lg font-semibold'>{t('connection-side.empty')}</h1>
                 <h1 className='text-sm font-semibold text-primary-100'>
-                  {data?.firstName} has not connected with anyone yet.
+                  {t('connection-side.empty-sub', { name: data?.firstName })}
                 </h1>
               </motion.div>
             )}
@@ -339,7 +345,7 @@ const Profile: NextPageWithLayout = () => {
                 className='rounded-xl bg-primary-100/10 p-6'
               >
                 <div className='flex justify-between'>
-                  <h1 className='mb-2 text-2xl font-semibold'>About</h1>
+                  <h1 className='mb-2 text-2xl font-semibold'>{t('about')}</h1>
                   {canEdit && <EditButton name='bio' onClick={() => setShowBioModal(true)} />}
                 </div>
                 <p data-cy='bio'>{`${data?.bio || ''} `}</p>
@@ -347,13 +353,13 @@ const Profile: NextPageWithLayout = () => {
             ) : (
               <>
                 {canEdit && (
-                  <NewSectionButton data-cy='new-bio-btn' text='About' onClick={() => setShowBioModal(true)} />
+                  <NewSectionButton data-cy='new-bio-btn' text={t('about')} onClick={() => setShowBioModal(true)} />
                 )}
               </>
             )}
             {!!data?.jobs.length ? (
               <motion.div
-                layout
+                layout='position'
                 variants={variants}
                 initial='hidden'
                 exit='exit'
@@ -362,7 +368,7 @@ const Profile: NextPageWithLayout = () => {
                 className='rounded-xl bg-primary-100/10 p-6'
               >
                 <div className='flex justify-between'>
-                  <h1 className='mb-4 text-2xl font-semibold'>Work Experience</h1>
+                  <h1 className='mb-4 text-2xl font-semibold'>{t('work')}</h1>
                   {canEdit && <EditButton name='job' type='add' onClick={() => setEdittingJobId('new')} />}
                 </div>
                 <div className='flex flex-col' data-cy='work-experience'>
@@ -380,7 +386,7 @@ const Profile: NextPageWithLayout = () => {
                           </div>
                           <p className='text-sm font-semibold leading-[0.8] text-primary-100'>
                             {job.startDate && format(job.startDate, 'MMM yyyy')} -{' '}
-                            {job.endDate ? format(job.endDate, 'MMM yyyy') : 'Present'}
+                            {job.endDate ? format(job.endDate, 'MMM yyyy') : t('present')}
                           </p>
                         </div>
                       </div>
@@ -403,11 +409,7 @@ const Profile: NextPageWithLayout = () => {
             ) : (
               <>
                 {canEdit && (
-                  <NewSectionButton
-                    data-cy='new-job-btn'
-                    text='Work Experience'
-                    onClick={() => setEdittingJobId('new')}
-                  />
+                  <NewSectionButton data-cy='new-job-btn' text={t('work')} onClick={() => setEdittingJobId('new')} />
                 )}
               </>
             )}
@@ -422,7 +424,7 @@ const Profile: NextPageWithLayout = () => {
                 className='rounded-xl bg-primary-100/10 p-6'
               >
                 <div className='flex justify-between'>
-                  <h1 className='mb-4 text-2xl font-semibold'>Education</h1>
+                  <h1 className='mb-4 text-2xl font-semibold'>{t('education')}</h1>
                   {canEdit && <EditButton name='edu' type='add' onClick={() => setEdittingEducationId('new')} />}
                 </div>
                 <div className='flex flex-wrap gap-4' data-cy='education'>
@@ -441,7 +443,7 @@ const Profile: NextPageWithLayout = () => {
                         </div>
                         <p className='text-sm font-semibold leading-[0.8] text-primary-100'>
                           {education.startDate && format(education.startDate, 'MMM yyyy')} -{' '}
-                          {education.endDate ? format(education.endDate, 'MMM yyyy') : 'Present'}
+                          {education.endDate ? format(education.endDate, 'MMM yyyy') : t('present')}
                         </p>
                       </div>
                     </div>
@@ -453,7 +455,7 @@ const Profile: NextPageWithLayout = () => {
                 {canEdit && (
                   <NewSectionButton
                     data-cy='new-edu-btn'
-                    text='Education'
+                    text={t('education')}
                     onClick={() => setEdittingEducationId('new')}
                   />
                 )}
@@ -529,5 +531,11 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     };
   }
 
-  return { props: {} };
+  return {
+    props: {
+      messages: JSON.parse(
+        JSON.stringify(await import(`../../../public/locales/${ctx.locale || 'en'}.json`)),
+      ) as IntlMessages,
+    },
+  };
 };

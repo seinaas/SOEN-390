@@ -2,6 +2,7 @@ import { type PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 
 import { createTRPCRouter, protectedProcedure } from '../trpc';
+import { triggerNotification, triggerNotificationRefresh } from '../helpers';
 
 /**
  * This is the connections router.
@@ -157,13 +158,22 @@ export const connectionsRouter = createTRPCRouter({
 
       const { user1ID, user2ID } = getCorrectUserOrder(ctx.session.user.id, recipient.id);
 
-      return await ctx.prisma.connection.create({
+      const res = await ctx.prisma.connection.create({
         data: {
           user1Id: user1ID,
           user2Id: user2ID,
           connectionStatus: ctx.session.user.id == user1ID ? 'Pending_1_To_2' : 'Pending_2_To_1',
         },
       });
+
+      await triggerNotification({
+        type: 'ConnectionRequest',
+        to: recipient.id,
+        route: ctx.session.user.email && `/u/${ctx.session.user.email}`,
+        ctx,
+      });
+
+      return res;
     }),
 
   acceptConnection: protectedProcedure
@@ -177,7 +187,7 @@ export const connectionsRouter = createTRPCRouter({
 
       const { user1ID, user2ID } = getCorrectUserOrder(ctx.session.user.id, recipient.id);
 
-      return await ctx.prisma.connection.update({
+      const res = await ctx.prisma.connection.update({
         data: {
           connectionStatus: 'Connected',
         },
@@ -185,6 +195,15 @@ export const connectionsRouter = createTRPCRouter({
           user1Id_user2Id: { user1Id: user1ID, user2Id: user2ID },
         },
       });
+
+      await triggerNotification({
+        type: 'ConnectionAccepted',
+        to: recipient.id,
+        route: ctx.session.user.email && `/u/${ctx.session.user.email}`,
+        ctx,
+      });
+
+      return res;
     }),
 
   removeConnection: protectedProcedure
@@ -198,10 +217,22 @@ export const connectionsRouter = createTRPCRouter({
 
       const { user1ID, user2ID } = getCorrectUserOrder(ctx.session.user.id, recipient.id);
 
-      return await ctx.prisma.connection.delete({
+      const res = await ctx.prisma.connection.delete({
         where: {
           user1Id_user2Id: { user1Id: user1ID, user2Id: user2ID },
         },
       });
+
+      await ctx.prisma.notification.deleteMany({
+        where: {
+          type: 'ConnectionRequest',
+          senderId: res.connectionStatus === 'Pending_1_To_2' ? user1ID : user2ID,
+          userId: res.connectionStatus === 'Pending_1_To_2' ? user2ID : user1ID,
+        },
+      });
+
+      await triggerNotificationRefresh({ ctx, to: recipient.id });
+
+      return res;
     }),
 });

@@ -85,6 +85,10 @@ jobs:
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
       FACEBOOK_CLIENT_ID: ${{ secrets.FACEBOOK_CLIENT_ID }}
       FACEBOOK_CLIENT_SECRET: ${{ secrets.FACEBOOK_CLIENT_SECRET }}
+      CLOUDFLARE_ACCOUNT_ID: ${{secrets.CLOUDFLARE_ACCOUNT_ID}}
+      CLOUDFLARE_ACCESS_KEY_ID: ${{secrets.CLOUDFLARE_ACCESS_KEY_ID}}
+      CLOUDFLARE_SECRET_ACCESS_KEY: ${{secrets.CLOUDFLARE_SECRET_ACCESS_KEY}}
+      CLOUDFLARE_BUCKET_NAME: ${{secrets.CLOUDFLARE_BUCKET_NAME}}
     environment: Preview
     steps:
       - uses: actions/checkout@v3
@@ -106,6 +110,12 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
+
+      - name: Set up MySQL
+        run: |
+          sudo /etc/init.d/mysql start
+          sudo mysql --user=root --password=root -h 127.0.0.1 -e 'CREATE DATABASE prospects;'
+          npx prisma db push
 
       - name: Install Dependencies
         run: npm ci

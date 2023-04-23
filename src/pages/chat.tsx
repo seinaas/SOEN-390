@@ -10,15 +10,22 @@ import Modal from '../components/modal';
 import EditButton from '../components/profile/editButton';
 import type { RouterOutputs } from '../utils/api';
 import { api } from '../utils/api';
-import { connectToChannel, useSubscribeToEvent } from '../utils/pusher';
-import { type NextPageWithLayout } from './_app';
 import { PostMessageItem } from '../components/postMessage';
+import { connectToChannel, pusherStore, useSubscribeToChannelEvent } from '../utils/pusher';
+import { type NextPageWithLayout } from './_app';
+import { getServerAuthSession } from '../server/auth';
+import { type GetServerSidePropsContext } from 'next';
+import { useTranslations } from 'next-intl';
+import { Upload, uploadFile } from '../components/upload';
+import { FileDownloadPreview, FileUploadPreview } from '../components/filePreview';
+import { useFileUploading } from '../customHooks/useFileUploading';
+import { useStore } from 'zustand';
 
 function TagsInput({ tagList, setTagList }: { tagList: string[]; setTagList: Dispatch<SetStateAction<string[]>> }) {
   return (
     <div className='tags-input-container mt-1 flex-wrap p-1'>
       {tagList.map((tag, index) => (
-        <div className='tag-item mr-1 mt-1 inline-block rounded-2xl bg-primary-100 p-2' key={index}>
+        <div className='tag-item mr-1 mt-1 inline-block rounded-2xl bg-primary-100 py-2 px-4 text-white' key={index}>
           <span className='text'>{tag}</span>
           <button
             className='close ml-1'
@@ -39,12 +46,12 @@ function MessageItem({
   message,
   userId,
   lastCreatedAt,
+  isFile,
 }: {
-  message: RouterOutputs['chat']['sendMessage'] & {
-    sender: { firstName: string | null; lastName: string | null };
-  };
+  message: RouterOutputs['chat']['sendMessage'] & { sender: { firstName: string | null; lastName: string | null } };
   userId: string;
   lastCreatedAt?: Date;
+  isFile: boolean;
 }) {
   const isSender = message?.senderId === userId;
   return (
@@ -87,6 +94,18 @@ function MessageItem({
             <PostMessageItem post={message.embeddedPost}></PostMessageItem>
           </div>
         )}
+        {isFile && (
+          <div
+            className={`rounded-md py-3 pl-2 pr-4 ${
+              isSender ? 'bg-primary-500 text-white' : 'bg-primary-100/10 text-primary-500'
+            }`}
+          >
+            <FileDownloadPreview
+              fileName={message.message}
+              pathPrefixes={['conversations', message.conversationId, 'messages', message.id]}
+            />
+          </div>
+        )}
         {(!lastCreatedAt || differenceInMinutes(message.createdAt, lastCreatedAt) > 5) && (
           <div className='text-xs text-gray-500'>{format(message.createdAt, 'MMM. do, p')}</div>
         )}
@@ -96,8 +115,11 @@ function MessageItem({
 }
 
 const Chat: NextPageWithLayout = () => {
+  const t = useTranslations('chat');
+
   const [selectedConversationId, setSelectedConversationId] = useState<string>();
   const [message, setMessage] = useState('');
+  const [newFile, setNewFile] = useState<File>();
   const [openNewChatModal, setOpenNewChatModal] = useState(false);
   const [messages, setMessages] = useState<
     (Messages & { sender: { firstName: string | null; lastName: string | null } })[]
@@ -112,6 +134,9 @@ const Chat: NextPageWithLayout = () => {
 
   const { data: session } = useSession();
   const utils = api.useContext();
+
+  const members = useStore(pusherStore, (state) => state.members);
+
   const connections = api.connections.getUserConnections.useQuery(
     { userEmail: session?.user?.email || '' },
     {
@@ -127,6 +152,7 @@ const Chat: NextPageWithLayout = () => {
   const newChatMutation = api.chat.sendMessage.useMutation();
 
   const conversations = api.conversation.getUserConversations.useQuery().data;
+  const { getPreSignedPUTUrl } = useFileUploading();
 
   useEffect(() => {
     if (messagesToUse) {
@@ -139,17 +165,14 @@ const Chat: NextPageWithLayout = () => {
     if (lastChannel) {
       connectToChannel(lastChannel);
       setSelectedConversationId(lastChannel);
+      setSelectedConversationId(lastChannel);
     }
   }, []);
 
   // Subscribe to a Pusher event
-  useSubscribeToEvent(
+  useSubscribeToChannelEvent(
     'message-sent',
-    (
-      data: RouterOutputs['chat']['sendMessage'] & {
-        sender: { firstName: string | null; lastName: string | null };
-      },
-    ) => {
+    (data: Messages & { sender: { firstName: string | null; lastName: string | null } }) => {
       setMessages((oldData) => [
         {
           ...data,
@@ -180,6 +203,48 @@ const Chat: NextPageWithLayout = () => {
     );
   };
 
+  const confirmCreation = () => {
+    setOpenNewChatModal(false);
+    createConversation.mutate([...tags], {
+      onSuccess: (data) => {
+        if (data?.id) {
+          setSelectedConversationId(data.id);
+          void utils.conversation.getUserConversations.invalidate();
+          connectToChannel(data.id);
+          localStorage.setItem('lastChannel', data.id);
+        } else {
+          setSelectedConversationId(data.id);
+        }
+      },
+    });
+    setTags([]);
+  };
+
+  const handleSendNewMessage = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    newChatMutation.mutate({
+      message: message,
+      conversationId: selectedConversationId as string,
+    });
+
+    setMessage('');
+
+    if (newFile) {
+      const newMessage: Messages = await newChatMutation.mutateAsync({
+        message: newFile.name,
+        conversationId: selectedConversationId as string,
+        isFile: true,
+      });
+      const url = await getPreSignedPUTUrl.mutateAsync({
+        fileName: newFile.name,
+        pathPrefixes: ['conversations', selectedConversationId as string, 'messages', newMessage.id],
+      });
+      await uploadFile({ file: newFile, url });
+      setNewFile(undefined);
+    }
+  };
+
   const confirmAddUsers = (conversationId: string) => {
     addToConversation.mutate(
       {
@@ -196,40 +261,23 @@ const Chat: NextPageWithLayout = () => {
     );
   };
 
-  const confirmCreation = () => {
-    setOpenNewChatModal(false);
-    createConversation.mutate([...tags], {
-      onSuccess: (data) => {
-        if (data?.id) {
-          setSelectedConversationId(data.id);
-          void utils.conversation.getUserConversations.invalidate();
-          connectToChannel(data.id);
-          localStorage.setItem('lastChannel', data.id);
-        } else {
-          setSelectedConversationId(data);
-        }
-      },
-    });
-    setTags([]);
-  };
-
   // Connect to the last channel the user was in
   // TODO: Store the channel whenever it is changed
   return (
     <main className='flex h-full max-h-screen w-full overflow-hidden'>
       <div className='flex h-full w-[350px] flex-col overflow-y-auto bg-primary-100/10'>
         <div className='flex items-center justify-between bg-primary-500 p-4 text-2xl font-semibold text-white'>
-          <h1>Your Conversations</h1>
-          <div data-cy='create-convo-btn'>
-            <EditButton name='chat' type='add' onClick={() => setOpenNewChatModal(true)} />
-          </div>
+          <h1>{t('sidebar.title')}</h1>
+          <EditButton name='chat' type='add' onClick={() => setOpenNewChatModal(true)} />
         </div>
         {!conversations?.length ? (
           <div className='flex h-full flex-col items-center justify-center'>
             <div className='text-2xl font-semibold text-primary-500' data-cy='no-convos'>
-              No conversations yet
+              {t('sidebar.empty')}
             </div>
-            <div className='text-lg font-semibold text-primary-500'>Create one to start chatting!</div>
+            <div className='text-center text-lg font-semibold leading-none text-primary-200'>
+              {t('sidebar.empty-sub')}
+            </div>
           </div>
         ) : (
           conversations?.map((conversation) => (
@@ -249,7 +297,20 @@ const Chat: NextPageWithLayout = () => {
                   loader={({ src }) => src}
                   src={conversation?.users[0]?.image || '/placeholder.jpeg'}
                   alt='User Image'
+                  referrerPolicy='no-referrer'
                 />
+
+                {/* Green activity bubble if user is online */}
+                <AnimatePresence initial={false}>
+                  {conversation.users.length === 1 && members.has(conversation.users[0]?.id || '') && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      className='absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500'
+                    ></motion.div>
+                  )}
+                </AnimatePresence>
               </div>
               <div className='text-left'>
                 <div className='text-ellipsis text-lg font-semibold'>
@@ -269,7 +330,7 @@ const Chat: NextPageWithLayout = () => {
         )}
       </div>
       {selectedConversationId && (
-        <div className='flex h-full max-w-[800px] flex-1 flex-col p-4'>
+        <div className='flex h-full max-w-[800px] flex-1 flex-col'>
           <div className='items-right flex justify-between bg-primary-500 p-4 text-2xl font-semibold text-white'>
             <h1>Messages</h1>
             <div className='flex'>
@@ -285,45 +346,49 @@ const Chat: NextPageWithLayout = () => {
                   message={message}
                   userId={session?.user?.id || ''}
                   lastCreatedAt={messages[0]?.createdAt}
+                  isFile={message.isFile}
                 />
               ))}
-              <div className='float-left clear-both' ref={messageEndRef} />
+              <div className='float-left clear-both' ref={messageEndRef} data-cy='new-message-form' />
             </div>
           </div>
-          <form
-            className='mt-8'
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (!message) {
-                return;
-              }
-              newChatMutation.mutate({
-                message: message,
-                conversationId: selectedConversationId,
-              });
-              setMessage('');
-            }}
-          >
-            <input
-              type='text'
-              className='w-full rounded-md bg-primary-100/10 px-4 py-3 outline-none'
-              placeholder='Type a message...'
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-            />
+          <form className='mt-8 flex items-center' onSubmit={handleSendNewMessage}>
+            <div className='flex h-fit w-full flex-col justify-center gap-3 rounded-md bg-primary-100/10 px-2 py-3 outline-none'>
+              <div className='flex w-full flex-row px-2'>
+                <input
+                  type='text'
+                  className='w-full rounded-md bg-transparent outline-none'
+                  placeholder={t('message-placeholder')}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  data-cy='new-message-input'
+                />
+                <Upload
+                  setFile={(newFile: File | undefined) => {
+                    setNewFile(newFile);
+                  }}
+                  className='h-8 w-8'
+                />
+              </div>
+              <FileUploadPreview file={newFile} />
+            </div>
           </form>
         </div>
       )}
 
       <AnimatePresence>
         {openNewChatModal && (
-          <Modal onCancel={() => setOpenNewChatModal(false)} onConfirm={() => confirmCreation()}>
-            <h1 className='mb-4 text-2xl font-semibold'>New Chat</h1>
+          <Modal
+            onCancel={() => setOpenNewChatModal(false)}
+            onConfirm={() => confirmCreation()}
+            confirmText={t('modals.confirm')}
+          >
+            <h1 className='mb-4 text-2xl font-semibold'>{t('modals.new')}</h1>
             <div className='flex flex-col'>
               {connections?.map((connection) => (
                 <button
+                  data-cy={`add-user-${connection.lastName || ''}`}
                   className='flex items-center justify-start rounded-md px-4 py-3 transition-colors duration-200 hover:bg-primary-100/10'
-                  data-cy='connection-btn'
                   key={connection.id}
                   onClick={() => {
                     if (tags.find((tag) => connection.email == tag) == undefined) {
@@ -338,6 +403,7 @@ const Chat: NextPageWithLayout = () => {
                       loader={({ src }) => src}
                       src={connection.image || '/placeholder.jpeg'}
                       alt='User Image'
+                      referrerPolicy='no-referrer'
                     />
                   </div>
                   <div className='ml-4'>
@@ -349,7 +415,7 @@ const Chat: NextPageWithLayout = () => {
               ))}
             </div>
             {tags && (
-              <div data-cy='tags-list'>
+              <div>
                 <TagsInput tagList={tags} setTagList={setTags}></TagsInput>
               </div>
             )}
@@ -361,9 +427,9 @@ const Chat: NextPageWithLayout = () => {
           <Modal
             onConfirm={() => confirmAddUsers(selectedConversationId || '')}
             onCancel={() => setShowAddUsers(false)}
-            confirmText='Yes'
+            confirmText={t('modals.confirm')}
           >
-            <h1 className='mb-4 text-2xl font-semibold'>Add users to conversation</h1>
+            <h1 className='mb-4 text-2xl font-semibold'>{t('modals.add-users')}</h1>
             <div className='flex flex-col'>
               {connections
                 ?.filter(
@@ -375,6 +441,7 @@ const Chat: NextPageWithLayout = () => {
                 )
                 ?.map((connection) => (
                   <button
+                    data-cy={`add-user-${connection.email}`}
                     className='flex items-center justify-start rounded-md px-4 py-3 transition-colors duration-200 hover:bg-primary-100/10'
                     key={connection.id}
                     onClick={() => {
@@ -390,6 +457,7 @@ const Chat: NextPageWithLayout = () => {
                         loader={({ src }) => src}
                         src={connection.image || '/placeholder.jpeg'}
                         alt='User Image'
+                        referrerPolicy='no-referrer'
                       />
                     </div>
                     <div className='ml-4'>
@@ -413,9 +481,9 @@ const Chat: NextPageWithLayout = () => {
           <Modal
             onConfirm={() => confirmLeaveGroup(selectedConversationId || '')}
             onCancel={() => setShowLeaveGroup(false)}
-            confirmText='Yes'
+            confirmText={t('modals.yes')}
           >
-            <h1 className='mb-4 text-2xl font-semibold'>Are you sure you want to leave the group?</h1>
+            <h1 className='mb-4 text-2xl font-semibold'>{t('modals.leave')}</h1>
           </Modal>
         )}
       </AnimatePresence>
@@ -426,3 +494,24 @@ const Chat: NextPageWithLayout = () => {
 Chat.getLayout = (page) => <MainLayout>{page}</MainLayout>;
 
 export default Chat;
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  const session = await getServerAuthSession(ctx);
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {
+      messages: JSON.parse(
+        JSON.stringify(await import(`../../public/locales/${ctx.locale || 'en'}.json`)),
+      ) as IntlMessages,
+    },
+  };
+};

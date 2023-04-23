@@ -16,7 +16,7 @@
       }
     },
     {
-      "files": ["./tests/server/**/*.{ts,tsx,js,jsx}"],
+      "files": ["./tests/unit/**/*.{ts,tsx,js,jsx}"],
       "parserOptions": {
         "project": "./tsconfig.json"
       },

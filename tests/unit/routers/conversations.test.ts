@@ -52,7 +52,10 @@ describe('conversations', () => {
 
       expect(data[0]).toEqual({
         id: '1',
-        users: [{ email: 'hello@hotmail.com' }, { email: 'hello2@hotmail.com' }],
+        users: [
+          { email: 'hello@hotmail.com', id: '1' },
+          { email: 'hello2@hotmail.com', id: '2' },
+        ],
         messages: [{ id: '1', message: 'hello', senderId: '1', conversationId: '1' }],
       });
     });

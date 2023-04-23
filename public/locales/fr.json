@@ -1,0 +1,142 @@
+{
+  "landing": {
+    "heading": {
+      "1": "On sait que vous êtes un ",
+      "2": "pro"
+    },
+    "welcome": {
+      "1": "Bienvenue à ProSpects! Nous vous facilitons la recherche de votre emploi idéal. Connectez-vous avec des personnes partageant les mêmes intérêts et développez votre réseau!",
+      "2": "Rejoignez-nous pour des opportunités illimités"
+    },
+    "button": "Devenez membre",
+    "header": {
+      "about": "À propos",
+      "jobs": "Emplois",
+      "contact": "Contact"
+    }
+  },
+  "auth": {
+    "login": "Connexion",
+    "signup": "Inscription",
+    "signout": "Déconnexion",
+    "or": "ou",
+    "no-account": "Vous n'avez pas de compte?",
+    "have-account": "Vous avez déjà un compte?",
+    "register": "S'inscrire",
+    "signin": "Se connecter",
+    "email": "Email",
+    "password": "Mot de passe",
+    "confirm-password": "Confirmer le mot de passe"
+  },
+  "header": {
+    "search": "Rechercher"
+  },
+  "modal": {
+    "cancel": "Annuler",
+    "save": "Sauvegarder"
+  },
+  "feed": {
+    "post": "Commencez un post",
+    "like": "J'aime",
+    "liked": "J'aime",
+    "comment": "Commenter",
+    "comment-placeholder": "Laissez un commentaire",
+    "share": "Partager",
+    "shared": "Partagé"
+  },
+  "profile": {
+    "connection": "Connexion",
+    "connections": "Connexions",
+    "sent": "Envoyé",
+    "cancel": "Annuler",
+    "accept": "Accepter",
+    "ignore": "Ignorer",
+    "connect": "Connecter",
+    "message": "Message",
+    "contact": "Informations de Contact",
+    "languages": "Langues",
+    "skills": "Compétences",
+    "about": "À propos",
+    "work": "Expérience professionelle",
+    "education": "Éducation",
+    "view-profile": "Voir le Profil",
+    "present": "Aujourd'hui",
+    "connection-side": {
+      "title": "Connexions de {name}",
+      "empty": "Aucune connexion",
+      "empty-sub": "{name} n'a pas encore de connexion"
+    },
+    "modals": {
+      "languages": {
+        "placeholder": "Ajouter une langue",
+        "add": "Ajouter",
+        "empty": "Vous n'avez pas encore ajouté de langue"
+      },
+      "skills": {
+        "placeholder": "Ajouter une compétence",
+        "add": "Ajouter",
+        "empty": "Vous n'avez pas encore ajouté de compétence",
+        "empty-sub": "Ajoutez des compétences pour démontrer votre expertise!"
+      },
+      "about": {
+        "placeholder": "Écrivez quelque chose à propos de vous"
+      },
+      "job": {
+        "new": "Ajouter un Emploi",
+        "edit": "Modifier l'Expérience",
+        "title": "Titre du Poste",
+        "company": "Nom de l'Entreprise",
+        "description": "Description de l'Emploi"
+      },
+      "education": {
+        "new": "Ajouter une Éducation",
+        "edit": "Modifier l'Éducation",
+        "degree": "Diplôme",
+        "school": "Nom de l'Institution",
+        "location": "Lieu",
+        "description": "Description"
+      }
+    }
+  },
+  "notifications": {
+    "empty": "Aucune notification",
+    "clear": "Vider",
+    "see-all": "Voir Plus",
+    "filters": {
+      "title": "Filtres",
+      "all": "Toutes",
+      "unread": "Non Lues",
+      "likes": "Likes",
+      "comments": "Commentaires",
+      "connections": "Connexions"
+    },
+    "settings": {
+      "title": "Paramètres de Notifications",
+      "likes": "Désactiver les Likes",
+      "comments": "Désactiver les Commentaires",
+      "connections": "Désactiver les Connexions"
+    },
+    "content": {
+      "ConnectionRequest": "{name} veut se connecter avec vous!",
+      "ConnectionAccepted": "{name} a accepté votre demande de connexion!",
+      "ConnectionResponse": "",
+      "Comment": "A laissé un commentaire: {comment}",
+      "Like": "A aimé votre post!"
+    }
+  },
+  "chat": {
+    "sidebar": {
+      "title": "Vos Conversations",
+      "empty": "Aucune conversation",
+      "empty-sub": "Commencez une conversation avec quelqu'un!"
+    },
+    "message-placeholder": "Écrivez un message...",
+    "modals": {
+      "new": "Nouvelle Conversation",
+      "leave": "Voulez-vous vraiment quitter cette conversation?",
+      "add-users": "Ajouter des utilisateurs à la conversation",
+      "confirm": "Confirmer",
+      "yes": "Oui"
+    }
+  }
+}

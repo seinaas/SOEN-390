@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import Button from './button';
+import { useTranslations } from 'next-intl';
 
 type Props = {
   onCancel?: () => unknown;
@@ -9,7 +10,9 @@ type Props = {
   showCancel?: boolean;
 };
 
-const Modal: React.FC<Props> = ({ showCancel = true, children, confirmText = 'confirm', onConfirm, onCancel }) => {
+const Modal: React.FC<Props> = ({ showCancel = true, children, confirmText, onConfirm, onCancel }) => {
+  const t = useTranslations('modal');
+
   return (
     <>
       <motion.div
@@ -46,11 +49,11 @@ const Modal: React.FC<Props> = ({ showCancel = true, children, confirmText = 'co
           <div className='flex justify-end gap-2 bg-primary-100/20 p-4'>
             {showCancel && (
               <Button reverse onClick={onCancel}>
-                Cancel
+                {t('cancel')}
               </Button>
             )}
             <Button data-cy='modal-submit' onClick={onConfirm}>
-              {confirmText}
+              {confirmText || t('save')}
             </Button>
           </div>
         </motion.div>

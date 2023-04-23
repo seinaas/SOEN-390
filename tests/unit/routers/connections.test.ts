@@ -280,7 +280,11 @@ describe('connections', () => {
         },
       };
 
-      const del = jest.spyOn(request.ctx.prisma.connection, 'delete').mockImplementation();
+      const del = jest.spyOn(request.ctx.prisma.connection, 'delete').mockResolvedValue({
+        user1Id: '1',
+        user2Id: '2',
+        connectionStatus: 'Connected',
+      });
       request.ctx.prisma.user.findUnique.mockResolvedValueOnce(userInput);
 
       await request.caller.connections.removeConnection({ userEmail: '' });

@@ -1,0 +1,142 @@
+{
+  "landing": {
+    "heading": {
+      "1": "We know you're a ",
+      "2": "pro"
+    },
+    "welcome": {
+      "1": "Welcome to ProSpects! We make it easy to find your ideal job. Connect with people with similar interests and expand your network!",
+      "2": "Join us for unlimited opportunites!"
+    },
+    "button": "Become a member",
+    "header": {
+      "about": "About",
+      "jobs": "Jobs",
+      "contact": "Contact"
+    }
+  },
+  "auth": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "signout": "Sign Out",
+    "or": "or",
+    "no-account": "No Account?",
+    "have-account": "Have an Account?",
+    "register": "Register now",
+    "signin": "Sign in now",
+    "email": "Email",
+    "password": "Password",
+    "confirm-password": "Confirm Password"
+  },
+  "header": {
+    "search": "Search"
+  },
+  "modal": {
+    "cancel": "Cancel",
+    "save": "Save Changes"
+  },
+  "feed": {
+    "post": "Start a post",
+    "like": "Like",
+    "liked": "Liked",
+    "comment": "Comment",
+    "comment-placeholder": "Write a comment",
+    "share": "Share",
+    "shared": "Shared"
+  },
+  "profile": {
+    "connection": "Connection",
+    "connections": "Connections",
+    "sent": "Sent",
+    "cancel": "Cancel",
+    "accept": "Accept",
+    "ignore": "Ignore",
+    "connect": "Connect",
+    "message": "Message",
+    "contact": "Contact Information",
+    "languages": "Languages",
+    "skills": "Skills",
+    "about": "About",
+    "work": "Work Experience",
+    "education": "Education",
+    "view-profile": "View Profile",
+    "present": "Present",
+    "connection-side": {
+      "title": "{name}'s Connections",
+      "empty": "No connections",
+      "empty-sub": "{name} has not connected with anyone yet"
+    },
+    "modals": {
+      "languages": {
+        "placeholder": "Add a language",
+        "add": "Add",
+        "empty": "You haven't added any languages yet"
+      },
+      "skills": {
+        "placeholder": "Add a skill",
+        "add": "Add",
+        "empty": "You haven't added any skills yet",
+        "empty-sub": "Add some skills to show off your talents!"
+      },
+      "about": {
+        "placeholder": "Tell us about yourself..."
+      },
+      "job": {
+        "new": "Add a Job",
+        "edit": "Edit Experience",
+        "title": "Job Title",
+        "company": "Company Name",
+        "description": "Job Description"
+      },
+      "education": {
+        "new": "Add Education",
+        "edit": "Edit Education",
+        "degree": "Degree",
+        "school": "Institution Name",
+        "location": "Location",
+        "description": "Description"
+      }
+    }
+  },
+  "notifications": {
+    "empty": "No notifications yet",
+    "clear": "Clear All",
+    "see-all": "See All",
+    "filters": {
+      "title": "Filters",
+      "all": "All",
+      "unread": "Unread",
+      "likes": "Likes",
+      "comments": "Comments",
+      "connections": "Connections"
+    },
+    "settings": {
+      "title": "Notification Settings",
+      "likes": "Mute Likes",
+      "comments": "Mute Comments",
+      "connections": "Mute Connections"
+    },
+    "content": {
+      "ConnectionRequest": "{name} sent you a connection request!",
+      "ConnectionAccepted": "{name} accepted your connection request!",
+      "ConnectionResponse": "",
+      "Comment": "Left a comment: {comment}",
+      "Like": "Liked your post!"
+    }
+  },
+  "chat": {
+    "sidebar": {
+      "title": "Your Conversations",
+      "empty": "No conversations yet",
+      "empty-sub": "Create a conversation to start chatting!"
+    },
+    "message-placeholder": "Type a message...",
+    "modals": {
+      "new": "New Chat",
+      "leave": "Are you sure you want to leave this conversation?",
+      "add-users": "Add users to this conversation",
+      "confirm": "Confirm",
+      "yes": "Yes"
+    }
+  }
+}
