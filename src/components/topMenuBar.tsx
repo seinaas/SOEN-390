@@ -10,47 +10,46 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import Button from '../components/button';
+import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/router';
+import { motion } from 'framer-motion';
 
 const TopMenuBar: React.FC = () => {
   const { data } = useSession();
+  const t = useTranslations();
+  const router = useRouter();
 
   return (
-    <div
-      className=' hidden h-20 w-full items-center justify-between bg-primary-600 pl-5 pr-10 md:flex'
-      data-cy='topMenuBar'
-    >
+    <div className='flex h-20 w-full items-center justify-between bg-primary-600 pl-5 pr-10' data-cy='topMenuBar'>
       {/* Logo */}
-      <Link href='/' className='relative h-16 w-36' data-cy='topMenuBar-logo'>
-        <Image alt='ProSpect Logo' src='/Logo.png' fill className='object-contain' />
+      <Link href='/' className='relative hidden h-16 w-36 md:block' data-cy='topMenuBar-logo'>
+        <Image priority alt='ProSpect Logo' src='/Logo.png' fill className='object-contain' />
       </Link>
 
       {/* Links */}
-      <div className='flex items-center space-x-10 '>
-        <div className=' flex w-full justify-end space-x-7 text-lg font-semibold text-white'>
-          <Link href='/' data-cy='topMenuBar-link-about'>
-            ABOUT
+      <div className='flex items-center gap-8 '>
+        <motion.div layout className=' flex w-full justify-end space-x-7 text-lg font-semibold text-white'>
+          <Link href='/about' data-cy='topMenuBar-link-about'>
+            {t('landing.header.about')}
           </Link>
           {!data && (
             <>
-              <Link href='/' data-cy='topMenuBar-link-jobs'>
-                JOBS
-              </Link>
-              <Link href='/' data-cy='topMenuBar-link-people'>
-                PEOPLE
+              <Link href='/contact' data-cy='topMenuBar-link-contact'>
+                {t('landing.header.contact')}
               </Link>
             </>
           )}
-          <Link href='/' data-cy='topMenuBar-link-language'>
-            FR
+          <Link href={router.asPath} locale={router.locale === 'fr' ? 'en' : 'fr'} data-cy='topMenuBar-link-language'>
+            {router.locale === 'fr' ? 'EN' : 'FR'}
           </Link>
-        </div>
+        </motion.div>
 
         {/* Buttons */}
 
         {data ? (
-          <div className='flex justify-center space-x-5 whitespace-nowrap'>
+          <div className='hidden justify-center space-x-5 whitespace-nowrap md:flex'>
             <Button data-cy='signout-button' variant='secondary' reverse onClick={() => signOut()}>
-              Sign Out
+              {t('auth.signout')}
             </Button>
             <div className='relative h-10 w-10'>
               <Image
@@ -64,18 +63,18 @@ const TopMenuBar: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div className='flex justify-center space-x-5 whitespace-nowrap'>
+          <motion.div layout className='hidden justify-center space-x-5 whitespace-nowrap md:flex'>
             <Link href='/auth/signin'>
               <Button data-cy='signin-button' variant='secondary' reverse>
-                Login
+                {t('auth.login')}
               </Button>
             </Link>
             <Link href='/auth/register'>
               <Button data-cy='register-button' reverse>
-                Sign Up
+                {t('auth.signup')}
               </Button>
             </Link>
-          </div>
+          </motion.div>
         )}
       </div>
     </div>

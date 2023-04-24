@@ -35,6 +35,10 @@ export const serverSchema = z.object({
   FACEBOOK_CLIENT_SECRET: z.string(),
   PUSHER_SECRET: z.string(),
   PUSHER_APP_ID: z.string(),
+  CLOUDFLARE_ACCOUNT_ID: z.string(),
+  CLOUDFLARE_ACCESS_KEY_ID: z.string(),
+  CLOUDFLARE_SECRET_ACCESS_KEY: z.string(),
+  CLOUDFLARE_BUCKET_NAME: z.string(),
 });
 
 /**
@@ -56,6 +60,10 @@ export const serverEnv = {
   FACEBOOK_CLIENT_SECRET: process.env.FACEBOOK_CLIENT_SECRET,
   PUSHER_SECRET: process.env.PUSHER_SECRET,
   PUSHER_APP_ID: process.env.PUSHER_APP_ID,
+  CLOUDFLARE_ACCOUNT_ID: process.env.CLOUDFLARE_ACCOUNT_ID,
+  CLOUDFLARE_ACCESS_KEY_ID: process.env.CLOUDFLARE_ACCESS_KEY_ID,
+  CLOUDFLARE_SECRET_ACCESS_KEY: process.env.CLOUDFLARE_SECRET_ACCESS_KEY,
+  CLOUDFLARE_BUCKET_NAME: process.env.CLOUDFLARE_BUCKET_NAME,
 };
 
 /**
@@ -66,6 +74,7 @@ export const serverEnv = {
 export const clientSchema = z.object({
   NEXT_PUBLIC_PUSHER_KEY: z.string(),
   NEXT_PUBLIC_PUSHER_CLUSTER: z.string(),
+  NEXT_PUBLIC_OPENAI_KEY: z.string(),
   // NEXT_PUBLIC_CLIENTVAR: z.string(),
 });
 
@@ -78,5 +87,6 @@ export const clientSchema = z.object({
 export const clientEnv = {
   NEXT_PUBLIC_PUSHER_KEY: process.env.NEXT_PUBLIC_PUSHER_KEY,
   NEXT_PUBLIC_PUSHER_CLUSTER: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
+  NEXT_PUBLIC_OPENAI_KEY: process.env.NEXT_PUBLIC_OPENAI_KEY,
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 };

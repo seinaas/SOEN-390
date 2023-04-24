@@ -173,9 +173,6 @@ export const connectionsRouter = createTRPCRouter({
         to: recipient.id,
         route: ctx.session.user.email && `/u/${ctx.session.user.email}`,
         ctx,
-        content: `${ctx.session.user.firstName || ''} ${
-          ctx.session.user.lastName || ''
-        } sent you a connection request!`,
       });
 
       return res;
@@ -206,9 +203,6 @@ export const connectionsRouter = createTRPCRouter({
         to: recipient.id,
         route: ctx.session.user.email && `/u/${ctx.session.user.email}`,
         ctx,
-        content: `${ctx.session.user.firstName || ''} ${
-          ctx.session.user.lastName || ''
-        } accepted your connection request!`,
       });
 
       return res;

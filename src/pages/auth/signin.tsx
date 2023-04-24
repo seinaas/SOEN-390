@@ -19,6 +19,7 @@ import Input from '../../components/input';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -28,6 +29,7 @@ const formSchema = z.object({
 type FormInputs = z.infer<typeof formSchema>;
 
 export const SignIn: NextPageWithLayout = () => {
+  const t = useTranslations('auth');
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
@@ -60,16 +62,16 @@ export const SignIn: NextPageWithLayout = () => {
 
   return (
     <motion.form className='flex w-full flex-col gap-4' onSubmit={onSubmit}>
-      <Input data-cy='email-input' type='email' placeholder='Email' autoComplete='email' {...register('email')} />
+      <Input data-cy='email-input' type='email' placeholder={t('email')} autoComplete='email' {...register('email')} />
       <Input
         data-cy='password-input'
         type='password'
-        placeholder='Password'
+        placeholder={t('password')}
         autoComplete='new-password'
         {...register('password')}
       />
       <Button data-cy='signin-btn' layoutId='auth-btn' fullWidth>
-        Sign In
+        {t('login')}
       </Button>
       {isError && (
         <p className='text-center text-sm text-red-600'>{error || errors.email?.message || errors.password?.message}</p>
@@ -103,5 +105,11 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     }
   }
 
-  return { props: {} };
+  return {
+    props: {
+      messages: JSON.parse(
+        JSON.stringify(await import(`../../../public/locales/${ctx.locale || 'en'}.json`)),
+      ) as IntlMessages,
+    },
+  };
 };

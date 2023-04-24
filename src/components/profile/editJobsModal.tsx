@@ -8,11 +8,12 @@
  *		database via the appropriate mutation.
  */
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Job } from '@prisma/client';
+import { type Job } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { api } from '../../utils/api';
 import Modal from '../modal';
+import { useTranslations } from 'next-intl';
 
 const formSchema = z.object({
   logo: z.string().nullish(),
@@ -32,6 +33,8 @@ type Props = {
 };
 
 const EditJobsModal: React.FC<Props> = ({ job, onCancel }) => {
+  const t = useTranslations('profile.modals.job');
+
   const updateMutation = api.user.updateJob.useMutation();
   const addMutation = api.user.addJob.useMutation();
 
@@ -77,13 +80,13 @@ const EditJobsModal: React.FC<Props> = ({ job, onCancel }) => {
   };
 
   return (
-    <Modal onCancel={onCancel} onConfirm={handleSubmit(onSubmit)} confirmText='Save Changes'>
-      <h1 className='mb-4 text-2xl font-semibold'>{job ? 'Edit Experience' : 'Add a Job'}</h1>
+    <Modal onCancel={onCancel} onConfirm={handleSubmit(onSubmit)}>
+      <h1 className='mb-4 text-2xl font-semibold'>{job ? t('edit') : t('new')}</h1>
       <form className='flex w-full flex-col gap-2'>
         <input
           data-cy='job-title-input'
           type='text'
-          placeholder='Job Title'
+          placeholder={t('title')}
           className='text-md block w-full rounded-lg border border-gray-300 p-3 shadow-inner outline-0 ring-0 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-75'
           {...register('title')}
         />
@@ -91,14 +94,14 @@ const EditJobsModal: React.FC<Props> = ({ job, onCancel }) => {
         <input
           data-cy='company-input'
           type='text'
-          placeholder='Company Name'
+          placeholder={t('company')}
           className='text-md block w-full rounded-lg border border-gray-300 p-3 shadow-inner outline-0 ring-0 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-75'
           {...register('company')}
         />
 
         <textarea
           data-cy='description-input'
-          placeholder='Job Description'
+          placeholder={t('description')}
           className='text-md block h-32 w-full rounded-lg border border-gray-300 p-3 shadow-inner outline-0 ring-0 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-75'
           {...register('description')}
         />

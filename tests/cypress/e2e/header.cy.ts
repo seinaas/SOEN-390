@@ -1,13 +1,13 @@
 describe('Header', () => {
   it('should successfully search for a user by part of first name', () => {
-    cy.register().then(({ email }) => {
-      cy.dataCy('search-user-input').type('Tes');
+    cy.register(undefined, undefined, 'SearchedUser').then(({ email }) => {
+      cy.dataCy('search-user-input').type('Searc');
       cy.dataCy('search-user-dropdown').should('contain', email);
     });
   });
   it('should successfully search for a user by part of last name', () => {
-    cy.register().then(({ email }) => {
-      cy.dataCy('search-user-input').type('Use');
+    cy.register().then(({ email, randomId }) => {
+      cy.dataCy('search-user-input').type(randomId.toString().slice(0, 3));
       cy.dataCy('search-user-dropdown').should('contain', email);
     });
   });
