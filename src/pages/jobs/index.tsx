@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MainLayout from '../../components/mainLayout';
 import Image from 'next/image';
 import type { NextPageWithLayout } from '../_app';
@@ -35,10 +35,11 @@ type Title = (typeof TABS)[number]['title'];
 const JobBoard: NextPageWithLayout = () => {
   const [selectedTab, setSelectedTab] = useState<Title>('suggested');
   const [fileList, setFileList] = useState<{ key: string; file: File }[]>([]);
+  const [refresh, setRefresh] = useState(true);
   const { data: session } = useSession();
   const { getPreSignedPUTUrl } = useFileUploading();
   const userId = session?.user?.id;
-  const { fileList: uploadedFileList, removeFile } = useJobPostFiles(userId);
+  const { fileList: uploadedFileList, loadFile } = useJobPostFiles(userId);
   const t = useTranslations('jobs');
 
   const handleAddingNewFile = (newFile: File | undefined, newKey: string) => {
@@ -56,6 +57,12 @@ const JobBoard: NextPageWithLayout = () => {
     }
     setFileList([]);
   };
+
+  useEffect(() => {
+    if (fileList.length === 0) {
+      void loadFile();
+    }
+  }, [fileList]);
 
   return (
     <main className='relative flex w-full flex-col justify-center gap-4 xs:py-4 xs:px-4 sm:min-h-full lg:px-8 xl:flex-row'>
@@ -98,13 +105,13 @@ const JobBoard: NextPageWithLayout = () => {
                         url={uploadedFileList.find((uploadedFile) => uploadedFile.fileType === fileType)?.url}
                         pathPrefixes={[userId as string, 'applicationProfile', fileType]}
                         isOwner={true}
-                        onDelete={() =>
+                        onDelete={() => {
                           removeFile(
                             uploadedFileList.find(
                               (uploadedFile) => uploadedFile.fileType === fileType,
                             ) as FileDownloadInfo,
-                          )
-                        }
+                          );
+                        }}
                       />
                     </div>
                   )

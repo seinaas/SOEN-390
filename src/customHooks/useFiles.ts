@@ -99,5 +99,5 @@ export const useJobPostFiles = (userId: string | undefined) => {
     setFileList(fileList?.filter((file) => file.fileName !== fileToRemove.fileName && file.url !== fileToRemove.url));
   };
 
-  return { fileList, removeFile };
+  return { fileList, removeFile, loadFile };
 };
