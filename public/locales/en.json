@@ -94,6 +94,10 @@
         "school": "Institution Name",
         "location": "Location",
         "description": "Description"
+      },
+      "headline": {
+        "title": "Edit Headline",
+        "placeholder": "What do you do?"
       }
     }
   },

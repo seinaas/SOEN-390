@@ -32,6 +32,7 @@ import EditEducationModal from '../../components/profile/editEducationModal';
 import EditLanguagesModal from '../../components/profile/editLanguagesModal';
 import { langsByCode } from '../../utils/languages';
 import { useTranslations } from 'next-intl';
+import EditHeadlineModal from '../../components/profile/editHeadlineModal';
 
 const variants: Variants = {
   hidden: { opacity: 0, y: 10 },
@@ -45,6 +46,7 @@ const Profile: NextPageWithLayout = () => {
   const [showLanguagesModal, setShowLanguagesModal] = useState(false);
   const [showSkillsModal, setShowSkillsModal] = useState(false);
   const [showBioModal, setShowBioModal] = useState(false);
+  const [showHeadlineModal, setShowHeadlineModal] = useState(false);
   const [edittingJobId, setEdittingJobId] = useState('');
   const [edittingEducationId, setEdittingEducationId] = useState('');
 
@@ -86,7 +88,7 @@ const Profile: NextPageWithLayout = () => {
   const canEdit = sessionData?.user?.email === data?.email;
 
   return (
-    <main className='relative flex h-full w-full flex-col justify-center gap-4 xs:py-4 xs:px-4 md:flex-row lg:px-8'>
+    <main className='relative flex h-full w-full flex-col justify-center gap-4 text-primary-600 xs:py-4 xs:px-4 md:flex-row lg:px-8'>
       {/* Left Side */}
       <div className='flex-1 md:max-w-md'>
         <div className='flex flex-col rounded-xl bg-primary-100/20 py-8 px-6'>
@@ -103,11 +105,16 @@ const Profile: NextPageWithLayout = () => {
                   priority
                 />
               </div>
-              <div>
-                <h1 className='text-2xl font-semibold'>
-                  {data?.firstName} {data?.lastName}
-                </h1>
-                <p className='text-sm font-normal text-primary-100'>{data?.headline}</p>
+              <div className=''>
+                <div className='flex items-center gap-2'>
+                  <div>
+                    <h1 className='text-2xl font-semibold'>
+                      {data?.firstName} {data?.lastName}
+                    </h1>
+                    <p className='text-sm font-normal text-primary-100'>{data?.headline}</p>
+                  </div>
+                  {canEdit && <EditButton name='headline' onClick={() => setShowHeadlineModal(true)} />}
+                </div>
                 <div className='my-2 h-px w-full bg-primary-100/20'></div>
 
                 <button
@@ -383,10 +390,13 @@ const Profile: NextPageWithLayout = () => {
                         </div>
                         <div className='flex flex-1 flex-col'>
                           <div className='flex justify-between'>
-                            <h1 className='text-lg font-semibold'>{job.title}</h1>
+                            <div className='flex items-center gap-2'>
+                              <h1 className='text-lg font-semibold'>{job.title}</h1>
+                              <h1 className='text-sm font-semibold text-primary-100'>@ {job.company}</h1>
+                            </div>
                             {canEdit && <EditButton name='job' onClick={() => setEdittingJobId(job.jobId)} />}
                           </div>
-                          <p className='text-sm font-semibold leading-[0.8] text-primary-100'>
+                          <p className='text-sm font-semibold leading-[0.8] text-primary-100/70'>
                             {job.startDate && format(job.startDate, 'MMM yyyy')} -{' '}
                             {job.endDate ? format(job.endDate, 'MMM yyyy') : t('present')}
                           </p>
@@ -490,6 +500,15 @@ const Profile: NextPageWithLayout = () => {
             bio={data?.bio || ''}
             onCancel={async () => {
               setShowBioModal(false);
+              await utils.user.getByEmail.refetch();
+            }}
+          />
+        )}
+        {showHeadlineModal && (
+          <EditHeadlineModal
+            headline={data?.headline || ''}
+            onCancel={async () => {
+              setShowHeadlineModal(false);
               await utils.user.getByEmail.refetch();
             }}
           />

@@ -88,6 +88,7 @@ export const userRouter = createTRPCRouter({
         bio: z.string().nullish(),
         skills: z.array(z.string()).nullish(),
         languages: z.array(z.string()).nullish(),
+        headline: z.string().nullish(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
