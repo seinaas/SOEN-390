@@ -9,6 +9,7 @@ import {
   IoDocumentAttachSharp,
   IoPencilSharp,
   IoCheckmarkSharp,
+  IoOpenSharp,
 } from 'react-icons/io5';
 import { AiFillDelete } from 'react-icons/ai';
 import { api, type RouterOutputs } from '../../utils/api';
@@ -92,7 +93,7 @@ const JobPost: React.FC<Props> = ({ jobData }) => {
                 <div>{t('job-view.skills')}</div>
               </div>
               <div className='flex flex-wrap space-y-2 text-primary-100'>
-                <div className='flex flex-row gap-1'>
+                <div className='flex flex-row flex-wrap gap-1'>
                   {jobData.jobSkills?.map((skill, i) => (
                     <div key={i} className='rounded-md bg-primary-100/20 px-2 py-1 text-xs font-semibold'>
                       {skill}
@@ -111,7 +112,7 @@ const JobPost: React.FC<Props> = ({ jobData }) => {
                 <div>{t('job-view.documents')}</div>
               </div>
               <div className='flex flex-wrap space-y-2 text-primary-100'>
-                <div className='flex flex-row gap-1'>
+                <div className='flex flex-row flex-wrap gap-1'>
                   {jobData.requiredDocuments?.map((doc, i) => (
                     <div key={i} className='rounded-md bg-primary-100/20 px-2 py-1 text-xs font-semibold'>
                       {t(`files.${doc}`)}
@@ -124,15 +125,15 @@ const JobPost: React.FC<Props> = ({ jobData }) => {
         </div>
 
         {/* Apply Job Button.*/}
-        <div className='mt-6 flex justify-start gap-3'>
+        <div className='mt-6 flex flex-wrap justify-start gap-3'>
           {/* Can see/use the delete job button only if it's a recruiter */}
           {jobData.recruiterId === session?.user?.id ? (
             <Button
               layout={false}
               onClick={() => deleteJob.mutate({ jobPostingId: jobData.jobPostingId || '' })}
               className='hover-red-600 flex border-red-600 bg-red-600 p-1 py-2 px-4 text-white hover:border-red-300 hover:bg-red-300'
+              iconLeft={<AiFillDelete />}
             >
-              <AiFillDelete />
               {t('job-view.delete')}
             </Button>
           ) : (
@@ -145,18 +146,17 @@ const JobPost: React.FC<Props> = ({ jobData }) => {
                 }}
                 className='flex py-2 px-4'
                 variant={jobData.isApplied ? 'secondary' : 'primary'}
-              >
-                {jobData.isApplied ? (
-                  <>
+                iconLeft={
+                  jobData.isApplied ? (
                     <IoCheckmarkSharp />
-                    {t('job-view.applied')}
-                  </>
-                ) : (
-                  <>
+                  ) : jobData.applicationLink ? (
+                    <IoOpenSharp />
+                  ) : (
                     <IoPencilSharp />
-                    {t('job-view.apply')}
-                  </>
-                )}
+                  )
+                }
+              >
+                {jobData.isApplied ? t('job-view.applied') : t('job-view.apply')}
               </Button>
               {/* Save Job Button */}
               <Button
@@ -166,18 +166,9 @@ const JobPost: React.FC<Props> = ({ jobData }) => {
                 onClick={() =>
                   saveJobToggle.mutate({ jobPostingId: jobData.jobPostingId || '', saved: !jobData.isSaved })
                 }
+                iconLeft={jobData.isSaved ? <IoCheckmarkSharp /> : <IoIosBookmark />}
               >
-                {jobData.isSaved ? (
-                  <>
-                    <IoCheckmarkSharp />
-                    {t('job-view.saved')}
-                  </>
-                ) : (
-                  <>
-                    <IoIosBookmark />
-                    {t('job-view.save')}
-                  </>
-                )}
+                {jobData.isSaved ? t('job-view.saved') : t('job-view.save')}
               </Button>
             </>
           )}

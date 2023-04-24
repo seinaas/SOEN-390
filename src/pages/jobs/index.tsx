@@ -114,7 +114,7 @@ const JobBoard: NextPageWithLayout = () => {
           <div className='rounded-xl py-4'>
             <p>{t('recruiting.description')}</p>
           </div>
-          <Link href='/jobs/createJobPost'>
+          <Link href='/jobs/create'>
             <Button className='p-2' layout={false}>
               {t('recruiting.button')}
             </Button>
