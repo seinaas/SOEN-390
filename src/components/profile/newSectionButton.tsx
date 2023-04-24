@@ -52,7 +52,7 @@ const NewSectionButton: React.FC<Props> = ({ text, ...props }) => {
           </motion.div>
         )}
       </AnimatePresence>
-      <motion.h1 layout className='text-2xl font-semibold'>
+      <motion.h1 layout='position' className='text-2xl font-semibold'>
         {text}
       </motion.h1>
     </motion.button>

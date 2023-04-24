@@ -22,11 +22,14 @@ import { useEffect, useState } from 'react';
 import { IoIosClose } from 'react-icons/io';
 import EditButton from '../components/profile/editButton';
 import NotificationSettingsModal from '../components/notifications/settingsModal';
+import { useTranslations } from 'next-intl';
 
 const FILTERS = ['all', 'unread', 'likes', 'comments', 'connections'] as const;
 type Filter = (typeof FILTERS)[number];
 
 const Notifications: NextPageWithLayout = () => {
+  const t = useTranslations('notifications');
+
   const [currentFilter, setCurrentFilter] = useState<Filter>('all');
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
@@ -83,7 +86,7 @@ const Notifications: NextPageWithLayout = () => {
       {/* Filters section */}
       <div className='flex w-full items-start sm:max-w-sm'>
         <div className='flex flex-1 flex-col gap-2 rounded-lg bg-primary-100/20 p-3'>
-          <h2 className='text-2xl font-bold text-primary-300'>Filters</h2>
+          <h2 className='text-2xl font-bold text-primary-300'>{t('filters.title')}</h2>
           <div className='flex flex-wrap gap-2'>
             {FILTERS.map((filter) => (
               <button
@@ -97,7 +100,7 @@ const Notifications: NextPageWithLayout = () => {
                   setCurrentFilter(filter);
                 }}
               >
-                {filter}
+                {t(`filters.${filter}`)}
               </button>
             ))}
           </div>
@@ -123,7 +126,7 @@ const Notifications: NextPageWithLayout = () => {
                 });
               }}
             >
-              Clear all
+              {t('clear')}
             </button>
           </div>
         </div>
@@ -211,7 +214,12 @@ const Notifications: NextPageWithLayout = () => {
                           })}
                         </span>
                       </div>
-                      <span className='text-left text-primary-400'>{notification.content}</span>
+                      <span className='text-left text-primary-400'>
+                        {t(`content.${notification.type}`, {
+                          name: `${notification.Sender.firstName || ''} ${notification.Sender.lastName || ''}`,
+                          content: notification.content,
+                        })}
+                      </span>
                       {/* Show 'Approve'/'Ignore' buttons if notification is a connection request */}
                       <AnimatePresence>
                         {notification.type === 'ConnectionRequest' && (
@@ -241,7 +249,7 @@ const Notifications: NextPageWithLayout = () => {
                               }}
                               className='flex-1 rounded-md bg-primary-400 px-2 py-1 text-white hover:bg-primary-500 active:bg-primary-600'
                             >
-                              Accept
+                              {t('accept')}
                             </button>
                             <button
                               onClick={(e) => {
@@ -257,7 +265,7 @@ const Notifications: NextPageWithLayout = () => {
                               }}
                               className='flex-1 rounded-md bg-primary-100/20 px-2 py-1 text-primary-100 hover:bg-primary-100/30 active:bg-primary-100/50'
                             >
-                              Decline
+                              {t('decline')}
                             </button>
                           </motion.div>
                         )}
@@ -271,7 +279,7 @@ const Notifications: NextPageWithLayout = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className='flex flex-1 items-center justify-center'
               >
-                <span className='text-primary-400'>No notifications yet</span>
+                <span className='text-primary-400'>{t('empty')}</span>
               </motion.div>
             )}
           </AnimatePresence>
@@ -300,5 +308,11 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     };
   }
 
-  return { props: {} };
+  return {
+    props: {
+      messages: JSON.parse(
+        JSON.stringify(await import(`../../public/locales/${ctx.locale || 'en'}.json`)),
+      ) as IntlMessages,
+    },
+  };
 };

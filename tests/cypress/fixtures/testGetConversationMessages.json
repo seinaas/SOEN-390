@@ -1,0 +1,46 @@
+[
+  {
+    "result": {
+      "data": {
+        "json": [
+          {
+            "users": [
+              {
+                "id": "fakeUserId",
+                "firstName": "Testy",
+                "lastName": "test",
+                "email": "",
+                "image": ""
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "result": {
+      "data": {
+        "json": [
+          {
+            "id": "fakeMessageId",
+            "message": "test.txt",
+            "senderId": "fakeSenderId",
+            "createdAt": "2023-04-20T18:09:02.027Z",
+            "conversationId": "fakeConversationId",
+            "isFile": true,
+            "sender": {
+              "firstName": "Testy",
+              "lastName": "test"
+            }
+          }
+        ],
+        "meta": {
+          "values": {
+            "0.createdAt": ["Date"]
+          }
+        }
+      }
+    }
+  }
+]

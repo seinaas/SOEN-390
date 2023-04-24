@@ -1,13 +1,13 @@
 /*
- *		Pusher Store Initializer
- *
- *
- *		This is a JavaScript module that sets up a Pusher store using Zustand. The store contains a Pusher client and a channel to be accessed by any component.
- *		The module exports functions to initialize the Pusher store, connect to a channel, subscribe to events on a channel and retrieve the current number of
- *		members in the presence channel. The module also contains hooks that allow components to subscribe to events on the channel. The code initializes the
- *		Pusher client and channel if they do not already exist, and signs the client in.
- */
-import type { Channel } from 'pusher-js';
+*		Pusher Store Initializer
+*
+*
+*		This is a JavaScript module that sets up a Pusher store using Zustand. The store contains a Pusher client and a channel to be accessed by any component. 
+*		The module exports functions to initialize the Pusher store, connect to a channel, subscribe to events on a channel and retrieve the current number of 
+*		members in the presence channel. The module also contains hooks that allow components to subscribe to events on the channel. The code initializes the 
+*		Pusher client and channel if they do not already exist, and signs the client in.
+*/
+import type { Channel, PresenceChannel } from 'pusher-js';
 
 import { useEffect, useRef } from 'react';
 import Pusher from 'pusher-js';
@@ -47,22 +47,6 @@ const createPusherStore = () => {
     };
   });
 
-  // TODO: Implement presence channel
-  // Update helper that sets 'members' to contents of presence channel's current members
-  // const updateMembers = () => {
-  //   console.log(presenceChannel);
-  //   store.setState(() => ({
-  //     members: new Map(Object.entries(presenceChannel.members)),
-  //   }));
-  // };
-
-  // Bind all "present users changed" events to trigger updateMembers
-  // presenceChannel.bind('pusher:subscription_succeeded', updateMembers);
-  // presenceChannel.bind('pusher:member_added', updateMembers);
-  // presenceChannel.bind('pusher:member_removed', updateMembers);
-
-  pusherClient.signin();
-
   return store;
 };
 
@@ -74,10 +58,32 @@ export function initPusher() {
   }
 }
 
+// Sign user into Pusher and subscribe to presence channel to track online activity
+export function pusherAuth() {
+  const pusherClient = pusherStore.getState().pusherClient;
+  if (!pusherClient.user.user_data) {
+    const presenceChannel = pusherClient.subscribe('presence-channel') as PresenceChannel;
+
+    // Update helper that sets 'members' to contents of presence channel's current members
+    const updateMembers = () => {
+      pusherStore.setState(() => ({
+        members: new Map(Object.entries(presenceChannel.members.members as Record<string, string>)),
+      }));
+    };
+
+    // Bind all "present users changed" events to trigger updateMembers
+    presenceChannel.bind('pusher:subscription_succeeded', updateMembers);
+    presenceChannel.bind('pusher:member_added', updateMembers);
+    presenceChannel.bind('pusher:member_removed', updateMembers);
+
+    pusherClient.signin();
+  }
+}
+
 export function connectToChannel(userId: string) {
   if (!pusherStore || pusherStore.getState().channel?.name === userId) return;
   pusherStore.setState(() => ({
-    channel: pusherStore.getState().pusherClient.subscribe(userId),
+    channel: pusherStore.getState().pusherClient.subscribe(`${userId}`),
   }));
 }
 

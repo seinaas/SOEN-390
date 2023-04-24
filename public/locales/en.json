@@ -1,0 +1,239 @@
+{
+  "landing": {
+    "heading": {
+      "1": "We know you're a ",
+      "2": "pro"
+    },
+    "welcome": {
+      "1": "Welcome to ProSpects! We make it easy to find your ideal job. Connect with people with similar interests and expand your network!",
+      "2": "Join us for unlimited opportunites!"
+    },
+    "button": "Become a member",
+    "header": {
+      "about": "About",
+      "contact": "Contact"
+    }
+  },
+  "auth": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "signout": "Sign Out",
+    "or": "or",
+    "no-account": "No Account?",
+    "have-account": "Have an Account?",
+    "register": "Register now",
+    "signin": "Sign in now",
+    "email": "Email",
+    "password": "Password",
+    "confirm-password": "Confirm Password"
+  },
+  "header": {
+    "search": "Search"
+  },
+  "modal": {
+    "cancel": "Cancel",
+    "save": "Save Changes"
+  },
+  "feed": {
+    "post": "Start a post",
+    "like": "Like",
+    "liked": "Liked",
+    "comment": "Comment",
+    "comment-placeholder": "Write a comment",
+    "share": "Share",
+    "shared": "Shared"
+  },
+  "profile": {
+    "connection": "Connection",
+    "connections": "Connections",
+    "sent": "Sent",
+    "cancel": "Cancel",
+    "accept": "Accept",
+    "ignore": "Ignore",
+    "connect": "Connect",
+    "message": "Message",
+    "contact": "Contact Information",
+    "languages": "Languages",
+    "skills": "Skills",
+    "about": "About",
+    "work": "Work Experience",
+    "education": "Education",
+    "view-profile": "View Profile",
+    "present": "Present",
+    "connection-side": {
+      "title": "{name}'s Connections",
+      "empty": "No connections",
+      "empty-sub": "{name} has not connected with anyone yet"
+    },
+    "modals": {
+      "languages": {
+        "placeholder": "Add a language",
+        "add": "Add",
+        "empty": "You haven't added any languages yet"
+      },
+      "skills": {
+        "placeholder": "Add a skill",
+        "add": "Add",
+        "empty": "You haven't added any skills yet",
+        "empty-sub": "Add some skills to show off your talents!"
+      },
+      "about": {
+        "placeholder": "Tell us about yourself..."
+      },
+      "job": {
+        "new": "Add a Job",
+        "edit": "Edit Experience",
+        "title": "Job Title",
+        "company": "Company Name",
+        "description": "Job Description"
+      },
+      "education": {
+        "new": "Add Education",
+        "edit": "Edit Education",
+        "degree": "Degree",
+        "school": "Institution Name",
+        "location": "Location",
+        "description": "Description"
+      },
+      "headline": {
+        "title": "Edit Headline",
+        "placeholder": "What do you do?"
+      }
+    }
+  },
+  "notifications": {
+    "empty": "No notifications yet",
+    "clear": "Clear All",
+    "see-all": "See All",
+    "accept": "Accept",
+    "decline": "Decline",
+    "filters": {
+      "title": "Filters",
+      "all": "All",
+      "unread": "Unread",
+      "likes": "Likes",
+      "comments": "Comments",
+      "connections": "Connections"
+    },
+    "settings": {
+      "title": "Notification Settings",
+      "likes": "Mute Likes",
+      "comments": "Mute Comments",
+      "connections": "Mute Connections"
+    },
+    "content": {
+      "ConnectionRequest": "{name} sent you a connection request!",
+      "ConnectionAccepted": "{name} accepted your connection request!",
+      "ConnectionResponse": "",
+      "Comment": "Left a comment: {content}",
+      "Like": "Liked your post!"
+    }
+  },
+  "chat": {
+    "sidebar": {
+      "title": "Your Conversations",
+      "empty": "No conversations yet",
+      "empty-sub": "Create a conversation to start chatting!"
+    },
+    "message-placeholder": "Type a message...",
+    "modals": {
+      "new": "New Chat",
+      "leave": "Are you sure you want to leave this conversation?",
+      "add-users": "Add users to this conversation",
+      "confirm": "Confirm",
+      "yes": "Yes"
+    }
+  },
+  "jobs": {
+    "files": {
+      "resume": "Resume/CV",
+      "cover-letter": "Cover Letter",
+      "portfolio": "Portfolio",
+      "transcript": "Transcript"
+    },
+    "profile": {
+      "title": "Application Profile",
+      "description": "Upload all necessary documents to share you skills and experiences with the recruiters.",
+      "upload": "Confirm Upload"
+    },
+    "recruiting": {
+      "title": "Are you recruiting?",
+      "description": "Create a job post to reach out to aspiring work professionals",
+      "button": "Create Job Post"
+    },
+    "tabs": {
+      "suggested": "Suggested Jobs",
+      "saved": "Saved Jobs",
+      "applied": "Applied Jobs"
+    },
+    "job-view": {
+      "back": "Back",
+      "delete": "Delete",
+      "apply": "Apply",
+      "applied": "Applied",
+      "save": "Save",
+      "saved": "Saved",
+      "description": "Job Description",
+      "no-description": "No description provided",
+      "skills": "Job Skills",
+      "documents": "Required Documents",
+      "no-saved": "You have not saved any jobs yet 😔",
+      "no-applied": "You have not applied to any jobs yet 😔",
+      "cannot-apply": "You are missing the documents required to apply!"
+    },
+    "job-types": {
+      "FullTime": "Full Time",
+      "PartTime": "Part Time",
+      "Internship": "Internship",
+      "Contract": "Contract",
+      "Temporary": "Temporary",
+      "Volunteer": "Volunteer"
+    },
+    "workplace-types": {
+      "Remote": "Remote",
+      "Onsite": "Onsite",
+      "Hybrid": "Hybrid"
+    },
+    "create": {
+      "title": "Create a Job Post",
+      "required": "required",
+      "company": "Company",
+      "job-title": "Job Title",
+      "job-title-placeholder": "e.g. Software Engineer, Data Scientist, etc.",
+      "location": "Job Location",
+      "job-type": "Job Type",
+      "workplace-type": "Workplace Type",
+      "description": "Job Description",
+      "description-placeholder": "e.g. What will you be doing?",
+      "documents": "Required Documents",
+      "skills": "Job Skills",
+      "comma": "comma-separated",
+      "link": "External Application Link",
+      "post": "Post Job"
+    }
+  },
+  "about": {
+    "title": "Our Purpose",
+    "welcome": {
+      "1": "Welcome to our professional networking platform ProSpects, designed to connect you with like-minded individuals and help you build a successful career.",
+      "2": "At our core, we believe in the power of networking and building meaningful relationships to further your personal and professional goals. We understand that in today's fast-paced world, it can be challenging to make those connections, which is why we have created a platform that makes it easier than ever to connect with other professionals in your field.",
+      "3": "Our platform is designed to be user-friendly and intuitive, with features that allow you to showcase your skills and experience, connect with other professionals in your industry, and stay up-to-date on the latest news and trends in your field.",
+      "4": "Whether you're looking for a new job opportunity, seeking mentorship or looking to expand your professional network, our platform can help. We believe that everyone has something valuable to offer, and we are committed to creating a diverse and inclusive community where everyone can thrive. We welcome professionals from all backgrounds and industries, and our goal is to help you achieve your career goals, whatever they may be.",
+      "5": "Join us today and start building your professional network. We can't wait to see where your career takes you!"
+    },
+    "header": {
+      "about": "About",
+      "contact": "Contact"
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "form": {
+      "1": "Fill out the form below to contact us.",
+      "2": "Name",
+      "3": "Email",
+      "4": "Write Something..."
+    },
+    "button": "Send"
+  }
+}

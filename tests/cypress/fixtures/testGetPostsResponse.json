@@ -1,0 +1,38 @@
+[
+	{
+		"result": {
+			"data": {
+				"json": 0
+			}
+		}
+	},
+	{
+		"result": {
+			"data": {
+				"json": [
+					{
+						"id": "54325432",
+						"userId": "54321",
+						"createdAt": "2023-04-18T19:24:10.645Z",
+						"content": "This is a dummy post",
+						"hasFiles": true,
+						"comments": [],
+						"likes": [],
+						"User": {
+							"firstName": "Dummy",
+							"lastName": "User",
+							"image": null
+						}
+					}
+				],
+				"meta": {
+					"values": {
+						"0.createdAt": [
+							"Date"
+						]
+					}
+				}
+			}
+		}
+	}
+]
