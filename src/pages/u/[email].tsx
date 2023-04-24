@@ -13,6 +13,7 @@ import {
   IoIosPaperPlane,
   IoIosCloseCircle,
   IoIosArrowForward,
+  IoIosBriefcase,
 } from 'react-icons/io';
 import { type NextPageWithLayout } from '../_app';
 import MainLayout from '../../components/mainLayout';
@@ -375,9 +376,10 @@ const Profile: NextPageWithLayout = () => {
                   {data.jobs.map((job, i) => (
                     <motion.div key={job.company}>
                       <div className='flex gap-2'>
-                        <div className='relative flex h-12 w-12 items-center justify-center rounded-full bg-white'>
+                        <div className='relative flex h-12 w-12 items-center justify-center rounded-full bg-white text-primary-500'>
                           {/* TODO: Update Placeholder Image */}
-                          <Image alt={`${job.company || ''} Logo`} src={'/logos/google.svg'} width={40} height={40} />
+                          <IoIosBriefcase size={32} />
+                          {/* <Image alt={`${job.company || ''} Logo`} src={'/logos/google.svg'} width={40} height={40} /> */}
                         </div>
                         <div className='flex flex-1 flex-col'>
                           <div className='flex justify-between'>
