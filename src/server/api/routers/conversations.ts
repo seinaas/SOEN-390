@@ -67,12 +67,7 @@ export const conversationsRouter = createTRPCRouter({
     if (user) {
       return user.DirectMessages.map((convo) => ({
         ...convo,
-        users: convo.users
-          .filter((user) => user.id !== ctx.session.user.id)
-          .map((user) => {
-            const { id, ...userWithoutId } = user;
-            return userWithoutId;
-          }),
+        users: convo.users.filter((user) => user.id !== ctx.session.user.id),
       }));
     }
     return [];
