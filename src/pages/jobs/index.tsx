@@ -35,11 +35,10 @@ type Title = (typeof TABS)[number]['title'];
 const JobBoard: NextPageWithLayout = () => {
   const [selectedTab, setSelectedTab] = useState<Title>('suggested');
   const [fileList, setFileList] = useState<{ key: string; file: File }[]>([]);
-  const [refresh, setRefresh] = useState(true);
   const { data: session } = useSession();
   const { getPreSignedPUTUrl } = useFileUploading();
   const userId = session?.user?.id;
-  const { fileList: uploadedFileList, loadFile } = useJobPostFiles(userId);
+  const { fileList: uploadedFileList, removeFile, loadFile } = useJobPostFiles(userId);
   const t = useTranslations('jobs');
 
   const handleAddingNewFile = (newFile: File | undefined, newKey: string) => {
