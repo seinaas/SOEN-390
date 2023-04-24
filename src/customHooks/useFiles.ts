@@ -46,7 +46,11 @@ export const usePostFiles = (post: Post) => {
     void loadFile();
   }, []);
 
-  return fileList;
+  const removeFile = (fileToRemove: FileDownloadInfo) => {
+    setFileList(fileList?.filter((file) => file.fileName !== fileToRemove.fileName && file.url !== fileToRemove.url));
+  };
+
+  return { fileList, removeFile };
 };
 
 // TODO: Add useJobPostFiles

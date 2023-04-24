@@ -1,5 +1,5 @@
 import { type Post } from '@prisma/client';
-import { PostFile, usePostFiles } from '../customHooks/useFiles';
+import { FileDownloadInfo, PostFile, usePostFiles } from '../customHooks/useFiles';
 import { BsDownload } from 'react-icons/bs';
 import { IoDocumentAttachOutline } from 'react-icons/io5';
 import { IoIosDownload, IoMdClose } from 'react-icons/io';
@@ -38,11 +38,10 @@ export const FileUploadPreview: React.FC<FileUploadPreviewProps> = ({ file }) =>
 
 //Only for previewing file in posts
 export const PostFileDownloadPreview: React.FC<PostFileDownloadPreviewProps> = ({ post, isOwner = false }) => {
-  const fileList,
-    removeFile = usePostFiles(post);
+  const { fileList, removeFile } = usePostFiles(post);
   const { getPreSignedDELETEUrl } = useFileUploading();
 
-  const handleDeleteFile = async (file: PostFile) => {
+  const handleDeleteFile = async (file: FileDownloadInfo) => {
     removeFile(file);
     const deleteUrl = await getPreSignedDELETEUrl.mutateAsync({
       fileName: file.fileName as string,
