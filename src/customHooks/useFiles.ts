@@ -95,5 +95,9 @@ export const useJobPostFiles = (userId: string | undefined) => {
     session?.user?.id && void loadFile();
   }, [session?.user?.id]);
 
-  return fileList;
+  const removeFile = (fileToRemove: FileDownloadInfo) => {
+    setFileList(fileList?.filter((file) => file.fileName !== fileToRemove.fileName && file.url !== fileToRemove.url));
+  };
+
+  return { fileList, removeFile };
 };

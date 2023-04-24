@@ -11,7 +11,7 @@ import { Upload, uploadFile } from '../../components/upload';
 import { useFileUploading } from '../../customHooks/useFileUploading';
 import { useSession } from 'next-auth/react';
 import { FileDownloadPreview, FileUploadPreview } from '../../components/filePreview';
-import { useJobPostFiles } from '../../customHooks/useFiles';
+import { FileDownloadInfo, useJobPostFiles } from '../../customHooks/useFiles';
 import { getServerAuthSession } from '../../server/auth';
 import { type GetServerSidePropsContext } from 'next';
 import { useTranslations } from 'next-intl';
@@ -38,7 +38,7 @@ const JobBoard: NextPageWithLayout = () => {
   const { data: session } = useSession();
   const { getPreSignedPUTUrl } = useFileUploading();
   const userId = session?.user?.id;
-  const uploadedFileList = useJobPostFiles(userId);
+  const { fileList: uploadedFileList, removeFile } = useJobPostFiles(userId);
   const t = useTranslations('jobs');
 
   const handleAddingNewFile = (newFile: File | undefined, newKey: string) => {
@@ -96,6 +96,15 @@ const JobBoard: NextPageWithLayout = () => {
                             ?.fileName as string
                         }
                         url={uploadedFileList.find((uploadedFile) => uploadedFile.fileType === fileType)?.url}
+                        pathPrefixes={[userId as string, 'applicationProfile', fileType]}
+                        isOwner={true}
+                        onDelete={() =>
+                          removeFile(
+                            uploadedFileList.find(
+                              (uploadedFile) => uploadedFile.fileType === fileType,
+                            ) as FileDownloadInfo,
+                          )
+                        }
                       />
                     </div>
                   )

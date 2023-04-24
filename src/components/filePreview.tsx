@@ -107,7 +107,7 @@ export const FileDownloadPreview: React.FC<FileDownloadPreviewProps> = ({
   };
 
   useEffect(() => {
-    pathPrefixes.length > 0 && void loadFile();
+    pathPrefixes.length > 0 && !url && void loadFile();
   }, []);
 
   const handleDeleteFile = async () => {
@@ -136,7 +136,7 @@ export const FileDownloadPreview: React.FC<FileDownloadPreviewProps> = ({
         </a>
         {isOwner && (
           <MdDeleteForever
-            className='h-6 w-6 hover:cursor-pointer hover:opacity-50'
+            className='h-6 w-6 opacity-50 hover:cursor-pointer hover:opacity-100'
             onClick={() => {
               void handleDeleteFile();
             }}
