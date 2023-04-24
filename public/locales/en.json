@@ -178,7 +178,8 @@
       "skills": "Job Skills",
       "documents": "Required Documents",
       "no-saved": "You have not saved any jobs yet 😔",
-      "no-applied": "You have not applied to any jobs yet 😔"
+      "no-applied": "You have not applied to any jobs yet 😔",
+      "cannot-apply": "You are missing the documents required to apply!"
     },
     "job-types": {
       "FullTime": "Full Time",

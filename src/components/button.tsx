@@ -18,11 +18,11 @@ const Button: React.FC<Props> = ({ reverse, variant = 'primary', fullWidth, icon
       className={`flex items-center justify-center gap-x-2 rounded-md border-2 text-sm font-semibold uppercase disabled:opacity-75 ${
         variant === 'primary'
           ? reverse
-            ? 'border-white bg-white text-primary-600 transition-colors duration-200 hover:border-transparent hover:bg-gray-100'
-            : 'border-primary-600 bg-primary-600 text-white transition-colors duration-200 hover:bg-primary-800'
+            ? 'border-white bg-white text-primary-600 transition-colors duration-200 enabled:hover:border-transparent enabled:hover:bg-gray-100'
+            : 'border-primary-600 bg-primary-600 text-white transition-colors duration-200 enabled:hover:bg-primary-800'
           : reverse
-          ? 'border-white bg-transparent text-white transition-colors duration-200 hover:bg-white hover:text-primary-600'
-          : 'border-primary-600 bg-transparent text-primary-600 transition-colors duration-200 hover:bg-primary-600 enabled:hover:text-white  disabled:bg-primary-100/20 disabled:opacity-50'
+          ? 'border-white bg-transparent text-white transition-colors duration-200 enabled:hover:bg-white enabled:hover:text-primary-600'
+          : 'border-primary-600 bg-transparent text-primary-600 transition-colors duration-200 enabled:hover:bg-primary-600 enabled:hover:text-white  disabled:bg-primary-100/20 disabled:opacity-50'
       } ${fullWidth ? 'w-full' : ''}
       ${className || 'px-4 py-3'}`}
       {...props}

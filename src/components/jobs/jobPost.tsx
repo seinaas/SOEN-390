@@ -17,6 +17,7 @@ import { useSession } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import { IoIosBookmark } from 'react-icons/io';
 import { useTranslations } from 'next-intl';
+import { useJobPostFiles } from '../../customHooks/useFiles';
 
 type Props = {
   jobData: RouterOutputs['jobPosting']['getJobPosting'];
@@ -26,6 +27,11 @@ const JobPost: React.FC<Props> = ({ jobData }) => {
   const { data: session } = useSession();
   const utils = api.useContext();
   const t = useTranslations('jobs');
+  const uploadedFileList = useJobPostFiles(session?.user?.id);
+
+  const canApply = jobData.requiredDocuments.every((requiredDocument) =>
+    uploadedFileList?.some((uploadedFile) => uploadedFile.fileType === requiredDocument),
+  );
 
   const saveJobToggle = api.jobPosting.toggleSavedJobPosting.useMutation({
     onSuccess: () => {
@@ -144,6 +150,7 @@ const JobPost: React.FC<Props> = ({ jobData }) => {
                   if (jobData.applicationLink) void window.open(jobData.applicationLink, '_blank');
                   else applyJobToggle.mutate({ jobPostingId: jobData.jobPostingId || '', applied: !jobData.isApplied });
                 }}
+                disabled={!canApply && !jobData.applicationLink}
                 className='flex py-2 px-4'
                 variant={jobData.isApplied ? 'secondary' : 'primary'}
                 iconLeft={
@@ -173,6 +180,9 @@ const JobPost: React.FC<Props> = ({ jobData }) => {
             </>
           )}
         </div>
+        {!canApply && !jobData.applicationLink && (
+          <div className='mt-2 text-xs text-red-600'>{t('job-view.cannot-apply')}</div>
+        )}
       </div>
       {/* Job Description */}
       <div className='flex flex-col gap-2 rounded-lg bg-white p-4'>
