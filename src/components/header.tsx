@@ -231,7 +231,9 @@ const Header: React.FC = () => {
                 <NotificationBubble count={notifCount} />
                 <IoIosNotifications size={28} />
               </button>
-              <AnimatePresence>{showNotifDropdown && <NotificationsDropdown />}</AnimatePresence>
+              <AnimatePresence>
+                {showNotifDropdown && <NotificationsDropdown setShowDropdown={setShowNotifDropdown} />}
+              </AnimatePresence>
             </span>
             <button
               onClick={() => signOut()}

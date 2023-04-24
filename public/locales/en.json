@@ -101,6 +101,8 @@
     "empty": "No notifications yet",
     "clear": "Clear All",
     "see-all": "See All",
+    "accept": "Accept",
+    "decline": "Decline",
     "filters": {
       "title": "Filters",
       "all": "All",
