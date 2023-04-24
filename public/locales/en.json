@@ -142,6 +142,9 @@
       "add-users": "Add users to this conversation",
       "confirm": "Confirm",
       "yes": "Yes"
+    },
+    "files": {
+      "file-deleted": "This file has been deleted."
     }
   },
   "jobs": {

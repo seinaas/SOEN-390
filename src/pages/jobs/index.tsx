@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MainLayout from '../../components/mainLayout';
 import Image from 'next/image';
 import type { NextPageWithLayout } from '../_app';
@@ -11,7 +11,7 @@ import { Upload, uploadFile } from '../../components/upload';
 import { useFileUploading } from '../../customHooks/useFileUploading';
 import { useSession } from 'next-auth/react';
 import { FileDownloadPreview, FileUploadPreview } from '../../components/filePreview';
-import { useJobPostFiles } from '../../customHooks/useFiles';
+import { FileDownloadInfo, useJobPostFiles } from '../../customHooks/useFiles';
 import { getServerAuthSession } from '../../server/auth';
 import { type GetServerSidePropsContext } from 'next';
 import { useTranslations } from 'next-intl';
@@ -38,7 +38,7 @@ const JobBoard: NextPageWithLayout = () => {
   const { data: session } = useSession();
   const { getPreSignedPUTUrl } = useFileUploading();
   const userId = session?.user?.id;
-  const uploadedFileList = useJobPostFiles(userId);
+  const { fileList: uploadedFileList, removeFile, loadFile } = useJobPostFiles(userId);
   const t = useTranslations('jobs');
 
   const handleAddingNewFile = (newFile: File | undefined, newKey: string) => {
@@ -56,6 +56,12 @@ const JobBoard: NextPageWithLayout = () => {
     }
     setFileList([]);
   };
+
+  useEffect(() => {
+    if (fileList.length === 0) {
+      void loadFile();
+    }
+  }, [fileList]);
 
   return (
     <main className='relative flex w-full flex-col justify-center gap-4 xs:py-4 xs:px-4 sm:min-h-full lg:px-8 xl:flex-row'>
@@ -96,6 +102,15 @@ const JobBoard: NextPageWithLayout = () => {
                             ?.fileName as string
                         }
                         url={uploadedFileList.find((uploadedFile) => uploadedFile.fileType === fileType)?.url}
+                        pathPrefixes={[userId as string, 'applicationProfile', fileType]}
+                        isOwner={true}
+                        onDelete={() => {
+                          removeFile(
+                            uploadedFileList.find(
+                              (uploadedFile) => uploadedFile.fileType === fileType,
+                            ) as FileDownloadInfo,
+                          );
+                        }}
                       />
                     </div>
                   )

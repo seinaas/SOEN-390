@@ -57,7 +57,20 @@ function MessageItem({
   lastCreatedAt?: Date;
   isFile: boolean;
 }) {
+  const editMessageMutation = api.chat.editMessage.useMutation();
+  const t = useTranslations('chat');
   const isSender = message?.senderId === userId;
+
+  //Edits the message in the database to say that it has been deleted
+  const deleteFileFromMessage = async () => {
+    await editMessageMutation.mutateAsync({
+      messageId: message.id,
+      message: 'deleted',
+      conversationId: message.conversationId,
+      isFile: true,
+    });
+  };
+
   return (
     <motion.div
       layout
@@ -77,16 +90,19 @@ function MessageItem({
       <div className={`flex flex-col gap-1 ${isSender ? 'items-end text-right' : 'items-start text-left'} max-w-[80%]`}>
         <div>{`${message?.sender?.firstName || ''} ${message?.sender?.lastName || ''}`}</div>
         <div
-          className={`rounded-md ${isFile ? 'pl-2 pr-4' : 'px-4'} py-3 ${
-            isSender ? 'bg-primary-500 text-white' : 'bg-primary-100/10 text-primary-500'
-          }`}
+          className={`rounded-md ${
+            isFile && message.message !== 'deleted' ? (isSender ? 'px-2' : 'pl-2 pr-4') : 'px-4'
+          } py-3 ${isSender ? 'bg-primary-500 text-white' : 'bg-primary-100/10 text-primary-500'}`}
         >
-          {(isFile && (
-            <FileDownloadPreview
-              fileName={message.message}
-              pathPrefixes={['conversations', message.conversationId, 'messages', message.id]}
-            />
-          )) ||
+          {(isFile &&
+            ((message.message === 'deleted' && <span className='italic'>{t('files.file-deleted')}</span>) || (
+              <FileDownloadPreview
+                fileName={message.message}
+                pathPrefixes={['conversations', message.conversationId, 'messages', message.id]}
+                isOwner={isSender}
+                onDeleteAsync={deleteFileFromMessage}
+              />
+            ))) ||
             message.message}
         </div>
         {(!lastCreatedAt || differenceInMinutes(message.createdAt, lastCreatedAt) > 5) && (
@@ -200,6 +216,20 @@ const Chat: NextPageWithLayout = () => {
     },
   );
 
+  useSubscribeToChannelEvent(
+    'message-updated',
+    (data: Messages & { sender: { firstName: string | null; lastName: string | null } }) => {
+      console.log('message updated');
+      setMessages((oldData) => [
+        {
+          ...data,
+          createdAt: new Date(data.createdAt),
+        },
+        ...oldData.filter((message) => message.id !== data.id),
+      ]);
+    },
+  );
+
   const handleClick = (conversation: RouterOutputs['conversation']['getUserConversations'][number]) => {
     connectToChannel(conversation.id);
     setSelectedConversationId(conversation.id);
@@ -269,6 +299,7 @@ const Chat: NextPageWithLayout = () => {
       }
     }
 
+    //Sending files
     if (newFile) {
       const newMessage: Messages = await newChatMutation.mutateAsync({
         message: newFile.name,
@@ -279,7 +310,7 @@ const Chat: NextPageWithLayout = () => {
         fileName: newFile.name,
         pathPrefixes: ['conversations', selectedConversationId as string, 'messages', newMessage.id],
       });
-      await uploadFile({ file: newFile, url });
+      void uploadFile({ file: newFile, url });
       setNewFile(undefined);
     }
   };
