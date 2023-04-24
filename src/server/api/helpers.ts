@@ -44,7 +44,7 @@ export const triggerChatNotification = async ({
   to: string;
   ctx: ReturnType<typeof createInnerTRPCContext>;
 }) => {
-  if (ctx.session?.user?.id && ctx.session.user.id !== to) {
+  if (ctx.session?.user?.id) {
     await ctx.pusher.sendToUser(to, 'chat', {});
   }
 };

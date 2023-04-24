@@ -32,7 +32,7 @@ const LandingPageBody: React.FC = () => {
   const t = useTranslations('landing');
 
   return (
-    <main className='flex h-full w-full flex-col bg-primary-600 py-8 px-4 md:h-auto md:flex-grow md:flex-row md:gap-10 md:px-16'>
+    <main className='flex h-full w-full flex-grow flex-col bg-primary-600 py-8 px-4 md:h-auto md:flex-row md:gap-10 md:px-16'>
       {/* Landing Page Picture */}
       <div className='relative flex h-72 flex-1 justify-center md:h-auto'>
         <Image

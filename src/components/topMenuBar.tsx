@@ -13,12 +13,9 @@ const TopMenuBar: React.FC = () => {
   const router = useRouter();
 
   return (
-    <div
-      className=' hidden h-20 w-full items-center justify-between bg-primary-600 pl-5 pr-10 md:flex'
-      data-cy='topMenuBar'
-    >
+    <div className='flex h-20 w-full items-center justify-between bg-primary-600 pl-5 pr-10' data-cy='topMenuBar'>
       {/* Logo */}
-      <Link href='/' className='relative h-16 w-36' data-cy='topMenuBar-logo'>
+      <Link href='/' className='relative hidden h-16 w-36 md:block' data-cy='topMenuBar-logo'>
         <Image priority alt='ProSpect Logo' src='/Logo.png' fill className='object-contain' />
       </Link>
 
@@ -43,7 +40,7 @@ const TopMenuBar: React.FC = () => {
         {/* Buttons */}
 
         {data ? (
-          <div className='flex justify-center space-x-5 whitespace-nowrap'>
+          <div className='hidden justify-center space-x-5 whitespace-nowrap md:flex'>
             <Button data-cy='signout-button' variant='secondary' reverse onClick={() => signOut()}>
               {t('auth.signout')}
             </Button>
@@ -59,7 +56,7 @@ const TopMenuBar: React.FC = () => {
             </div>
           </div>
         ) : (
-          <motion.div layout className='flex justify-center space-x-5 whitespace-nowrap'>
+          <motion.div layout className='hidden justify-center space-x-5 whitespace-nowrap md:flex'>
             <Link href='/auth/signin'>
               <Button data-cy='signin-button' variant='secondary' reverse>
                 {t('auth.login')}

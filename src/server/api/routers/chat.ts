@@ -39,7 +39,7 @@ export const chatRouter = createTRPCRouter({
       });
       await ctx.pusher.trigger(input.conversationId, 'message-sent', {
         ...messageToSend,
-        sender: { firstName: ctx.session.user.firstName, lastName: ctx.session.user.lastName },
+        sender: { firstName: ctx.session.user.firstName, lastName: ctx.session.user.lastName, id: ctx.session.user.id },
       });
 
       // Send notification to all users in the conversation
@@ -58,12 +58,10 @@ export const chatRouter = createTRPCRouter({
       if (conversation) {
         await Promise.all(
           conversation.users.map(async (user) => {
-            if (user.id !== ctx.session.user.id) {
-              await triggerChatNotification({
-                to: user.id,
-                ctx,
-              });
-            }
+            await triggerChatNotification({
+              to: user.id,
+              ctx,
+            });
           }),
         );
       }

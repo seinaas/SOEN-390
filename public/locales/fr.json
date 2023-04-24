@@ -125,7 +125,7 @@
       "ConnectionRequest": "{name} veut se connecter avec vous!",
       "ConnectionAccepted": "{name} a accepté votre demande de connexion!",
       "ConnectionResponse": "",
-      "Comment": "A laissé un commentaire: {comment}",
+      "Comment": "A laissé un commentaire: {content}",
       "Like": "A aimé votre post!"
     }
   },
