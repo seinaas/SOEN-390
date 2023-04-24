@@ -239,7 +239,7 @@ const Post: React.FC<PostProps> = ({
         </button>
       </motion.div>
       {post.comments?.map((comment) => {
-        return <Comment key={comment.commentId} ownsPost={ownsPost} comment={comment} refetchPost={refetchPost} />;
+        return <Comment key={comment.commentId} userId={userId} comment={comment} refetchPost={refetchPost} />;
       })}
       <AnimatePresence mode='wait'>
         {commentingPost && (
@@ -285,15 +285,17 @@ const Post: React.FC<PostProps> = ({
 
 type CommentProps = {
   comment: PostType['comments'][number];
-  ownsPost: boolean;
+  userId: string;
   refetchPost: () => unknown;
 };
-const Comment: React.FC<CommentProps> = ({ comment, ownsPost, refetchPost }) => {
+const Comment: React.FC<CommentProps> = ({ comment, userId, refetchPost }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingContent, setEditingContent] = useState('');
 
   const editComment = api.post.editComment.useMutation();
   const deleteComment = api.post.deleteComment.useMutation();
+
+  const ownsComment = comment.userId === userId;
 
   const removeComment = (e: React.MouseEvent, commentId: string) => {
     e.preventDefault();
@@ -351,7 +353,7 @@ const Comment: React.FC<CommentProps> = ({ comment, ownsPost, refetchPost }) => 
           <h1 className='font-bold text-primary-500'>
             {comment.User.firstName} {comment.User.lastName}
           </h1>
-          {ownsPost && (
+          {ownsComment && (
             <div className='flex items-center gap-1'>
               <button
                 data-cy='edit-comment-btn'
