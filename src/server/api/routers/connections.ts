@@ -1,14 +1,16 @@
+/*
+*		Connections Router
+*
+*
+*		This file implements several procedures related to connections in a TRPC router. It includes procedures for getting user connections, 
+*		getting the connection status for a user, and sending a connection request. It uses Zod for input validation and the Prisma ORM for database operations. 
+*		There are also some helper functions for triggering notifications.
+*/
 import { type PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 import { triggerNotification, triggerNotificationRefresh } from '../helpers';
-
-/**
- * This is the connections router.
- * It contains all the procedures related to connections.
- * This includes sending a connection request, accepting a connection request, and getting all connections for a user.
- */
 
 // Retrieve the recipient of a connection request
 const getRecipient = async ({ prisma, email }: { prisma: PrismaClient; email: string }) => {

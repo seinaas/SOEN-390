@@ -1,3 +1,12 @@
+/*
+*		Registration Form Component
+*
+*
+*		This is a Next.js page component for registering users. It defines a registration form schema using Zod, and handles form submissions with React Hook Form. 
+*		It also integrates with Next.js authentication using next-auth and handles form errors and API request errors. The component uses Framer Motion for animations 
+*		and a custom AuthLayout component. Additionally, it defines a server-side function that redirects authenticated users to the homepage or the final authentication 
+*		page, depending on whether they have completed the signup process.
+*/
 import { type GetServerSidePropsContext } from 'next';
 import { useState, type ReactElement } from 'react';
 import { getServerAuthSession } from '../../server/auth';

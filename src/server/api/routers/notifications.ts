@@ -1,12 +1,16 @@
+/*
+*		Notifications Router
+*
+*
+*		This file exports a notifications router containing procedures related to notifications. The procedures include getting the number of notifications, getting all notifications, 
+*		updating a notification, marking all notifications as seen, clearing a notification, clearing all notifications, getting the current user's muted notification preferences, and 
+*		updating the current user's muted notification preferences. These procedures are wrapped in a TRPC router and use a Prisma client to interact with the database. The router is 
+*		protected and can only be accessed by authenticated users.
+*/
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 import { NotificationType } from '@prisma/client';
 
-/**
- * This is the notifications router.
- * It contains all the procedures related to notifications.
- * This includes getting the number of notifications, getting all notifications, and updating a notification.
- */
 export const notificationsRouter = createTRPCRouter({
   // Get the number of notifications for the current user
   getNotificationCount: protectedProcedure.query(async ({ ctx }) => {

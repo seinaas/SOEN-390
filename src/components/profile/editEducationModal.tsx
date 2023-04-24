@@ -1,3 +1,11 @@
+/*
+*		Edit Education Modal
+*
+*
+*		This is a React component that renders a form for editing or adding education information. It uses the react-hook-form library for form handling and validation, and 
+*		the zod library for defining the form schema. The component takes in an optional education object and an onCancel function as props, and calls the appropriate 
+*		API mutation function when the form is submitted. It also renders a Modal component for a better user experience.
+*/
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type Education } from '@prisma/client';
 import { useForm } from 'react-hook-form';

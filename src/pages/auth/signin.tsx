@@ -1,3 +1,11 @@
+/*
+*		Sign-in Form Component
+*
+*
+*		The code defines a React component for a sign-in form with email and password fields. It uses zod for form validation and react-hook-form for handling form data. 
+*		It calls the signIn function from next-auth/react to authenticate the user and redirect them to the appropriate page. It also uses framer-motion for animation 
+*		and AuthLayout as the layout for the sign-in page. Lastly, it defines a getServerSideProps function to check if the user is already authenticated and redirect them accordingly.
+*/
 import React, { useState, type ReactElement } from 'react';
 import { type NextPageWithLayout } from '../_app';
 import { z } from 'zod';

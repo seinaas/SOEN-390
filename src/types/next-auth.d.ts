@@ -1,3 +1,12 @@
+/*
+*		Additional Field Types Creator
+*
+*
+*		This file extends the default types provided by the next-auth library, adding additional fields to the Session and User interfaces, as well as updating 
+*		the MicrosoftProfile and FacebookProfile interfaces. Specifically, the Session interface includes fields such as education, jobs, and bio for the logged 
+*		in user, while the User interface includes fields such as headline, volunteering, and languages. Finally, the MicrosoftProfile and FacebookProfile interfaces 
+*		have been updated to include the email, given_name, and family_name fields.
+*/
 import { type DefaultSession } from 'next-auth';
 import { type AzureB2CProfile as DefaultAzureB2CProfile } from 'next-auth/providers/azure-ad-b2c';
 import { type FacebookProfile as DefaultFacebookProfile } from 'next-auth/providers/facebook';

@@ -1,3 +1,12 @@
+/*
+*		Server Authentication Wrapper
+*
+*
+*		This file exports a function named getServerAuthSession that wraps the getServerSession function from the next-auth library. It is used to get the user's 
+*		session information on the server-side, for use in creating a trpc context or a restricted API route. The function takes an object ctx as an argument, 
+*		which contains the req (request) and res (response) objects. The getAuthOptions function is called with the req and res objects to get the configuration 
+*		options for NextAuth.js. The getServerSession function then returns the user's session information.
+*/
 import { type NextApiRequest, type NextApiResponse, type GetServerSidePropsContext } from 'next';
 import { getServerSession } from 'next-auth';
 

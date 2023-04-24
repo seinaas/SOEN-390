@@ -1,3 +1,12 @@
+/*
+*   NextAuth Authentication Set-Up
+*
+*
+*   The provided code is a JavaScript module exporting a function that returns NextAuth options for authentication. It imports 
+*   the necessary dependencies, such as NextAuth and authentication providers like Google, Facebook, and Microsoft. The code 
+*   includes a callback for creating a user session, as well as a callback for signing a user in using credentials. The PrismaAdapter 
+*   is used to connect to a database. Lastly, the module exports a function that takes a Next.js request and response object and returns NextAuth options.
+*/
 /* istanbul ignore file */
 
 import NextAuth, {

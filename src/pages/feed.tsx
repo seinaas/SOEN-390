@@ -1,3 +1,11 @@
+/*
+*		Posts Content Component
+*
+*
+*		The code is a React component for rendering a single post with editing, commenting, and liking functionality. It uses several APIs, including next-auth, 
+*		framer-motion, and date-fns. The component receives the post data as props and allows the user to modify and delete it. It also includes logic for adding 
+*		comments and toggling likes. Finally, it renders the post content with user information and allows for dynamic animations.
+*/
 import { formatDistance } from 'date-fns';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';

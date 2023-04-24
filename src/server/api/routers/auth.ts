@@ -1,12 +1,15 @@
+/*
+*		Authentication Router
+*
+*
+*		This is a Node.js module that defines an authentication router for a TRPC server. It exposes a single procedure, which handles email/password registration using bcrypt for password hashing. 
+*		The procedure takes in an email, password, and confirmPassword as input and returns the user ID and email upon successful registration. It also performs input validation to ensure the password 
+*		and confirmPassword match, and that the user doesn't already exist. The authentication router is created using the createTRPCRouter function from the trpc library.
+*/
 import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import bcrypt from 'bcryptjs';
 
-/**
- * This is the authentication router.
- * It only contains one procedure, which handles email/password registration.
- * This is required because next-auth does not natively support email/password registration.
- */
 export const authRouter = createTRPCRouter({
   register: publicProcedure
     .input(z.object({ email: z.string().email(), password: z.string(), confirmPassword: z.string() }))

@@ -1,3 +1,9 @@
+/*
+*		Chat Router
+*
+*
+*		This code exports a chat router that has one protected procedure, "submit", which takes in a message string and triggers a Pusher event.
+*/
 import { z } from 'zod';
 
 import { createTRPCRouter, protectedProcedure } from '../trpc';

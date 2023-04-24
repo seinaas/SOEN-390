@@ -1,3 +1,13 @@
+/*
+*   Enviroment Variable Schema Creation
+*
+*
+*   The code exports two schemas to ensure that the app isn't built with invalid environment variables. The first schema 
+*   is for server-side environment variables, and the second schema is for client-side environment variables. The serverSchema 
+*   checks for various environment variables, including DATABASE_URL, NODE_ENV, and NEXTAUTH_SECRET. The clientSchema checks 
+*   for the NEXT_PUBLIC_PUSHER_KEY and NEXT_PUBLIC_PUSHER_CLUSTER. The code sets each environment variable to undefined if it is 
+*   not set in process.env. These environment variables are used during the build process of the Next.js app.
+*/
 // @ts-check
 import { z } from 'zod';
 

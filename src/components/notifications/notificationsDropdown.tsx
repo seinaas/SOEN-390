@@ -1,3 +1,10 @@
+/*
+*		Notification Dropdown Component
+*
+* 
+*		This is a React component that renders a dropdown for notifications. The dropdown shows a list of unread notifications, with options to mark them as seen and navigate to their associated routes. 
+*		The component also includes functionality to accept or decline connection requests. Finally, it uses a Pusher subscription to receive real-time updates for new notifications.
+*/
 import { api } from '../../utils/api';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'framer-motion';
