@@ -14,6 +14,7 @@ describe('chat', () => {
       expect(trigger).toHaveBeenCalledWith('test', 'message-sent', {
         sender: {
           firstName: 'Unknown',
+          id: '1',
           lastName: 'User',
         },
       });
