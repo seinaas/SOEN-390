@@ -10,7 +10,7 @@ import Modal from '../components/modal';
 import EditButton from '../components/profile/editButton';
 import type { RouterOutputs } from '../utils/api';
 import { api } from '../utils/api';
-import { connectToChannel, pusherStore, useSubscribeToChannelEvent } from '../utils/pusher';
+import { connectToChannel, pusherStore, useSubscribeToChannelEvent, useSubscribeToUserEvent } from '../utils/pusher';
 import { type NextPageWithLayout } from './_app';
 import { getServerAuthSession } from '../server/auth';
 import { type GetServerSidePropsContext } from 'next';
@@ -49,15 +49,18 @@ function TagsInput({ tagList, setTagList }: { tagList: string[]; setTagList: Dis
 function MessageItem({
   message,
   userId,
+  nextSenderId,
   lastCreatedAt,
   isFile,
 }: {
   message: RouterOutputs['chat']['sendMessage'] & { sender: { firstName: string | null; lastName: string | null } };
   userId: string;
+  nextSenderId?: string;
   lastCreatedAt?: Date;
   isFile: boolean;
 }) {
   const isSender = message?.senderId === userId;
+  const timeFromLastMessage = differenceInMinutes(lastCreatedAt || new Date(), message.createdAt);
   return (
     <motion.div
       layout
@@ -72,10 +75,15 @@ function MessageItem({
           delay: 0.1,
         },
       }}
-      className={`flex ${isSender ? 'justify-end' : 'justify-start'} mb-4`}
+      className={`flex ${isSender ? 'justify-end' : 'justify-start'} mb-2`}
     >
       <div className={`flex flex-col gap-1 ${isSender ? 'items-end text-right' : 'items-start text-left'} max-w-[80%]`}>
-        <div>{`${message?.sender?.firstName || ''} ${message?.sender?.lastName || ''}`}</div>
+        {(!nextSenderId || nextSenderId !== message.senderId || timeFromLastMessage > 5) && (
+          <div className='mt-2 flex items-center gap-1'>
+            <span>{`${message?.sender?.firstName || ''} ${message?.sender?.lastName || ''}`}</span>
+            <span className='text-xs text-gray-500'>| {format(message.createdAt, 'p')}</span>
+          </div>
+        )}
         <div
           className={`rounded-md ${isFile ? 'pl-2 pr-4' : 'px-4'} py-3 ${
             isSender ? 'bg-primary-500 text-white' : 'bg-primary-100/10 text-primary-500'
@@ -89,9 +97,6 @@ function MessageItem({
           )) ||
             message.message}
         </div>
-        {(!lastCreatedAt || differenceInMinutes(message.createdAt, lastCreatedAt) > 5) && (
-          <div className='text-xs text-gray-500'>{format(message.createdAt, 'MMM. do, p')}</div>
-        )}
       </div>
     </motion.div>
   );
@@ -104,9 +109,7 @@ const Chat: NextPageWithLayout = () => {
   const [message, setMessage] = useState('');
   const [newFile, setNewFile] = useState<File>();
   const [openNewChatModal, setOpenNewChatModal] = useState(false);
-  const [messages, setMessages] = useState<
-    (Messages & { sender: { firstName: string | null; lastName: string | null } })[]
-  >([]);
+  const [messages, setMessages] = useState<RouterOutputs['conversation']['getConversationMessages']>([]);
   const [showLeaveGroup, setShowLeaveGroup] = useState(false);
   const [showAddUsers, setShowAddUsers] = useState(false);
 
@@ -189,7 +192,7 @@ const Chat: NextPageWithLayout = () => {
   // Subscribe to a Pusher event
   useSubscribeToChannelEvent(
     'message-sent',
-    (data: Messages & { sender: { firstName: string | null; lastName: string | null } }) => {
+    (data: Messages & { sender: { firstName: string | null; lastName: string | null; id: string } }) => {
       setMessages((oldData) => [
         {
           ...data,
@@ -199,6 +202,10 @@ const Chat: NextPageWithLayout = () => {
       ]);
     },
   );
+
+  useSubscribeToUserEvent('chat', () => {
+    void utils.conversation.getUserConversations.invalidate();
+  });
 
   const handleClick = (conversation: RouterOutputs['conversation']['getUserConversations'][number]) => {
     connectToChannel(conversation.id);
@@ -339,12 +346,18 @@ const Chat: NextPageWithLayout = () => {
                     )}
                   </AnimatePresence>
                 </div>
-                <div className='text-left'>
-                  <div className='text-ellipsis text-lg font-semibold'>
+                <div className='max-w-full truncate whitespace-nowrap text-left'>
+                  <h1 className='text-ellipsis text-lg font-semibold'>
                     {conversation.users.length < 2
                       ? `${conversation.users[0]?.firstName || ''} ${conversation.users[0]?.lastName || ''}`
                       : conversation.users.map((user) => `${user.firstName || ''} ${user.lastName || ''}`).join(', ')}
-                  </div>
+                  </h1>
+                  <p className='truncate'>
+                    {conversation.users.length > 1 && (
+                      <span className='font-medium'>{conversation.messages[0]?.sender?.firstName}:</span>
+                    )}{' '}
+                    {conversation.messages[0]?.message || ''}
+                  </p>
                   {/* <div className='text-sm'>
                   {conversation.id === selectedConversationId
                     ? messages[0]?.message || ''
@@ -388,15 +401,19 @@ const Chat: NextPageWithLayout = () => {
               className='absolute inset-0 flex flex-col-reverse overflow-auto px-4'
               ref={messagesRef}
             >
-              {messages?.map((message) => (
-                <MessageItem
-                  key={message.id}
-                  message={message}
-                  userId={session?.user?.id || ''}
-                  lastCreatedAt={messages[0]?.createdAt}
-                  isFile={message.isFile}
-                />
-              ))}
+              {messages?.map((message, index) => {
+                const nextSenderId = messages[index + 1]?.senderId;
+                return (
+                  <MessageItem
+                    key={message.id}
+                    message={message}
+                    userId={session?.user?.id || ''}
+                    nextSenderId={nextSenderId}
+                    lastCreatedAt={messages[index - 1]?.createdAt}
+                    isFile={message.isFile}
+                  />
+                );
+              })}
               <div className='float-left clear-both' ref={messageEndRef} />
             </div>
           </div>

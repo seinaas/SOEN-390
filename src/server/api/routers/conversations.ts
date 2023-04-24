@@ -60,6 +60,20 @@ export const conversationsRouter = createTRPCRouter({
                 email: true,
               },
             },
+            messages: {
+              orderBy: {
+                createdAt: 'desc',
+              },
+              select: {
+                message: true,
+                sender: {
+                  select: {
+                    firstName: true,
+                  },
+                },
+              },
+              take: 1,
+            },
           },
         },
       },
@@ -165,6 +179,7 @@ export const conversationsRouter = createTRPCRouter({
             select: {
               firstName: true,
               lastName: true,
+              id: true,
             },
           },
         },
