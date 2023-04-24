@@ -178,7 +178,8 @@
       "skills": "Compétences Requises",
       "documents": "Documents Requis",
       "no-saved": "Vous n'avez pas encore sauvegardé de poste 😔",
-      "no-applied": "Vous n'avez pas encore postulé à un poste 😔"
+      "no-applied": "Vous n'avez pas encore postulé à un poste 😔",
+      "cannot-apply": "Il vous manque des documents pour postuler à ce poste"
     },
     "job-types": {
       "FullTime": "Temps Plein",

@@ -61,7 +61,7 @@ function MessageItem({
   isFile: boolean;
 }) {
   const isSender = message?.senderId === userId;
-  const timeFromLastMessage = differenceInMinutes(lastCreatedAt || new Date(), message.createdAt);
+  const timeFromLastMessage = differenceInMinutes(message.createdAt, lastCreatedAt || new Date());
   return (
     <motion.div
       layout
@@ -428,7 +428,7 @@ const Chat: NextPageWithLayout = () => {
                     message={message}
                     userId={session?.user?.id || ''}
                     nextSenderId={nextSenderId}
-                    lastCreatedAt={messages[index - 1]?.createdAt}
+                    lastCreatedAt={messages[index + 1]?.createdAt}
                     isFile={message.isFile}
                   />
                 );
