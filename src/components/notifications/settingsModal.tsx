@@ -9,7 +9,20 @@ type Props = {
   onCancel?: () => unknown;
 };
 
-const TYPES = ['likes', 'comments', 'connections'] as const;
+const TYPES = [
+  {
+    key: 'likes',
+    type: 'Likes',
+  },
+  {
+    key: 'comments',
+    type: 'Comments',
+  },
+  {
+    key: 'connections',
+    type: 'connections',
+  },
+] as const;
 
 const NotificationSettingsModal: React.FC<Props> = ({ onCancel }) => {
   const t = useTranslations('notifications.settings');
@@ -36,15 +49,15 @@ const NotificationSettingsModal: React.FC<Props> = ({ onCancel }) => {
           // Really convoluted way to get the correct types for the notification type
           // but whatever
           let correctTypes: NotificationType[];
-          if (type === 'connections') {
+          if (type.type === 'connections') {
             correctTypes = ['ConnectionRequest', 'ConnectionAccepted', 'ConnectionResponse'];
           } else {
-            correctTypes = [type.slice(0, -1) as NotificationType];
+            correctTypes = [type.type.slice(0, -1) as NotificationType];
           }
 
           const isMuted = correctTypes.every((t) => muted.includes(t));
           return (
-            <div className='flex items-center gap-4 rounded-md bg-primary-100/10 p-2' key={type}>
+            <div className='flex items-center gap-4 rounded-md bg-primary-100/10 p-2' key={type.key}>
               <button
                 onClick={() => {
                   if (isMuted) {
@@ -67,7 +80,7 @@ const NotificationSettingsModal: React.FC<Props> = ({ onCancel }) => {
                   className='h-4 w-4 rounded-full bg-white'
                 />
               </button>
-              <h2 className='text-lg font-semibold text-primary-300'>{t(type)}</h2>
+              <h2 className='text-lg font-semibold text-primary-300'>{t(type.key)}</h2>
             </div>
           );
         })}
