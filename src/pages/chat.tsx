@@ -126,7 +126,7 @@ const Chat: NextPageWithLayout = () => {
   const connections = api.connections.getUserConnections.useQuery(
     { userEmail: session?.user?.email || '' },
     {
-      enabled: openNewChatModal,
+      enabled: openNewChatModal || showAddUsers,
     },
   ).data;
   const messagesToUse = api.conversation.getConversationMessages.useQuery({
