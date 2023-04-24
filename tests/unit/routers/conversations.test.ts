@@ -146,7 +146,7 @@ describe('conversations', () => {
         'test3email',
         'test4email',
       ]);
-      expect(data).toEqual('1');
+      expect(data).toEqual({ id: '1' });
     });
     it('should remove user from convo', async () => {
       const request = trpcRequest({ user: { id: '1' }, expires: '' });
