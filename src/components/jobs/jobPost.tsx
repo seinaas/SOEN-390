@@ -180,7 +180,7 @@ const JobPost: React.FC<Props> = ({ jobData }) => {
             </>
           )}
         </div>
-        {!canApply && !jobData.applicationLink && (
+        {!canApply && !jobData.applicationLink && jobData.recruiterId !== session?.user?.id && (
           <div className='mt-2 text-xs text-red-600'>{t('job-view.cannot-apply')}</div>
         )}
       </div>
