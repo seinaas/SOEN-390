@@ -1,11 +1,11 @@
 /*
-*		Notidications Content Component
-*
-*
-*		The code defines a Next.js page component called Notifications. It contains functionality for filtering and displaying notifications. Notifications can be filtered by type, 
-*		such as unread, likes, comments, or connections. The component also allows users to clear all notifications, mark them as seen, and update connection requests. It uses various 
-*		API functions and packages, including Next.js, date-fns, and framer-motion.
-*/
+ *		Notidications Content Component
+ *
+ *
+ *		The code defines a Next.js page component called Notifications. It contains functionality for filtering and displaying notifications. Notifications can be filtered by type,
+ *		such as unread, likes, comments, or connections. The component also allows users to clear all notifications, mark them as seen, and update connection requests. It uses various
+ *		API functions and packages, including Next.js, date-fns, and framer-motion.
+ */
 import { type GetServerSidePropsContext } from 'next';
 import MainLayout from '../components/mainLayout';
 import { getServerAuthSession } from '../server/auth';

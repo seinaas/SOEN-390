@@ -1,9 +1,9 @@
 /*
-*		Input Field Template
-*
-*
-*		This is the React template used to style and make input fields throughout the website. This allows them to gain relative animations and fit within the respective scene well.
-*/
+ *		Input Field Template
+ *
+ *
+ *		This is the React template used to style and make input fields throughout the website. This allows them to gain relative animations and fit within the respective scene well.
+ */
 import { motion, type HTMLMotionProps } from 'framer-motion';
 import { type ForwardedRef, forwardRef } from 'react';
 

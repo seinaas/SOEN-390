@@ -1,12 +1,12 @@
 /*
-*		API Web Hooks Initializer
-*
-*
-*		The file exports a set of typesafe React Query hooks for communicating with a tRPC API. It sets up a superjson transformer for data deserialization 
-*		and specifies links to determine request flow from client to server, including a logger and HTTP batch link. It uses createTRPCNext from the @trpc/next 
-*		package to generate these hooks based on an AppRouter type. It also provides inference helpers for inputs and outputs using inferRouterInputs and inferRouterOutputs 
-*		respectively. Finally, it determines whether tRPC should await queries when server rendering pages.
-*/
+ *		API Web Hooks Initializer
+ *
+ *
+ *		The file exports a set of typesafe React Query hooks for communicating with a tRPC API. It sets up a superjson transformer for data deserialization
+ *		and specifies links to determine request flow from client to server, including a logger and HTTP batch link. It uses createTRPCNext from the @trpc/next
+ *		package to generate these hooks based on an AppRouter type. It also provides inference helpers for inputs and outputs using inferRouterInputs and inferRouterOutputs
+ *		respectively. Finally, it determines whether tRPC should await queries when server rendering pages.
+ */
 /* istanbul ignore file */
 
 import { httpBatchLink, loggerLink } from '@trpc/client';

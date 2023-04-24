@@ -34,7 +34,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 Before working on this project, ensure you have the following:
 
-* #### **Node.js v16+**
+- #### **Node.js v16+**
 
 <table>
   <tr>
@@ -48,10 +48,12 @@ Before working on this project, ensure you have the following:
   </tr>
 </table>
 
-* #### [**Git**](https://git-scm.com/downloads)
+- #### [**Git**](https://git-scm.com/downloads)
 
-* #### [**VSCode (optional but recommended)**](https://code.visualstudio.com/download)
+- #### [**VSCode (optional but recommended)**](https://code.visualstudio.com/download)
+
   Alongside VSCode, the following extensions will improve your development experience:
+
   > **NOTE:** These are all optional, but recommended
 
   - [**ESLint**](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)

@@ -1,9 +1,9 @@
 /*
-*		Main Page Layout Template
-*
-*
-*		This is a simplistic template design for a React page in general. It is used to wrap each individual specifc page, and keep the website structure consistent.
-*/
+ *		Main Page Layout Template
+ *
+ *
+ *		This is a simplistic template design for a React page in general. It is used to wrap each individual specifc page, and keep the website structure consistent.
+ */
 import Header from './header';
 
 type Props = {

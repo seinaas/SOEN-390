@@ -1,11 +1,11 @@
 /*
-*		Posts Router
-*
-*
-*		This file defines a TRPC router for handling various procedures related to posts. The procedures include getting all posts made 
-*		by a user, creating a post, updating a post, deleting a post, and creating a comment on a post. The code interacts with a Prisma 
-*		ORM to perform database operations, and includes functionality for sending notifications using a triggerNotification helper function.
-*/
+ *		Posts Router
+ *
+ *
+ *		This file defines a TRPC router for handling various procedures related to posts. The procedures include getting all posts made
+ *		by a user, creating a post, updating a post, deleting a post, and creating a comment on a post. The code interacts with a Prisma
+ *		ORM to perform database operations, and includes functionality for sending notifications using a triggerNotification helper function.
+ */
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 import { triggerNotification, triggerNotificationRefresh } from '../helpers';

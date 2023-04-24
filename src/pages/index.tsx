@@ -1,11 +1,11 @@
 /*
-*		Posts Content Component
-*
-*
-*		This is a Next.js page component that renders a landing page. It contains a navigation bar, a landing page picture, landing page text, and mobile buttons. 
-*		The landing page body component checks for user session data and renders different content based on its presence. The getServerSideProps function determines 
-*		whether a user session exists and redirects the user to the appropriate page.
-*/
+ *		Posts Content Component
+ *
+ *
+ *		This is a Next.js page component that renders a landing page. It contains a navigation bar, a landing page picture, landing page text, and mobile buttons.
+ *		The landing page body component checks for user session data and renders different content based on its presence. The getServerSideProps function determines
+ *		whether a user session exists and redirects the user to the appropriate page.
+ */
 import { type GetServerSidePropsContext, type NextPage } from 'next';
 import Head from 'next/head';
 import { signOut, useSession } from 'next-auth/react';

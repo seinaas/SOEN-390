@@ -1,11 +1,11 @@
 /*
-*		Edit Languages Modal
-*
-*
-*		The code is a React component for an "Edit Languages" modal. It allows users to add and remove languages from a list of their spoken languages. 
-*		The component uses React Hook Form and the Zod library for input validation. It also uses Framer Motion for animations and a custom 
-*		API module for making HTTP requests.
-*/
+ *		Edit Languages Modal
+ *
+ *
+ *		The code is a React component for an "Edit Languages" modal. It allows users to add and remove languages from a list of their spoken languages.
+ *		The component uses React Hook Form and the Zod library for input validation. It also uses Framer Motion for animations and a custom
+ *		API module for making HTTP requests.
+ */
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';

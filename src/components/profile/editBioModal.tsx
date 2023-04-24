@@ -1,11 +1,11 @@
 /*
-*		Edit Bio Modal
-*
-*
-*		This code defines an "EditBioModal" component that allows users to edit their bio. The component receives the initial bio value through props and updates it using state. 
-*		When the user clicks on the save button, an API mutation is executed to update the user's bio on the server. The component renders a Modal component 
-*		that contains a textarea where the user can edit their bio.
-*/
+ *		Edit Bio Modal
+ *
+ *
+ *		This code defines an "EditBioModal" component that allows users to edit their bio. The component receives the initial bio value through props and updates it using state.
+ *		When the user clicks on the save button, an API mutation is executed to update the user's bio on the server. The component renders a Modal component
+ *		that contains a textarea where the user can edit their bio.
+ */
 import { useState } from 'react';
 import { api } from '../../utils/api';
 import Modal from '../modal';

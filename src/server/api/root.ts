@@ -1,11 +1,11 @@
 /*
-*		Primary Router
-*
-*
-*		This file exports the appRouter variable, which is the primary router for a server. The router includes several other routers such as authRouter, 
-*		userRouter, connectionsRouter, chatRouter, postRouter, and notificationsRouter. These routers can be found in the /api/routers directory. The code 
-*		also exports the type definition AppRouter for the API.
-*/
+ *		Primary Router
+ *
+ *
+ *		This file exports the appRouter variable, which is the primary router for a server. The router includes several other routers such as authRouter,
+ *		userRouter, connectionsRouter, chatRouter, postRouter, and notificationsRouter. These routers can be found in the /api/routers directory. The code
+ *		also exports the type definition AppRouter for the API.
+ */
 import { createTRPCRouter } from './trpc';
 import { authRouter } from './routers/auth';
 import { userRouter } from './routers/user';

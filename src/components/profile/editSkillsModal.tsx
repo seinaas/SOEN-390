@@ -1,12 +1,12 @@
 /*
-*		Edit Skills Modal
-*
-*
-*		This is a React component for an "Edit Skills" modal, which allows users to add or remove skills. The component receives a list of existing 
-*		skills as props, and it manages the state of new skills internally using useState. When the user adds a new skill, it checks if the skill already 
-*		exists in the list to avoid duplicates. The component also displays a confirmation modal with a "Save Changes" button, which calls an API function 
-*		to update the user's skills. Finally, it uses Framer Motion to animate the appearance and removal of skills from the list.
-*/
+ *		Edit Skills Modal
+ *
+ *
+ *		This is a React component for an "Edit Skills" modal, which allows users to add or remove skills. The component receives a list of existing
+ *		skills as props, and it manages the state of new skills internally using useState. When the user adds a new skill, it checks if the skill already
+ *		exists in the list to avoid duplicates. The component also displays a confirmation modal with a "Save Changes" button, which calls an API function
+ *		to update the user's skills. Finally, it uses Framer Motion to animate the appearance and removal of skills from the list.
+ */
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';

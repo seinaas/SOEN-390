@@ -1,12 +1,12 @@
 /*
-*		User Router
-*
-*
-*		This is a user router that contains procedures related to searching for users, getting users by email or ID, and updating user data. 
-*		It uses the Prisma ORM and Zod for input validation. Some procedures are protected and require authentication, while others are public. 
-*		The procedures return different information such as user profiles, jobs, education, and connection counts. The router also includes raw 
-*		SQL queries for user searching.
-*/
+ *		User Router
+ *
+ *
+ *		This is a user router that contains procedures related to searching for users, getting users by email or ID, and updating user data.
+ *		It uses the Prisma ORM and Zod for input validation. Some procedures are protected and require authentication, while others are public.
+ *		The procedures return different information such as user profiles, jobs, education, and connection counts. The router also includes raw
+ *		SQL queries for user searching.
+ */
 import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 

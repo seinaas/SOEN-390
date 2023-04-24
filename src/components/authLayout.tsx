@@ -1,10 +1,10 @@
 /*
-*		Authentication Layout Modal
-*
-*
-*		This is the HTML design of the box used to authenticate the user on login. It creates the buttons for third party authenticators, and attachs said third part functionalities to those buttons.
-*		It also contains some changing layouts depending whether the user is logging in or registering for the first time.
-*/
+ *		Authentication Layout Modal
+ *
+ *
+ *		This is the HTML design of the box used to authenticate the user on login. It creates the buttons for third party authenticators, and attachs said third part functionalities to those buttons.
+ *		It also contains some changing layouts depending whether the user is logging in or registering for the first time.
+ */
 import Head from 'next/head';
 import { signIn } from 'next-auth/react';
 import { LayoutGroup, motion } from 'framer-motion';

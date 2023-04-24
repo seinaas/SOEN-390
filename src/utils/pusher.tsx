@@ -1,12 +1,12 @@
 /*
-*		Pusher Store Initializer
-*
-*
-*		This is a JavaScript module that sets up a Pusher store using Zustand. The store contains a Pusher client and a channel to be accessed by any component. 
-*		The module exports functions to initialize the Pusher store, connect to a channel, subscribe to events on a channel and retrieve the current number of 
-*		members in the presence channel. The module also contains hooks that allow components to subscribe to events on the channel. The code initializes the 
-*		Pusher client and channel if they do not already exist, and signs the client in.
-*/
+ *		Pusher Store Initializer
+ *
+ *
+ *		This is a JavaScript module that sets up a Pusher store using Zustand. The store contains a Pusher client and a channel to be accessed by any component.
+ *		The module exports functions to initialize the Pusher store, connect to a channel, subscribe to events on a channel and retrieve the current number of
+ *		members in the presence channel. The module also contains hooks that allow components to subscribe to events on the channel. The code initializes the
+ *		Pusher client and channel if they do not already exist, and signs the client in.
+ */
 import type { Channel } from 'pusher-js';
 
 import { useEffect, useRef } from 'react';

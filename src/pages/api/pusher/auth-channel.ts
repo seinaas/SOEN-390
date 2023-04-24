@@ -1,12 +1,12 @@
 /*
-*   Channel Authorization Check
-*
-*
-*   This is a Next.js API route that authorizes a user to access a Pusher channel. The handler function extracts the channel 
-*   name and socket ID from the request body, and then retrieves the user's authentication session using the getServerAuthSession 
-*   function. The function checks if the user is allowed to access the channel and sends a 404 status code if they are not. 
-*   If the user is allowed, the function generates an authorization object using the pusherServerClient and returns it as a response.
-*/
+ *   Channel Authorization Check
+ *
+ *
+ *   This is a Next.js API route that authorizes a user to access a Pusher channel. The handler function extracts the channel
+ *   name and socket ID from the request body, and then retrieves the user's authentication session using the getServerAuthSession
+ *   function. The function checks if the user is allowed to access the channel and sends a 404 status code if they are not.
+ *   If the user is allowed, the function generates an authorization object using the pusherServerClient and returns it as a response.
+ */
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServerAuthSession } from '../../../server/auth';
 import { pusherServerClient } from '../../../server/pusher';

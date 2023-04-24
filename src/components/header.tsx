@@ -1,10 +1,10 @@
 /*
-*		Header Layout Template
-*
-*
-*		This the React template used to make the headers for each of the webpages in the website. It contains a hamburger menu in the corner on mobile, and it will also support the functionality for notifications.
-*		It also contains the search bar, as well as some icons that represent the website and its logo.
-*/
+ *		Header Layout Template
+ *
+ *
+ *		This the React template used to make the headers for each of the webpages in the website. It contains a hamburger menu in the corner on mobile, and it will also support the functionality for notifications.
+ *		It also contains the search bar, as well as some icons that represent the website and its logo.
+ */
 import { AnimatePresence, motion } from 'framer-motion';
 import { signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';

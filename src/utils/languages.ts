@@ -1,11 +1,11 @@
 /*
-*		Lanuage Code Mapper
-*
-*
-*		This file contains a JavaScript object that maps ISO 639-1 language codes to their corresponding language names. It has a comment that instructs Istanbul code 
-*		coverage tool to ignore this file during testing. The object contains 184 key-value pairs, with each key being a two-letter language code and each value being the 
-*		name of the language.
-*/
+ *		Lanuage Code Mapper
+ *
+ *
+ *		This file contains a JavaScript object that maps ISO 639-1 language codes to their corresponding language names. It has a comment that instructs Istanbul code
+ *		coverage tool to ignore this file during testing. The object contains 184 key-value pairs, with each key being a two-letter language code and each value being the
+ *		name of the language.
+ */
 /* istanbul ignore file */
 
 const langsByCode = {
