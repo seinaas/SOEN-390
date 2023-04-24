@@ -1,4 +1,3 @@
-
 /*
  *		Edit Button Component
  *
