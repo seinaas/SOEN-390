@@ -53,9 +53,6 @@ export function initPusher() {
 export function pusherAuth() {
   const pusherClient = pusherStore.getState().pusherClient;
   if (!pusherClient.user.user_data) {
-    console.log('hereherhehrehrehrehrehrehrehreherherhere');
-    console.log(pusherClient.user.user_data);
-
     const presenceChannel = pusherClient.subscribe('presence-channel') as PresenceChannel;
 
     // Update helper that sets 'members' to contents of presence channel's current members

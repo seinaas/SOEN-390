@@ -1,4 +1,3 @@
-import { type TRPCError } from '@trpc/server';
 import { trpcRequest } from '../../utils';
 
 describe('postings', () => {
@@ -29,6 +28,82 @@ describe('postings', () => {
           updatedAt: date,
         },
       ]);
+    });
+  });
+
+  describe('getJobPostingPreviews', () => {
+    it('should return all job posting previews', async () => {
+      const request = trpcRequest({ user: { id: '1' }, expires: '' });
+      const date = new Date();
+      request.ctx.prisma.jobPosting.findMany.mockResolvedValueOnce([
+        {
+          jobPostingId: '1',
+          title: 'test',
+          description: 'test',
+          jobType: 'FullTime',
+          workplaceType: 'Remote',
+          createdAt: date,
+          updatedAt: date,
+        },
+      ] as any);
+      const jobPostings = await request.caller.jobPosting.getJobPostingPreviews();
+      expect(jobPostings).toEqual([
+        {
+          jobPostingId: '1',
+          title: 'test',
+          description: 'test',
+          jobType: 'FullTime',
+          workplaceType: 'Remote',
+          createdAt: date,
+          updatedAt: date,
+        },
+      ]);
+    });
+  });
+
+  describe('getJobPosting', () => {
+    it('should return a job posting', async () => {
+      const request = trpcRequest({ user: { id: '1' }, expires: '' });
+      const date = new Date();
+      request.ctx.prisma.jobPosting.findUnique.mockResolvedValueOnce({
+        jobPostingId: '1',
+        jobTitle: 'test',
+        company: 'test',
+        location: 'test',
+        description: 'test',
+        jobType: 'FullTime',
+        workplaceType: 'Remote',
+        jobSkills: 'test,test2',
+        requireResume: true,
+        createdAt: date,
+        updatedAt: date,
+      } as any);
+      request.ctx.prisma.savedJobPosting.findUnique.mockResolvedValueOnce({
+        userId: '1',
+        jobPostingId: '1',
+      } as any);
+      request.ctx.prisma.appliedJobPosting.findUnique.mockResolvedValueOnce(null);
+
+      const jobPosting = await request.caller.jobPosting.getJobPosting({
+        jobPostingId: '1',
+      });
+
+      expect(jobPosting).toEqual({
+        jobPostingId: '1',
+        jobTitle: 'test',
+        company: 'test',
+        location: 'test',
+        description: 'test',
+        jobType: 'FullTime',
+        workplaceType: 'Remote',
+        jobSkills: ['test', 'test2'],
+        requireResume: true,
+        createdAt: date,
+        updatedAt: date,
+        isSaved: true,
+        isApplied: false,
+        requiredDocuments: ['resume'],
+      });
     });
   });
 
@@ -90,7 +165,7 @@ describe('postings', () => {
     });
   });
 
-  describe('getSavedJobPostings', () => {
+  describe('getSavedJobPostingPreviews', () => {
     it('should return all saved job postings', async () => {
       const request = trpcRequest({ user: { id: '1' }, expires: '' });
       const date = new Date();
@@ -108,7 +183,68 @@ describe('postings', () => {
           },
         },
       ] as any);
-      const jobPostings = await request.caller.jobPosting.getSavedJobPostings();
+      const jobPostings = await request.caller.jobPosting.getSavedJobPostingPreviews();
+      expect(jobPostings).toEqual([
+        {
+          id: '1',
+          title: 'test',
+          description: 'test',
+          jobType: 'FullTime',
+          workplaceType: 'Remote',
+          createdAt: date,
+          updatedAt: date,
+        },
+      ]);
+    });
+  });
+
+  describe('toggleAppliedJobPosting', () => {
+    it('should apply to a job posting', async () => {
+      const request = trpcRequest({ user: { id: '1' }, expires: '' });
+      request.ctx.prisma.appliedJobPosting.create.mockResolvedValueOnce({
+        userId: '1',
+        jobPostingId: '1',
+      } as any);
+      const result = await request.caller.jobPosting.toggleAppliedJobPosting({
+        jobPostingId: '1',
+        applied: true,
+      });
+      expect(result).toBeUndefined();
+    });
+
+    it('should unapply to a job posting', async () => {
+      const request = trpcRequest({ user: { id: '1' }, expires: '' });
+      request.ctx.prisma.appliedJobPosting.delete.mockResolvedValueOnce({
+        userId: '1',
+        jobPostingId: '1',
+      } as any);
+      const result = await request.caller.jobPosting.toggleAppliedJobPosting({
+        jobPostingId: '1',
+        applied: false,
+      });
+      expect(result).toBeUndefined();
+    });
+  });
+
+  describe('getAppliedJobPostingPreviews', () => {
+    it('should return all applied job postings', async () => {
+      const request = trpcRequest({ user: { id: '1' }, expires: '' });
+      const date = new Date();
+      request.ctx.prisma.appliedJobPosting.findMany.mockResolvedValueOnce([
+        {
+          id: '1',
+          JobPosting: {
+            id: '1',
+            title: 'test',
+            description: 'test',
+            jobType: 'FullTime',
+            workplaceType: 'Remote',
+            createdAt: date,
+            updatedAt: date,
+          },
+        },
+      ] as any);
+      const jobPostings = await request.caller.jobPosting.getAppliedJobPostingPreviews();
       expect(jobPostings).toEqual([
         {
           id: '1',

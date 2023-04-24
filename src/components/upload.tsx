@@ -38,7 +38,7 @@ export const uploadFile = async ({ file, url }: { file?: File; url: string }) =>
   }
 
   //Uploads the file to the Cloudflare bucket
-  const upload = await fetch(url, {
+  await fetch(url, {
     method: 'PUT',
     body: file,
     headers: {
@@ -46,5 +46,4 @@ export const uploadFile = async ({ file, url }: { file?: File; url: string }) =>
       'content-length': `${file.size}`,
     },
   });
-  return upload;
 };

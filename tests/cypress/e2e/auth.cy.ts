@@ -44,7 +44,6 @@ describe('Landing Page', () => {
   it('should render the links in the Top Menu Bar', () => {
     cy.get('[data-cy=topMenuBar-link-about]').should('be.visible');
     cy.get('[data-cy=topMenuBar-link-contact]').should('be.visible');
-    cy.get('[data-cy=topMenuBar-link-jobs]').should('be.visible');
     cy.get('[data-cy=topMenuBar-link-language]').should('be.visible');
   });
 
@@ -52,7 +51,7 @@ describe('Landing Page', () => {
     cy.get('[data-cy=topMenuBar-logo]').should('be.visible');
   });
 
-  it('should not render the jobs and people links when user is logged in', () => {
+  it('should not render the contact links when user is logged in', () => {
     cy.intercept('GET', '/api/auth/session', {
       body: {
         user: {
@@ -64,7 +63,6 @@ describe('Landing Page', () => {
 
     cy.visit('/');
     cy.get('[data-cy=topMenuBar-link-contact]').should('not.be.visible');
-    cy.get('[data-cy=topMenuBar-link-jobs]').should('not.be.visible');
   });
 
   it('should render the user profile picture if logged in', () => {

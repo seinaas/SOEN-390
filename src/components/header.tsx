@@ -120,7 +120,7 @@ const Header: React.FC = () => {
           <Link href='/feed' className='hover:text-primary-100'>
             <IoMdHome size={28} />
           </Link>
-          <Link href='/' className='hover:text-primary-100'>
+          <Link href='/jobs' className='hover:text-primary-100'>
             <IoMdPeople size={28} />
           </Link>
           <Link href='/chat' className='relative hover:text-primary-100'>
@@ -216,7 +216,7 @@ const Header: React.FC = () => {
             <Link href='/feed' className='text-primary-500 hover:text-primary-600'>
               <IoMdHome size={28} />
             </Link>
-            <Link href='/' className='text-primary-500 hover:text-primary-600'>
+            <Link href='/jobs' className='text-primary-500 hover:text-primary-600'>
               <IoMdPeople size={28} />
             </Link>
             <Link href='/chat' className='relative text-primary-500 hover:text-primary-600'>
