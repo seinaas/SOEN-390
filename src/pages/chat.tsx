@@ -182,7 +182,7 @@ const Chat: NextPageWithLayout = () => {
   }, [messagesToUse]);
 
   useEffect(() => {
-    const lastChannel = localStorage.getItem('lastChannel');
+    const lastChannel = localStorage.getItem(`${session?.user?.id || ''}-lastChannel`);
     if (lastChannel) {
       connectToChannel(lastChannel);
       setSelectedConversationId(lastChannel);
@@ -251,7 +251,7 @@ const Chat: NextPageWithLayout = () => {
           setSelectedConversationId(data.id);
           void utils.conversation.getUserConversations.invalidate();
           connectToChannel(data.id);
-          localStorage.setItem('lastChannel', data.id);
+          localStorage.setItem(`${session?.user?.id || ''}-lastChannel`, data.id);
         } else {
           setSelectedConversationId(data.id);
         }
