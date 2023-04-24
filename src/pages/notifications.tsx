@@ -206,7 +206,12 @@ const Notifications: NextPageWithLayout = () => {
                           })}
                         </span>
                       </div>
-                      <span className='text-left text-primary-400'>{notification.content}</span>
+                      <span className='text-left text-primary-400'>
+                        {t(`content.${notification.type}`, {
+                          name: `${notification.Sender.firstName || ''} ${notification.Sender.lastName || ''}`,
+                          content: notification.content,
+                        })}
+                      </span>
                       {/* Show 'Approve'/'Ignore' buttons if notification is a connection request */}
                       <AnimatePresence>
                         {notification.type === 'ConnectionRequest' && (
@@ -236,7 +241,7 @@ const Notifications: NextPageWithLayout = () => {
                               }}
                               className='flex-1 rounded-md bg-primary-400 px-2 py-1 text-white hover:bg-primary-500 active:bg-primary-600'
                             >
-                              Accept
+                              {t('accept')}
                             </button>
                             <button
                               onClick={(e) => {
@@ -252,7 +257,7 @@ const Notifications: NextPageWithLayout = () => {
                               }}
                               className='flex-1 rounded-md bg-primary-100/20 px-2 py-1 text-primary-100 hover:bg-primary-100/30 active:bg-primary-100/50'
                             >
-                              Decline
+                              {t('decline')}
                             </button>
                           </motion.div>
                         )}

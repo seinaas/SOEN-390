@@ -23,6 +23,8 @@ import { useStore } from 'zustand';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { env } from '../env/client.mjs';
+import { useWindowSize } from '../utils/useWindowSize';
+import { IoIosArrowBack } from 'react-icons/io';
 
 function TagsInput({ tagList, setTagList }: { tagList: string[]; setTagList: Dispatch<SetStateAction<string[]>> }) {
   return (
@@ -157,6 +159,9 @@ const Chat: NextPageWithLayout = () => {
   const conversations = api.conversation.getUserConversations.useQuery().data;
   const { getPreSignedPUTUrl } = useFileUploading();
 
+  const { width } = useWindowSize();
+  const currentConversation = conversations?.find((c) => c.id === selectedConversationId);
+
   const moderateMessage = async (message: string): Promise<boolean> => {
     const openaiApiKey = env.NEXT_PUBLIC_OPENAI_KEY;
     const response = await fetch('https://api.openai.com/v1/moderations', {
@@ -172,13 +177,13 @@ const Chat: NextPageWithLayout = () => {
     const data = await response.json();
     if (
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      data.results[0].categories['hate'] ||
+      data?.results?.[0].categories['hate'] ||
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      data.results[0].categories['hate/threatening'] ||
+      data?.results?.[0].categories['hate/threatening'] ||
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      data.results[0].categories['sexual'] ||
+      data?.results?.[0].categories['sexual'] ||
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      data.results[0].categories['violence']
+      data?.results?.[0].categories['violence']
     ) {
       toast.warning(
         'Prospects does not tolerate hate speech or anything associated to it. Please refrain from using it.',
@@ -306,11 +311,16 @@ const Chat: NextPageWithLayout = () => {
   // TODO: Store the channel whenever it is changed
   return (
     <main className='flex h-full max-h-screen w-full overflow-hidden'>
-      <div className='flex h-full w-[350px] flex-col overflow-y-auto bg-primary-100/10'>
-        <div className='flex items-center justify-between bg-primary-500 p-4 text-2xl font-semibold text-white'>
+      <div
+        className={`flex h-full w-full flex-col overflow-y-auto bg-primary-100/10 xs:w-[350px] ${
+          selectedConversationId && width < 640 ? 'hidden' : ''
+        }`}
+      >
+        <div className='flex items-center justify-between rounded-bl-lg bg-primary-500 p-4 text-2xl font-semibold text-white'>
           <h1>{t('sidebar.title')}</h1>
           <EditButton name='chat' type='add' onClick={() => setOpenNewChatModal(true)} />
         </div>
+
         {!conversations?.length ? (
           <div className='flex h-full flex-col items-center justify-center'>
             <div className='text-2xl font-semibold text-primary-500' data-cy='no-convos'>
@@ -321,66 +331,88 @@ const Chat: NextPageWithLayout = () => {
             </div>
           </div>
         ) : (
-          conversations?.map((conversation) => (
-            <button
-              className={`flex items-center gap-4 px-3 py-4 ${
-                conversation.id === selectedConversationId
-                  ? 'bg-primary-500 text-white'
-                  : 'text-primary-500 hover:bg-primary-100/10'
-              } transition-colors duration-200 `}
-              key={conversation.id}
-              onClick={() => handleClick(conversation)}
-            >
-              <div className='relative h-12 w-12'>
-                <Image
-                  fill
-                  className='rounded-full object-cover'
-                  loader={({ src }) => src}
-                  src={conversation?.users[0]?.image || '/placeholder.jpeg'}
-                  alt='User Image'
-                  referrerPolicy='no-referrer'
-                />
+          <div className='flex w-full flex-col gap-2 p-2'>
+            {conversations?.map((conversation) => (
+              <button
+                className={`flex items-center gap-4 rounded-lg px-3 py-4 ${
+                  conversation.id === selectedConversationId
+                    ? 'bg-primary-100 text-white'
+                    : 'text-primary-500 hover:bg-primary-100/10'
+                } transition-colors duration-200 `}
+                key={conversation.id}
+                onClick={() => handleClick(conversation)}
+              >
+                <div className='relative h-12 min-h-[3rem] w-12 min-w-[3rem]'>
+                  <Image
+                    fill
+                    className='rounded-full object-cover'
+                    loader={({ src }) => src}
+                    src={conversation?.users[0]?.image || '/placeholder.jpeg'}
+                    alt='User Image'
+                    referrerPolicy='no-referrer'
+                  />
 
-                {/* Green activity bubble if user is online */}
-                <AnimatePresence initial={false}>
-                  {conversation.users.length === 1 && members.has(conversation.users[0]?.id || '') && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      exit={{ scale: 0 }}
-                      className='absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500'
-                    ></motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-              <div className='text-left'>
-                <div className='text-ellipsis text-lg font-semibold'>
-                  {conversation.users.length < 2
-                    ? `${conversation.users[0]?.firstName || ''} ${conversation.users[0]?.lastName || ''}`
-                    : String(conversation.users.map((user) => `${user.firstName || ''} ${user.lastName || ''}, `)) +
-                      ` ${String(session?.user?.firstName)} ${String(session?.user?.lastName)}`}
+                  {/* Green activity bubble if user is online */}
+                  <AnimatePresence initial={false}>
+                    {conversation.users.length === 1 && members.has(conversation.users[0]?.id || '') && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: 0 }}
+                        className='absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500'
+                      ></motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
-                {/* <div className='text-sm'>
+                <div className='text-left'>
+                  <div className='text-ellipsis text-lg font-semibold'>
+                    {conversation.users.length < 2
+                      ? `${conversation.users[0]?.firstName || ''} ${conversation.users[0]?.lastName || ''}`
+                      : conversation.users.map((user) => `${user.firstName || ''} ${user.lastName || ''}`).join(', ')}
+                  </div>
+                  {/* <div className='text-sm'>
                   {conversation.id === selectedConversationId
                     ? messages[0]?.message || ''
                     : conversation.messages[0]?.message}
                 </div> */}
-              </div>
-            </button>
-          ))
+                </div>
+              </button>
+            ))}
+          </div>
         )}
       </div>
       {selectedConversationId && (
         <div className='flex h-full max-w-[800px] flex-1 flex-col'>
-          <div className='items-right flex justify-between bg-primary-500 p-4 text-2xl font-semibold text-white'>
-            <h1>Messages</h1>
+          <div className='items-right flex justify-between rounded-br-lg bg-primary-500 p-4 text-2xl font-semibold text-white'>
+            <div className='flex items-center gap-2'>
+              {width < 640 && (
+                <button className='text-white' onClick={() => setSelectedConversationId('')}>
+                  <IoIosArrowBack size={24} />
+                </button>
+              )}
+              <h1 className='truncate'>
+                {(currentConversation?.users?.length || 0) < 2
+                  ? `${currentConversation?.users?.[0]?.firstName || ''} ${
+                      currentConversation?.users?.[0]?.lastName || ''
+                    }`
+                  : currentConversation?.users
+                      ?.map((user) => `${user.firstName || ''} ${user.lastName || ''}`)
+                      .join(', ') || ''}
+              </h1>
+            </div>
             <div className='flex'>
-              <EditButton name='chat' type='remove' onClick={() => setShowLeaveGroup(true)} />
+              {(currentConversation?.users.length || 0) > 1 && (
+                <EditButton name='chat' type='remove' onClick={() => setShowLeaveGroup(true)} />
+              )}
               <EditButton name='chat' type='addUsers' onClick={() => setShowAddUsers(true)} />
             </div>
           </div>
           <div className='relative h-full w-full'>
-            <div className='absolute inset-0 flex flex-col-reverse overflow-auto px-4' ref={messagesRef}>
+            <div
+              data-cy='messages-box'
+              className='absolute inset-0 flex flex-col-reverse overflow-auto px-4'
+              ref={messagesRef}
+            >
               {messages?.map((message) => (
                 <MessageItem
                   key={message.id}
@@ -390,10 +422,10 @@ const Chat: NextPageWithLayout = () => {
                   isFile={message.isFile}
                 />
               ))}
-              <div className='float-left clear-both' ref={messageEndRef} data-cy='new-message-form' />
+              <div className='float-left clear-both' ref={messageEndRef} />
             </div>
           </div>
-          <form className='mt-8 flex items-center' onSubmit={handleSendNewMessage}>
+          <form className='mt-8 flex items-center p-3' onSubmit={handleSendNewMessage} data-cy='new-message-form'>
             <div className='flex h-fit w-full flex-col justify-center gap-3 rounded-md bg-primary-100/10 px-2 py-3 outline-none'>
               <div className='flex w-full flex-row px-2'>
                 <input
@@ -408,7 +440,7 @@ const Chat: NextPageWithLayout = () => {
                   setFile={(newFile: File | undefined) => {
                     setNewFile(newFile);
                   }}
-                  className='h-8 w-8'
+                  className='h-6 w-6'
                 />
               </div>
               <FileUploadPreview file={newFile} />
@@ -433,7 +465,7 @@ const Chat: NextPageWithLayout = () => {
                   className='flex items-center justify-start rounded-md px-4 py-3 transition-colors duration-200 hover:bg-primary-100/10'
                   key={connection.id}
                   onClick={() => {
-                    if (tags.find((tag) => connection.email == tag) == undefined) {
+                    if (!tags.find((tag) => connection.email == tag)) {
                       setTags([...tags, connection.email]);
                     }
                   }}
@@ -483,7 +515,7 @@ const Chat: NextPageWithLayout = () => {
                 )
                 ?.map((connection) => (
                   <button
-                    data-cy={`add-user-${connection.email}`}
+                    data-cy={`add-user-${connection.lastName || ''}`}
                     className='flex items-center justify-start rounded-md px-4 py-3 transition-colors duration-200 hover:bg-primary-100/10'
                     key={connection.id}
                     onClick={() => {

@@ -80,6 +80,7 @@ jobs:
     needs: [lint, prettier]
     env:
       SKIP_ENV_VALIDATION: 1
+      NODE_ENV: test
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
@@ -89,6 +90,11 @@ jobs:
       CLOUDFLARE_ACCESS_KEY_ID: ${{secrets.CLOUDFLARE_ACCESS_KEY_ID}}
       CLOUDFLARE_SECRET_ACCESS_KEY: ${{secrets.CLOUDFLARE_SECRET_ACCESS_KEY}}
       CLOUDFLARE_BUCKET_NAME: ${{secrets.CLOUDFLARE_BUCKET_NAME}}
+      NEXT_PUBLIC_OPENAI_KEY: ${{secrets.NEXT_PUBLIC_OPENAI_KEY}}
+      PUSHER_SECRET: ${{secrets.PUSHER_SECRET}}
+      PUSHER_APP_ID: ${{secrets.PUSHER_APP_ID}}
+      NEXT_PUBLIC_PUSHER_KEY: ${{secrets.NEXT_PUBLIC_PUSHER_KEY}}
+      NEXT_PUBLIC_PUSHER_CLUSTER: ${{secrets.NEXT_PUBLIC_PUSHER_CLUSTER}}
     environment: Preview
     steps:
       - uses: actions/checkout@v3

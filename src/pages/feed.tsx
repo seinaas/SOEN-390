@@ -77,6 +77,8 @@ const Post: React.FC<PostProps> = ({
   const post = updatedPost || initialPost;
   const isLiked = !!post.likes?.find((like) => like.userId === userId && like.postId === post.id);
 
+  const ownsPost = post.userId === userId;
+
   const removePost = (postId: string) => {
     deletePost.mutate({
       postId: postId,
@@ -120,8 +122,6 @@ const Post: React.FC<PostProps> = ({
       );
     }
   };
-
-  const ownsPost = post.userId === userId;
 
   // Auto focus on comment input
   useEffect(() => {
@@ -248,7 +248,7 @@ const Post: React.FC<PostProps> = ({
         </button>
       </motion.div>
       {post.comments?.map((comment) => {
-        return <Comment key={comment.commentId} comment={comment} refetchPost={refetchPost} />;
+        return <Comment key={comment.commentId} userId={userId} comment={comment} refetchPost={refetchPost} />;
       })}
       <AnimatePresence mode='wait'>
         {commentingPost && (
@@ -294,14 +294,17 @@ const Post: React.FC<PostProps> = ({
 
 type CommentProps = {
   comment: PostType['comments'][number];
+  userId: string;
   refetchPost: () => unknown;
 };
-const Comment: React.FC<CommentProps> = ({ comment, refetchPost }) => {
+const Comment: React.FC<CommentProps> = ({ comment, userId, refetchPost }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingContent, setEditingContent] = useState('');
 
   const editComment = api.post.editComment.useMutation();
   const deleteComment = api.post.deleteComment.useMutation();
+
+  const ownsComment = comment.userId === userId;
 
   const removeComment = (e: React.MouseEvent, commentId: string) => {
     e.preventDefault();
@@ -359,19 +362,21 @@ const Comment: React.FC<CommentProps> = ({ comment, refetchPost }) => {
           <h1 className='font-bold text-primary-500'>
             {comment.User.firstName} {comment.User.lastName}
           </h1>
-          <div className='flex items-center gap-1'>
-            <button
-              data-cy='edit-comment-btn'
-              onClick={() => {
-                setIsEditing(!isEditing);
-              }}
-            >
-              <IoMdCreate />
-            </button>
-            <button data-cy='delete-comment-btn' onClick={(e) => removeComment(e, comment.commentId)}>
-              <IoMdRemove />
-            </button>
-          </div>
+          {ownsComment && (
+            <div className='flex items-center gap-1'>
+              <button
+                data-cy='edit-comment-btn'
+                onClick={() => {
+                  setIsEditing(!isEditing);
+                }}
+              >
+                <IoMdCreate />
+              </button>
+              <button data-cy='delete-comment-btn' onClick={(e) => removeComment(e, comment.commentId)}>
+                <IoMdRemove />
+              </button>
+            </div>
+          )}
         </motion.div>
         <div className='flex flex-col justify-center gap-2'>
           {isEditing ? (

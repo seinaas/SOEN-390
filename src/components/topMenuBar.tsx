@@ -25,20 +25,17 @@ const TopMenuBar: React.FC = () => {
       {/* Links */}
       <div className='flex items-center gap-8 '>
         <motion.div layout className=' flex w-full justify-end space-x-7 text-lg font-semibold text-white'>
-          <Link href='/' data-cy='topMenuBar-link-about'>
+          <Link href='/about' data-cy='topMenuBar-link-about'>
             {t('landing.header.about')}
           </Link>
           {!data && (
             <>
-              <Link href='/' data-cy='topMenuBar-link-jobs'>
-                {t('landing.header.jobs')}
-              </Link>
-              <Link href='/' data-cy='topMenuBar-link-contact'>
+              <Link href='/contact' data-cy='topMenuBar-link-contact'>
                 {t('landing.header.contact')}
               </Link>
             </>
           )}
-          <Link href='/' locale={router.locale === 'fr' ? 'en' : 'fr'} data-cy='topMenuBar-link-language'>
+          <Link href={router.asPath} locale={router.locale === 'fr' ? 'en' : 'fr'} data-cy='topMenuBar-link-language'>
             {router.locale === 'fr' ? 'EN' : 'FR'}
           </Link>
         </motion.div>

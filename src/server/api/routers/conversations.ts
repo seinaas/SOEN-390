@@ -3,7 +3,7 @@ import { createTRPCRouter, protectedProcedure } from '../trpc';
 
 export const conversationsRouter = createTRPCRouter({
   createConversationFromEmails: protectedProcedure.input(z.array(z.string())).mutation(async ({ ctx, input }) => {
-    let existingConversationId = null;
+    let existingConversationId: string | undefined;
     input.push(ctx?.session?.user?.email || '');
     const conversations = await ctx.prisma.directMessages.findMany({
       where: {
@@ -24,8 +24,8 @@ export const conversationsRouter = createTRPCRouter({
         existingConversationId = conversation?.id;
       }
     });
-    if (existingConversationId !== null) {
-      return existingConversationId;
+    if (existingConversationId) {
+      return { id: existingConversationId };
     }
     const conversation = await ctx.prisma.directMessages.create({
       data: {
