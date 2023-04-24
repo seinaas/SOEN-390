@@ -3,7 +3,15 @@ import { signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { IoIosChatbubbles, IoMdHome, IoMdLogOut, IoMdPeople, IoMdClose, IoIosNotifications } from 'react-icons/io';
+import {
+  IoIosChatbubbles,
+  IoMdHome,
+  IoMdLogOut,
+  IoMdPeople,
+  IoMdClose,
+  IoIosNotifications,
+  IoIosBriefcase,
+} from 'react-icons/io';
 import { api } from '../utils/api';
 import { FiMenu } from 'react-icons/fi';
 import { useSubscribeToUserEvent } from '../utils/pusher';
@@ -64,7 +72,7 @@ const Header: React.FC = () => {
   });
 
   const { data } = useSession();
-  const { data: searchRes, refetch } = api.user.search.useQuery(
+  const { data: searchRes, refetch } = api.search.useQuery(
     { query: searchQuery },
     {
       enabled: false,
@@ -164,7 +172,7 @@ const Header: React.FC = () => {
               className='relative h-10 w-full max-w-sm rounded-md bg-primary-100/20 px-4 placeholder-primary-100 outline-none transition-colors duration-200 focus:bg-primary-100 focus:text-white focus:placeholder-white/50 lg:w-96'
             />
             <AnimatePresence>
-              {searchRes && isFocused && (
+              {(!!searchRes?.jobs.length || searchRes?.users.length) && isFocused && (
                 <motion.div
                   data-cy='search-user-dropdown'
                   layout
@@ -174,37 +182,75 @@ const Header: React.FC = () => {
                   transition={{ duration: 0.2 }}
                   className='absolute top-4 left-0 right-0 -z-10 max-h-96 overflow-auto rounded-lg bg-white pt-6 shadow-lg'
                 >
-                  {searchRes.map((user) => (
-                    <motion.div layout key={user.email}>
-                      <Link
-                        href={`/u/${user.email}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSearchQuery('');
-                          setIsFocused(false);
-                        }}
-                        data-cy={`search-user-result-${user.lastName}`}
-                        className='flex items-center gap-4 px-4 py-2 hover:bg-primary-100/20'
-                      >
-                        <div className='relative h-8 w-8'>
-                          <Image
-                            alt='User Avatar'
-                            loader={() => user.image || '/placeholder.jpeg'}
-                            src={user.image || '/placeholder.jpeg'}
-                            fill
-                            className='rounded-full object-cover'
-                            referrerPolicy='no-referrer'
-                          />
-                        </div>
-                        <div className='flex flex-col'>
-                          <span className='font-medium text-primary-100'>
-                            {user.firstName} {user.lastName}
-                          </span>
-                          <span className='text-sm text-primary-100/50'>{user.email}</span>
-                        </div>
-                      </Link>
-                    </motion.div>
-                  ))}
+                  {!!searchRes.users.length && (
+                    <>
+                      <div className='px-4 pt-2 pb-1'>
+                        <span className='text-sm font-medium text-primary-100/50'>People</span>
+                      </div>
+                      {searchRes.users.map((user) => (
+                        <motion.div layout key={user.email}>
+                          <Link
+                            href={`/u/${user.email}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSearchQuery('');
+                              setIsFocused(false);
+                            }}
+                            data-cy={`search-user-result-${user.lastName}`}
+                            className='flex items-center gap-4 px-4 py-2 hover:bg-primary-100/20'
+                          >
+                            <div className='relative h-8 w-8'>
+                              <Image
+                                alt='User Avatar'
+                                loader={() => user.image || '/placeholder.jpeg'}
+                                src={user.image || '/placeholder.jpeg'}
+                                fill
+                                className='rounded-full object-cover'
+                                referrerPolicy='no-referrer'
+                              />
+                            </div>
+                            <div className='flex flex-col'>
+                              <span className='font-semibold text-primary-100'>
+                                {user.firstName} {user.lastName}
+                              </span>
+                              <span className='text-sm font-medium text-primary-100/80'>{user.headline}</span>
+                              <span className='text-xs text-primary-100/40'>{user.email}</span>
+                            </div>
+                          </Link>
+                        </motion.div>
+                      ))}
+                    </>
+                  )}
+                  {!!searchRes.jobs.length && (
+                    <>
+                      <div className='px-4 pt-2 pb-1'>
+                        <span className='text-sm font-medium text-primary-100/50'>Jobs</span>
+                      </div>
+                      {searchRes.jobs.map((job) => (
+                        <motion.div layout key={job.jobPostingId}>
+                          <Link
+                            href={`/`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSearchQuery('');
+                              setIsFocused(false);
+                            }}
+                            data-cy={`search-user-result-${job.jobPostingId}`}
+                            className='flex items-center gap-4 px-4 py-2 hover:bg-primary-100/20'
+                          >
+                            <div className='relative h-8 w-8 text-primary-500'>
+                              <IoIosBriefcase size={28} />
+                            </div>
+                            <div className='flex flex-col'>
+                              <span className='font-semibold text-primary-100'>{job.jobTitle}</span>
+                              <span className='text-sm font-medium text-primary-100/80'>{job.company}</span>
+                              <span className='text-xs text-primary-100/40'>{job.location}</span>
+                            </div>
+                          </Link>
+                        </motion.div>
+                      ))}
+                    </>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>

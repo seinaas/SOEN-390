@@ -1,24 +1,6 @@
 import { createUser, trpcRequest } from '../../utils';
 
 describe('user', () => {
-  describe('search', () => {
-    it('should fuzzy search for users', async () => {
-      const request = trpcRequest({ user: { id: '1' }, expires: '' });
-      const query = jest.spyOn(request.ctx.prisma, '$queryRaw').mockImplementation();
-
-      await request.caller.user.search({ query: 'john doe' });
-      expect(query).toHaveBeenCalledWith(expect.anything(), {
-        strings: ['', ' AND lower(concat(firstName, lastName)) LIKE ', ''],
-        values: ['%john%', '%doe%'],
-      });
-    });
-    it('should return null if input is shorter than 3 characters', async () => {
-      const request = trpcRequest({ user: { id: '1' }, expires: '' });
-
-      const data = await request.caller.user.search({ query: 'jo' });
-      expect(data).toBeNull();
-    });
-  });
   describe('getByEmail', () => {
     it('should return user by email', async () => {
       const request = trpcRequest();

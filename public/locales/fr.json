@@ -94,6 +94,10 @@
         "school": "Nom de l'Institution",
         "location": "Lieu",
         "description": "Description"
+      },
+      "headline": {
+        "title": "Titre de Profil",
+        "placeholder": "Que faite-vous?"
       }
     }
   },
