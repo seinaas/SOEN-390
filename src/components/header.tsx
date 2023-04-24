@@ -10,11 +10,21 @@ import { signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { IoIosChatbubbles, IoMdHome, IoMdLogOut, IoMdPeople, IoMdClose, IoIosNotifications } from 'react-icons/io';
+import {
+  IoIosChatbubbles,
+  IoMdHome,
+  IoMdLogOut,
+  IoMdPeople,
+  IoMdClose,
+  IoIosNotifications,
+  IoIosBriefcase,
+} from 'react-icons/io';
 import { api } from '../utils/api';
 import { FiMenu } from 'react-icons/fi';
 import { useSubscribeToUserEvent } from '../utils/pusher';
 import { NotificationsDropdown } from './notifications/notificationsDropdown';
+import { useRouter } from 'next/router';
+import { useTranslations } from 'next-intl';
 
 const NotificationBubble = ({ count }: { count: number }) => {
   return (
@@ -47,6 +57,8 @@ const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
 
+  const t = useTranslations('header');
+  const router = useRouter();
   const utils = api.useContext();
   api.notifications.getNotificationCount.useQuery(undefined, {
     onSuccess: (data) => {
@@ -63,11 +75,11 @@ const Header: React.FC = () => {
     void utils.notifications.getNotifications.refetch();
   });
   useSubscribeToUserEvent('chat', () => {
-    setChatNotifCount((prev) => prev + 1);
+    if (router.pathname !== '/chat') setChatNotifCount((prev) => prev + 1);
   });
 
   const { data } = useSession();
-  const { data: searchRes, refetch } = api.user.search.useQuery(
+  const { data: searchRes, refetch } = api.search.useQuery(
     { query: searchQuery },
     {
       enabled: false,
@@ -88,6 +100,11 @@ const Header: React.FC = () => {
       clearTimeout(timeout);
     };
   }, [searchQuery, refetch, searchRes]);
+
+  // TODO: Remove this and replace with a better solution
+  useEffect(() => {
+    if (router.pathname === '/chat') setChatNotifCount(0);
+  }, [router.pathname]);
 
   return (
     <>
@@ -118,7 +135,7 @@ const Header: React.FC = () => {
           <Link href='/feed' className='hover:text-primary-100'>
             <IoMdHome size={28} />
           </Link>
-          <Link href='/' className='hover:text-primary-100'>
+          <Link href='/jobs' className='hover:text-primary-100'>
             <IoMdPeople size={28} />
           </Link>
           <Link href='/chat' className='relative hover:text-primary-100'>
@@ -129,9 +146,17 @@ const Header: React.FC = () => {
             <NotificationBubble count={notifCount} />
             <IoIosNotifications size={28} />
           </Link>
-          <button onClick={() => signOut()} className='hover:text-primary-100'>
+          <button data-cy='signout-button-mobile' onClick={() => signOut()} className='hover:text-primary-100'>
             <IoMdLogOut size={28} />
           </button>
+          <Link
+            className='font-bold'
+            href={router.asPath}
+            locale={router.locale === 'fr' ? 'en' : 'fr'}
+            data-cy='topMenuBar-link-language'
+          >
+            {router.locale === 'fr' ? 'EN' : 'FR'}
+          </Link>
         </div>
       </div>
       {/* Heading Menu */}
@@ -148,13 +173,13 @@ const Header: React.FC = () => {
               onFocus={() => setIsFocused(true)}
               onBlur={(e) => e.relatedTarget === null && setIsFocused(false)}
               type='text'
-              placeholder='Search'
+              placeholder={t('search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className='relative h-10 w-full max-w-sm rounded-md bg-primary-100/20 px-4 placeholder-primary-100 outline-none transition-colors duration-200 focus:bg-primary-100 focus:text-white focus:placeholder-white/50 lg:w-96'
             />
             <AnimatePresence>
-              {searchRes && isFocused && (
+              {(!!searchRes?.jobs.length || searchRes?.users.length) && isFocused && (
                 <motion.div
                   data-cy='search-user-dropdown'
                   layout
@@ -164,36 +189,75 @@ const Header: React.FC = () => {
                   transition={{ duration: 0.2 }}
                   className='absolute top-4 left-0 right-0 -z-10 max-h-96 overflow-auto rounded-lg bg-white pt-6 shadow-lg'
                 >
-                  {searchRes.map((user) => (
-                    <motion.div layout key={user.email}>
-                      <Link
-                        href={`/u/${user.email}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSearchQuery('');
-                          setIsFocused(false);
-                        }}
-                        className='flex items-center gap-4 px-4 py-2 hover:bg-primary-100/20'
-                      >
-                        <div className='relative h-8 w-8'>
-                          <Image
-                            alt='User Avatar'
-                            loader={() => user.image || '/placeholder.jpeg'}
-                            src={user.image || '/placeholder.jpeg'}
-                            fill
-                            className='rounded-full object-cover'
-                            referrerPolicy='no-referrer'
-                          />
-                        </div>
-                        <div className='flex flex-col'>
-                          <span className='font-medium text-primary-100'>
-                            {user.firstName} {user.lastName}
-                          </span>
-                          <span className='text-sm text-primary-100/50'>{user.email}</span>
-                        </div>
-                      </Link>
-                    </motion.div>
-                  ))}
+                  {!!searchRes.users.length && (
+                    <>
+                      <div className='px-4 pt-2 pb-1'>
+                        <span className='text-sm font-medium text-primary-100/50'>People</span>
+                      </div>
+                      {searchRes.users.map((user) => (
+                        <motion.div layout key={user.email}>
+                          <Link
+                            href={`/u/${user.email}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSearchQuery('');
+                              setIsFocused(false);
+                            }}
+                            data-cy={`search-user-result-${user.lastName}`}
+                            className='flex items-center gap-4 px-4 py-2 hover:bg-primary-100/20'
+                          >
+                            <div className='relative h-8 w-8'>
+                              <Image
+                                alt='User Avatar'
+                                loader={() => user.image || '/placeholder.jpeg'}
+                                src={user.image || '/placeholder.jpeg'}
+                                fill
+                                className='rounded-full object-cover'
+                                referrerPolicy='no-referrer'
+                              />
+                            </div>
+                            <div className='flex flex-col'>
+                              <span className='font-semibold text-primary-100'>
+                                {user.firstName} {user.lastName}
+                              </span>
+                              <span className='text-sm font-medium text-primary-100/80'>{user.headline}</span>
+                              <span className='text-xs text-primary-100/40'>{user.email}</span>
+                            </div>
+                          </Link>
+                        </motion.div>
+                      ))}
+                    </>
+                  )}
+                  {!!searchRes.jobs.length && (
+                    <>
+                      <div className='px-4 pt-2 pb-1'>
+                        <span className='text-sm font-medium text-primary-100/50'>Jobs</span>
+                      </div>
+                      {searchRes.jobs.map((job) => (
+                        <motion.div layout key={job.jobPostingId}>
+                          <Link
+                            href={`/`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSearchQuery('');
+                              setIsFocused(false);
+                            }}
+                            data-cy={`search-user-result-${job.jobPostingId}`}
+                            className='flex items-center gap-4 px-4 py-2 hover:bg-primary-100/20'
+                          >
+                            <div className='relative h-8 w-8 text-primary-500'>
+                              <IoIosBriefcase size={28} />
+                            </div>
+                            <div className='flex flex-col'>
+                              <span className='font-semibold text-primary-100'>{job.jobTitle}</span>
+                              <span className='text-sm font-medium text-primary-100/80'>{job.company}</span>
+                              <span className='text-xs text-primary-100/40'>{job.location}</span>
+                            </div>
+                          </Link>
+                        </motion.div>
+                      ))}
+                    </>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
@@ -205,7 +269,7 @@ const Header: React.FC = () => {
             <Link href='/feed' className='text-primary-500 hover:text-primary-600'>
               <IoMdHome size={28} />
             </Link>
-            <Link href='/' className='text-primary-500 hover:text-primary-600'>
+            <Link href='/jobs' className='text-primary-500 hover:text-primary-600'>
               <IoMdPeople size={28} />
             </Link>
             <Link href='/chat' className='relative text-primary-500 hover:text-primary-600'>
@@ -220,7 +284,9 @@ const Header: React.FC = () => {
                 <NotificationBubble count={notifCount} />
                 <IoIosNotifications size={28} />
               </button>
-              <AnimatePresence>{showNotifDropdown && <NotificationsDropdown />}</AnimatePresence>
+              <AnimatePresence>
+                {showNotifDropdown && <NotificationsDropdown setShowDropdown={setShowNotifDropdown} />}
+              </AnimatePresence>
             </span>
             <button
               onClick={() => signOut()}
@@ -229,6 +295,14 @@ const Header: React.FC = () => {
             >
               <IoMdLogOut size={28} />
             </button>
+            <Link
+              className='font-bold text-primary-500 hover:text-primary-600'
+              href={router.asPath}
+              locale={router.locale === 'fr' ? 'en' : 'fr'}
+              data-cy='topMenuBar-link-language'
+            >
+              {router.locale === 'fr' ? 'EN' : 'FR'}
+            </Link>
           </div>
           {data?.user && (
             <Link

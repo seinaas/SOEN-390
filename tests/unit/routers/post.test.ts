@@ -104,7 +104,7 @@ describe('post', () => {
     });
     describe('createComment', () => {
       it('should create a comment for a post', async () => {
-        const createComment = jest.spyOn(request.ctx.prisma.comments, 'create').mockImplementation();
+        const createComment = jest.spyOn(request.ctx.prisma.comment, 'create').mockImplementation();
         await request.caller.post.createComment({
           postId: '1',
           content: 'test',
@@ -120,7 +120,7 @@ describe('post', () => {
     });
     describe('editComment', () => {
       it('should update a comment for a post', async () => {
-        const updateComment = jest.spyOn(request.ctx.prisma.comments, 'update').mockImplementation();
+        const updateComment = jest.spyOn(request.ctx.prisma.comment, 'update').mockImplementation();
         await request.caller.post.editComment({
           commentId: '1',
           content: 'test',
@@ -137,7 +137,7 @@ describe('post', () => {
     });
     describe('deleteComment', () => {
       it('should delete a comment for a post', async () => {
-        const deleteComment = jest.spyOn(request.ctx.prisma.comments, 'delete').mockImplementation();
+        const deleteComment = jest.spyOn(request.ctx.prisma.comment, 'delete').mockImplementation();
         await request.caller.post.deleteComment({
           commentId: '1',
         });
@@ -150,7 +150,7 @@ describe('post', () => {
     });
     describe('getCommentsPerPost', () => {
       it('should get comments for a post', async () => {
-        const getComments = jest.spyOn(request.ctx.prisma.comments, 'findMany').mockImplementation();
+        const getComments = jest.spyOn(request.ctx.prisma.comment, 'findMany').mockImplementation();
         await request.caller.post.getCommentsPerPost({
           postId: '1',
         });
@@ -164,8 +164,8 @@ describe('post', () => {
     });
     describe('toggleLike', () => {
       it('should like a post if not liked', async () => {
-        const createLike = jest.spyOn(request.ctx.prisma.likes, 'create').mockImplementation();
-        request.ctx.prisma.likes.findMany.mockResolvedValueOnce([] as any);
+        const createLike = jest.spyOn(request.ctx.prisma.like, 'create').mockImplementation();
+        request.ctx.prisma.like.findMany.mockResolvedValueOnce([] as any);
         request.ctx.prisma.post.findUnique.mockResolvedValueOnce(null as any);
         await request.caller.post.toggleLike({
           postId: '1',
@@ -178,8 +178,8 @@ describe('post', () => {
         });
       });
       it('should unlike a post if liked', async () => {
-        const deleteLike = jest.spyOn(request.ctx.prisma.likes, 'deleteMany').mockImplementation();
-        request.ctx.prisma.likes.findMany.mockResolvedValueOnce([
+        const deleteLike = jest.spyOn(request.ctx.prisma.like, 'deleteMany').mockImplementation();
+        request.ctx.prisma.like.findMany.mockResolvedValueOnce([
           {
             postId: '1',
             userId: '1',
@@ -205,7 +205,7 @@ describe('post', () => {
     });
     describe('getLikesPerPost', () => {
       it('should return likes for a post', async () => {
-        const getLikes = jest.spyOn(request.ctx.prisma.likes, 'findMany').mockImplementation();
+        const getLikes = jest.spyOn(request.ctx.prisma.like, 'findMany').mockImplementation();
         await request.caller.post.getLikesPerPost({
           postId: '1',
         });

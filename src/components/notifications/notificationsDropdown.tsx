@@ -14,8 +14,14 @@ import { customFormatDistance } from '../../utils/customFormat';
 import { useSubscribeToUserEvent } from '../../utils/pusher';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
-export const NotificationsDropdown: React.FC = () => {
+type Props = {
+  setShowDropdown: (show: boolean) => void;
+};
+
+export const NotificationsDropdown: React.FC<Props> = ({ setShowDropdown }) => {
+  const t = useTranslations('notifications');
   const router = useRouter();
   const utils = api.useContext();
   const updateNotifications = api.notifications.updateNotification.useMutation();
@@ -77,9 +83,10 @@ export const NotificationsDropdown: React.FC = () => {
         <span className='text-lg font-bold text-primary-300'>Notifications</span>
         <Link
           href='/notifications'
+          onClick={() => setShowDropdown(false)}
           className='rounded-md px-2 py-1 text-primary-100 transition-colors duration-200 hover:bg-primary-100/10 active:bg-primary-100/30'
         >
-          See All
+          {t('see-all')}
         </Link>
       </motion.div>
       {notifications?.length ? (
@@ -124,7 +131,12 @@ export const NotificationsDropdown: React.FC = () => {
                   })}
                 </span>
               </div>
-              <span className='text-left leading-[1.2] text-primary-100'>{notification.content}</span>
+              <span className='text-left leading-[1.2] text-primary-100'>
+                {t(`content.${notification.type}`, {
+                  name: `${notification.Sender.firstName || ''} ${notification.Sender.lastName || ''}`,
+                  content: notification.content,
+                })}
+              </span>
               <AnimatePresence>
                 {notification.type === 'ConnectionRequest' && (
                   <motion.div
@@ -153,7 +165,7 @@ export const NotificationsDropdown: React.FC = () => {
                       }}
                       className='flex-1 rounded-md bg-primary-400 px-2 py-1 text-white hover:bg-primary-500 active:bg-primary-600'
                     >
-                      Accept
+                      {t('accept')}
                     </button>
                     <button
                       onClick={(e) => {
@@ -170,7 +182,7 @@ export const NotificationsDropdown: React.FC = () => {
                       }}
                       className='flex-1 rounded-md bg-primary-100/20 px-2 py-1 text-primary-100 hover:bg-primary-100/30 active:bg-primary-100/50'
                     >
-                      Decline
+                      {t('decline')}
                     </button>
                   </motion.div>
                 )}
@@ -179,7 +191,7 @@ export const NotificationsDropdown: React.FC = () => {
           </motion.a>
         ))
       ) : (
-        <div className='pt-8 text-center text-primary-100/50'>Nothing to Show :(</div>
+        <div className='pt-8 text-center text-primary-100/50'>{t('empty')}</div>
       )}
     </motion.div>
   );

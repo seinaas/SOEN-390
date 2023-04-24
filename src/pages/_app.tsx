@@ -11,9 +11,10 @@ import { SessionProvider } from 'next-auth/react';
 import { type NextPage } from 'next';
 import { type ReactElement, type ReactNode } from 'react';
 import { type Session } from 'next-auth';
+import { type AbstractIntlMessages, NextIntlProvider } from 'next-intl';
 
 import { api } from '../utils/api';
-import { initPusher } from '../utils/pusher';
+import { initPusher, pusherAuth } from '../utils/pusher';
 
 import '../styles/globals.css';
 
@@ -21,16 +22,23 @@ export type NextPageWithLayout<P = Record<string, unknown>, IP = P> = NextPage<P
   getLayout?: (page: ReactElement) => ReactNode;
 };
 
-export type MyAppProps = AppProps & {
+type PageProps = {
+  session: Session;
+  messages: AbstractIntlMessages;
+};
+
+export type MyAppProps = AppProps<PageProps> & {
   Component: NextPageWithLayout;
-  pageProps: AppProps['pageProps'] & {
-    session: Session;
-  };
 };
 
 initPusher();
-const MyApp = (({ Component, pageProps: { session, ...pageProps } }: MyAppProps) => {
+const MyApp = ({ Component, pageProps: { session, ...pageProps } }: MyAppProps) => {
   const getLayout = Component.getLayout ?? ((page) => page);
-  return <SessionProvider session={session as Session}>{getLayout(<Component {...pageProps} />)}</SessionProvider>;
-}) as AppType;
+  pusherAuth();
+  return (
+    <SessionProvider session={session}>
+      <NextIntlProvider messages={pageProps.messages}>{getLayout(<Component {...pageProps} />)}</NextIntlProvider>
+    </SessionProvider>
+  );
+};
 export default api.withTRPC(MyApp);

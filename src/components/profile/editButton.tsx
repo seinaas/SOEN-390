@@ -1,3 +1,4 @@
+
 /*
 *		Edit Button Component
 *
@@ -6,10 +7,10 @@
 *		type (which defaults to 'edit'), name, and onClick (which is an optional function). The type prop is used to determine which icon to display, 
 *		either a plus sign or a pencil. When the button is clicked, the onClick function is called. The button is styled with a rounded background and hover/active effects.
 */
-import { IoMdAdd, IoMdCreate } from 'react-icons/io';
+import { IoMdAdd, IoMdCreate, IoMdExit, IoMdPersonAdd } from 'react-icons/io';
 
 type Props = {
-  type?: 'add' | 'edit';
+  type?: 'add' | 'edit' | 'remove' | 'addUsers';
   name: string;
   onClick?: () => void;
 };
@@ -23,6 +24,8 @@ const EditButton: React.FC<Props> = ({ type = 'edit', onClick, name }) => {
     >
       {type === 'add' && <IoMdAdd size={28} />}
       {type === 'edit' && <IoMdCreate size={20} />}
+      {type === 'remove' && <IoMdExit size={20} />}
+      {type === 'addUsers' && <IoMdPersonAdd size={20} />}
     </button>
   );
 };
