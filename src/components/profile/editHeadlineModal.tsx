@@ -1,5 +1,5 @@
 /*
- *		Edit Headline Modal 
+ *		Edit Headline Modal
  *
  *
  *		This file defines a React functional component called "EditHeadlineModal". The component takes in two props, "headline" and "onCancel". It uses the "useState" hook to create a state
