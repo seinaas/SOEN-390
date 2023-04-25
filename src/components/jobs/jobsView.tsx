@@ -1,3 +1,13 @@
+/*
+ *		Job Postings List Component
+ *
+ *
+ *		This is a React component that displays a list of job postings and a detailed view of a selected job posting. It uses the useWindowSize custom hook from utils/useWindowSize, 
+ *    the RouterOutputs and api objects from utils/api, and the AnimatePresence and motion components from framer-motion. The component receives three props: previews, an array of 
+ *    job postings to display in the list view; currentJobId, the ID of the selected job posting; and setCurrentJobId, a function to update the currentJobId state. The component uses 
+ *    the useQuery hook from api.jobPosting.getJobPosting to fetch the data of the selected job posting. The list view and detailed view are displayed side by side on larger screens, 
+ *    and the list view is hidden on smaller screens.
+ */
 import { useEffect } from 'react';
 import { useWindowSize } from '../../utils/useWindowSize';
 import { type RouterOutputs, api } from '../../utils/api';

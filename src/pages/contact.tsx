@@ -1,6 +1,10 @@
 /*
- *        Contact Us Section from the landing navigation bar
- *        This file contains the contact us section in which the user can send a message to the team of ProSpects.
+ *		About Us Page Component
+ *
+ *
+ *		This file defines the Contact Us page, which includes a form for users to send a message to ProSpects. It imports the TopMenuBar component and the Button component, as well as the 
+ *    IoCallSharp icon from the react-icons library. The ContactUsPageBody component renders the form using translations from the 'contact' locale. The form includes input fields for name 
+ *    and email, as well as a textarea for the message subject. The getServerSideProps function is used to import translations based on the user's locale.
  */
 import TopMenuBar from '../components/topMenuBar';
 import Button from '../components/button';

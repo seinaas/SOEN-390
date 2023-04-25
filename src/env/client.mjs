@@ -1,3 +1,12 @@
+/*
+ *   Enviroment Variable Client Error Throwing
+ *
+ *
+ *   This code exports a variable called 'env' which is created by parsing and validating an object called clientEnv using a schema defined in clientSchema. 
+ *   If the clientEnv object fails validation, an error is thrown with details of the invalid environment variables. Additionally, the code checks that each 
+ *   key in the clientEnv object starts with the string "NEXT_PUBLIC_" and throws an error if it does not. A utility function called formatErrors is also exported, 
+ *   which formats any errors that occur during validation.
+ */
 // @ts-check
 import { clientEnv, clientSchema } from './schema.mjs';
 

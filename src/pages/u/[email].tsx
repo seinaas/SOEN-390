@@ -1,3 +1,11 @@
+/*
+ *		Profile Page Component
+ *
+ *
+ *		This is a React component that defines the profile page of a user on a web app. It contains the user's image, name, headline, and a button to view their connections.
+ *		It also has buttons to edit the user's skills, bio, education, and job experience. The component queries the server for the user's information and connections, and
+ *		can send and accept connection requests. If the user is viewing their own profile, they can edit their information. The component uses Framer Motion to animate certain elements.
+ */
 import { type GetServerSidePropsContext } from 'next';
 import Image from 'next/image';
 import { useRouter } from 'next/router';

@@ -1,3 +1,11 @@
+/*
+ *		View Job Postings Page Component
+ *
+ *
+ *		This is a file used to create a job board application page. It imports several components such as "MainLayout", "Button", "Link", "TabSuggestedJobs", "TabSavedJobs", and "TabAppliedJobs" 
+ *    that are used in rendering the UI of the application. The code also imports some custom hooks such as "useFileUploading" and "useJobPostFiles". The application UI comprises a left 
+ *    side and a right side. The left side displays the user's profile information and has a section for uploading files. The right side displays job posts and has tabs for filtering posts.
+ */
 import React, { useState } from 'react';
 import MainLayout from '../../components/mainLayout';
 import Image from 'next/image';

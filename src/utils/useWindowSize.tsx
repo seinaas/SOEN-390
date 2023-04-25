@@ -1,3 +1,11 @@
+/*
+ *		Return Window Size Utility
+ *
+ *
+ *		This is a custom React hook called useWindowSize that returns the current window size as an object with width and height properties. It initializes the state with an undefined width 
+ *    and height to ensure that server and client renders match. It sets up an event listener for the window resize event and updates the state with the new width and height values. It also 
+ *    removes the event listener on cleanup to prevent memory leaks. Finally, it returns the windowSize state.
+ */
 import { useState, useEffect } from 'react';
 
 export function useWindowSize() {
