@@ -2,9 +2,9 @@
  *		Custom File Use Web Hooks
  *
  *
- *		This file defines two custom hooks: usePostFiles and useJobPostFiles.  usePostFiles is used to load a list of files associated with a post by making API calls to Cloudflare to obtain 
- *    presigned URLs for listing and downloading the files. useJobPostFiles is used to load files associated with a job application by making API calls to Cloudflare to obtain presigned URLs 
- *    for listing and downloading the files. Both hooks use the useEffect hook to trigger the API calls when the component is mounted, and update the state with the file information. The 
+ *		This file defines two custom hooks: usePostFiles and useJobPostFiles.  usePostFiles is used to load a list of files associated with a post by making API calls to Cloudflare to obtain
+ *    presigned URLs for listing and downloading the files. useJobPostFiles is used to load files associated with a job application by making API calls to Cloudflare to obtain presigned URLs
+ *    for listing and downloading the files. Both hooks use the useEffect hook to trigger the API calls when the component is mounted, and update the state with the file information. The
  *    returned fileList object contains an array of FileDownloadInfo objects, each containing the file name, URL, and optionally the file type.
  */
 import { useEffect, useState } from 'react';

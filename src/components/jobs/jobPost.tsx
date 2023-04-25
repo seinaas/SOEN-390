@@ -2,8 +2,8 @@
  *		Job Post Component
  *
  *
- *		This file defines a React component called JobPost. It imports various modules, including Next.js, React, and framer-motion. The component 
- *    renders job details and buttons for saving, applying, and deleting a job posting. It also checks whether the user has uploaded all required documents for the job. Finally, 
+ *		This file defines a React component called JobPost. It imports various modules, including Next.js, React, and framer-motion. The component
+ *    renders job details and buttons for saving, applying, and deleting a job posting. It also checks whether the user has uploaded all required documents for the job. Finally,
  *    the component uses the useContext and useTranslations hooks from Next.js for state management and internationalization.
  */
 import react from 'react';

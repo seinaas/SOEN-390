@@ -2,7 +2,7 @@
  *		Job Postings Router
  *
  *
- *		The file is implementing API routes for a Job Posting feature using the TRPCRouter. It includes procedures to get all job postings, create/update/delete job postings, get saved job 
+ *		The file is implementing API routes for a Job Posting feature using the TRPCRouter. It includes procedures to get all job postings, create/update/delete job postings, get saved job
  *    postings and recruiter job postings. It also allows for toggling save and apply to job postings. The input validation is done using Zod. The database interaction is done using Prisma ORM.
  */
 import { z } from 'zod';

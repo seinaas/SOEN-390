@@ -2,8 +2,8 @@
  *		About Us Page Component
  *
  *
- *		The file defines the About Us section for the ProSpects website. It imports a TopMenuBar component and the Next.js useTranslations hook for internationalization. The AboutUsPageBody 
- *    component displays the landing page text with translations. The code includes a getServerSideProps function to fetch the JSON messages for the translations. Finally, the code exports 
+ *		The file defines the About Us section for the ProSpects website. It imports a TopMenuBar component and the Next.js useTranslations hook for internationalization. The AboutUsPageBody
+ *    component displays the landing page text with translations. The code includes a getServerSideProps function to fetch the JSON messages for the translations. Finally, the code exports
  *    the AboutUs component as the default export.
  */
 import TopMenuBar from '../components/topMenuBar';
