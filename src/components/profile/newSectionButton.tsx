@@ -1,3 +1,11 @@
+/*
+ *		New Section Button Component
+ *
+ *
+ *		The code is a React component that renders a button with an animated plus icon using the Framer Motion library.
+ *		The button is initially hidden and appears with animation when hovered over. The component takes a text prop and any
+ *		other HTML button props. The plus icon uses the AnimatePresence component to animate its appearance and disappearance.
+ */
 import type { HTMLMotionProps } from 'framer-motion';
 import { type Variants, motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';

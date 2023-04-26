@@ -1,3 +1,11 @@
+/*
+ *		Chat Page Component
+ *
+ *
+ *		This is a page component for the chat feature of an application. The component has a form with a text input for users to enter messages, which are submitted
+ *		using the useMutation hook provided by the api.chat.submit module. The component also has a button that allows users to join a test channel using the connectToChannel
+ *		function from the pusher module. The useEffect hook is used to connect to the last channel the user was in. Finally, the component uses a custom layout component called MainLayout.
+ */
 import type { Messages } from '@prisma/client';
 import { differenceInMinutes, format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';

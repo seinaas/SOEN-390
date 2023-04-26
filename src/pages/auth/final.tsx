@@ -1,3 +1,12 @@
+/*
+ *		Authorization Form Handling
+ *
+ *
+ *		The code defines a registration form with input validation and error handling. When submitted, the form data is sent to an API
+ *		endpoint for user update using a custom hook from the api module. If the API call is successful, the user is redirected to the homepage,
+ *		otherwise an error message is displayed. The page is also protected by server-side authentication using getServerSideProps to redirect
+ *		unauthenticated users to the sign-in page and users who have already completed registration to the homepage.
+ */
 import { type GetServerSidePropsContext } from 'next';
 import { useState } from 'react';
 import { getServerAuthSession } from '../../server/auth';

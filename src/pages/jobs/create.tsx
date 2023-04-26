@@ -1,3 +1,10 @@
+/*
+ *		Create Job Posting Page Component
+ *
+ *
+ *		This file is a React component for a job posting creation page. It uses several libraries such as Next.js, zod, react-hook-form, and next-intl. The file defines a form schema, form
+ *    inputs, and constants for job and workplace types. The code handles form submission and uses a mutation to create a new job posting.
+ */
 import React from 'react';
 import MainLayout from '../../components/mainLayout';
 import Image from 'next/image';

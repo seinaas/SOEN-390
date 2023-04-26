@@ -1,3 +1,11 @@
+/*
+ *		Conversations Router
+ *
+ *
+ *		This file defines a TRPC router for managing conversations. It includes functions for creating new conversations, getting user conversations, adding and removing users from a
+ *    conversation, and retrieving messages for a conversation. The input and output of each function is validated using the zod library. The functions are protected and require
+ *    authentication using session context. The functions use Prisma for database operations and include various queries and mutations to manipulate the conversations and messages.
+ */
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 

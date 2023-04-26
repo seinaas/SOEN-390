@@ -1,3 +1,11 @@
+/*
+ *		Edit Button Component
+ *
+ *
+ *		This code defines a React component called EditButton, which is used to render an edit or add button. The component takes in three props:
+ *		type (which defaults to 'edit'), name, and onClick (which is an optional function). The type prop is used to determine which icon to display,
+ *		either a plus sign or a pencil. When the button is clicked, the onClick function is called. The button is styled with a rounded background and hover/active effects.
+ */
 import { IoMdAdd, IoMdCreate, IoMdExit, IoMdPersonAdd } from 'react-icons/io';
 
 type Props = {

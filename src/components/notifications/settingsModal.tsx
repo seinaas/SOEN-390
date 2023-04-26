@@ -1,3 +1,11 @@
+/*
+ *		Notification Settings Modal
+ *
+ *
+ *		This is a React component that renders a modal for notification settings. It uses the useState hook to manage the muted notification types, which are fetched from the API using a custom hook.
+ *		The user can mute or unmute notification types by clicking a button, which updates the muted state. When the user clicks the "Save Changes" button, the muted notification types
+ *		are updated using another custom API hook. The component also includes Framer Motion animation for the mute button.
+ */
 import { useState } from 'react';
 import { api } from '../../utils/api';
 import Modal from '../modal';

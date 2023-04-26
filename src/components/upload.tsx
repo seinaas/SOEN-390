@@ -1,3 +1,11 @@
+/*
+ *		File Upload Component
+ *
+ *
+ *		This file defines a React component for file uploads and a function for uploading files to a Cloudflare bucket. The Upload component allows users to select a file by clicking on an icon,
+ *    which opens a file picker dialog. The selected file is then passed to a callback function. The uploadFile function takes a file and a URL and uploads the file to the specified URL using
+ *    a PUT request. If no file is selected, the function logs a message to the console and returns. The function sets the content-type and content-length headers for the uploaded file.
+ */
 import { useRef } from 'react';
 import { BsFileEarmarkPlus } from 'react-icons/bs';
 

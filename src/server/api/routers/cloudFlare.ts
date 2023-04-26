@@ -1,3 +1,11 @@
+/*
+ *		CloudFlare Bucket Router
+ *
+ *
+ *		This file defines a router that exposes three endpoints for generating pre-signed URLs to interact with an AWS S3 bucket. The endpoints are getPresignedPUTUrl, getPresignedLISTUrl, and
+ *    getPresignedGETUrl. The router uses the createTRPCRouter function and imports the necessary AWS SDK client libraries. It also defines a protected procedure to handle input validation
+ *    and user authentication. Finally, the router generates the pre-signed URLs and returns them to the client.
+ */
 /* istanbul ignore file */
 import { z } from 'zod';
 

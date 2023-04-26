@@ -1,3 +1,11 @@
+/*
+ *   User Authorization Check
+ *
+ *
+ *   This is a Next.js API route that authorizes a user for Pusher. It takes in a socket ID from the request body
+ *   and uses it to authenticate the user with Pusher. The user's ID is retrieved from the server session. If the user or socket
+ *   ID is not found, a 404 error response is returned. Finally, the authentication data is sent as the response.
+ */
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { pusherServerClient } from '../../../server/pusher';
 import { getServerAuthSession } from '../../../server/auth';

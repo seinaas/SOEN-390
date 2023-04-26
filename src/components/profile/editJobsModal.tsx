@@ -1,3 +1,12 @@
+/*
+ *		Edit Jobs Modal
+ *
+ *
+ *		This is a React component that renders a modal form for editing or adding a job experience. The component receives a job prop, which is an optional Job object,
+ *		and an onCancel callback function. It also uses two mutations from a custom api object for updating or adding job data. The form inputs include fields for
+ *		the job title, company name, job description, start date, and end date. The onSubmit function is responsible for submitting the form data and updating the
+ *		database via the appropriate mutation.
+ */
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type Job } from '@prisma/client';
 import { useForm } from 'react-hook-form';

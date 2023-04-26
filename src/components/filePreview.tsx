@@ -1,3 +1,11 @@
+/*
+ *		File Preview Component
+ *
+ *
+ *		This is a file that exports three components for handling file uploads, downloads, and previews. The FileUploadPreview component accepts a File object and displays a preview of it.
+ *    The FileDownloadPreview component displays the name of the file, a download icon, and a link to download the file. The PostFileDownloadPreview component is specific to posts and displays
+ *    a list of files uploaded to a post along with their download links. The module also imports custom hooks for file handling and uploading, and uses icons from the React-icons library.
+ */
 import { type Post } from '@prisma/client';
 import { usePostFiles } from '../customHooks/useFiles';
 import { BsDownload } from 'react-icons/bs';

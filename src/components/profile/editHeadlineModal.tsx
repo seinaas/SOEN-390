@@ -1,3 +1,12 @@
+/*
+ *		Edit Headline Modal
+ *
+ *
+ *		This file defines a React functional component called "EditHeadlineModal". The component takes in two props, "headline" and "onCancel". It uses the "useState" hook to create a state
+ *    variable called "newHeadline" and a setter function called "setNewHeadline". The component also uses the "useTranslations" hook to access translations for the modal. It renders a modal
+ *    component with a title, an input field for the new headline, and cancel and save buttons. When the save button is clicked, the "updateMutation" function from the "api" module is called
+ *    to update the user's headline, and the "onCancel" function is called to close the modal.
+ */
 import { useState } from 'react';
 import { api } from '../../utils/api';
 import Modal from '../modal';
