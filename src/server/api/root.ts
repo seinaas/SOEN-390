@@ -11,11 +11,11 @@ import { authRouter } from './routers/auth';
 import { userRouter } from './routers/user';
 import { connectionsRouter } from './routers/connections';
 import { chatRouter } from './routers/chat';
-import { postRouter } from './routers/post';
 import { notificationsRouter } from './routers/notifications';
 import { conversationsRouter } from './routers/conversations';
 import { cloudFlareRouter } from './routers/cloudFlare';
 import { jobPostingRouter } from './routers/postings';
+import { postRouter } from './routers/post';
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
 
@@ -24,9 +24,9 @@ export const appRouter = createTRPCRouter({
   user: userRouter,
   connections: connectionsRouter,
   chat: chatRouter,
+  conversation: conversationsRouter,
   post: postRouter,
   notifications: notificationsRouter,
-  conversation: conversationsRouter,
   cloudFlare: cloudFlareRouter,
   jobPosting: jobPostingRouter,
   search: publicProcedure.input(z.object({ query: z.string() })).query(async ({ ctx, input }) => {

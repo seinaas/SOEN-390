@@ -7,6 +7,7 @@
 import { z } from 'zod';
 
 import { createTRPCRouter, protectedProcedure } from '../trpc';
+import type { Post } from '@prisma/client';
 import { triggerChatNotification } from '../helpers';
 
 export const chatRouter = createTRPCRouter({
@@ -14,6 +15,7 @@ export const chatRouter = createTRPCRouter({
     .input(
       z.object({
         message: z.string(),
+        post: z.custom<Post>().optional(),
         conversationId: z.string(),
         isFile: z.boolean().default(false),
       }),
@@ -23,8 +25,22 @@ export const chatRouter = createTRPCRouter({
         data: {
           senderId: ctx.session.user.id,
           message: input.message,
+          embeddedPostId: input.post?.id,
           conversationId: input.conversationId,
           isFile: input.isFile,
+        },
+        include: {
+          embeddedPost: {
+            include: {
+              User: true,
+              _count: {
+                select: {
+                  likes: true,
+                  comments: true,
+                },
+              },
+            },
+          },
         },
       });
       await ctx.pusher.trigger(input.conversationId, 'message-sent', {

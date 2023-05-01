@@ -18,6 +18,7 @@ import Modal from '../components/modal';
 import EditButton from '../components/profile/editButton';
 import type { RouterOutputs } from '../utils/api';
 import { api } from '../utils/api';
+import { PostMessageItem } from '../components/postMessage';
 import { connectToChannel, pusherStore, useSubscribeToChannelEvent, useSubscribeToUserEvent } from '../utils/pusher';
 import { type NextPageWithLayout } from './_app';
 import { getServerAuthSession } from '../server/auth';
@@ -92,19 +93,34 @@ function MessageItem({
             <span className='text-xs text-gray-500'>| {format(message.createdAt, 'p')}</span>
           </div>
         )}
-        <div
-          className={`rounded-md ${isFile ? 'pl-2 pr-4' : 'px-4'} py-3 ${
-            isSender ? 'bg-primary-500 text-white' : 'bg-primary-100/10 text-primary-500'
-          }`}
-        >
-          {(isFile && (
-            <FileDownloadPreview
-              fileName={message.message}
-              pathPrefixes={['conversations', message.conversationId, 'messages', message.id]}
-            />
-          )) ||
-            message.message}
-        </div>
+        {message.message ? (
+          <div
+            className={`rounded-md ${isFile ? 'pl-2 pr-4' : 'px-4'} py-3 ${
+              isSender ? 'bg-primary-500 text-white' : 'bg-primary-100/10 text-primary-500'
+            }`}
+          >
+            {(isFile && (
+              <FileDownloadPreview
+                fileName={message.message}
+                pathPrefixes={['conversations', message.conversationId, 'messages', message.id]}
+              />
+            )) ||
+              message.message}
+          </div>
+        ) : (
+          ''
+        )}
+        {message.embeddedPost && (
+          <div
+            className={
+              isSender
+                ? 'mt-1 rounded-md bg-primary-500 px-4 py-3 text-left'
+                : 'mt-1 rounded-md bg-primary-100/10 px-4 py-3 text-left'
+            }
+          >
+            <PostMessageItem post={message.embeddedPost}></PostMessageItem>
+          </div>
+        )}
       </div>
     </motion.div>
   );
@@ -194,6 +210,7 @@ const Chat: NextPageWithLayout = () => {
     if (lastChannel) {
       connectToChannel(lastChannel);
       setSelectedConversationId(lastChannel);
+      setSelectedConversationId(lastChannel);
     }
   }, []);
 
@@ -230,22 +247,6 @@ const Chat: NextPageWithLayout = () => {
           setShowLeaveGroup(false);
           void utils.conversation.getUserConversations.invalidate();
           setSelectedConversationId(undefined);
-        },
-      },
-    );
-  };
-
-  const confirmAddUsers = (conversationId: string) => {
-    addToConversation.mutate(
-      {
-        conversationId: conversationId,
-        usersEmail: tags,
-      },
-      {
-        onSuccess: () => {
-          void utils.conversation.getUserConversations.invalidate();
-          setShowAddUsers(false);
-          setTags([]);
         },
       },
     );
@@ -299,6 +300,24 @@ const Chat: NextPageWithLayout = () => {
     }
   };
 
+  const confirmAddUsers = (conversationId: string) => {
+    addToConversation.mutate(
+      {
+        conversationId: conversationId,
+        usersEmail: tags,
+      },
+      {
+        onSuccess: () => {
+          void utils.conversation.getUserConversations.invalidate();
+          setShowAddUsers(false);
+          setTags([]);
+        },
+      },
+    );
+  };
+
+  // Connect to the last channel the user was in
+  // TODO: Store the channel whenever it is changed
   return (
     <main className='flex h-full max-h-screen w-full overflow-hidden'>
       <div

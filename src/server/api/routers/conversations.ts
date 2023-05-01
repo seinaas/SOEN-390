@@ -190,6 +190,23 @@ export const conversationsRouter = createTRPCRouter({
               id: true,
             },
           },
+          embeddedPost: {
+            include: {
+              _count: {
+                select: {
+                  comments: true,
+                  likes: true,
+                },
+              },
+              User: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  image: true,
+                },
+              },
+            },
+          },
         },
       });
       return messages;

@@ -109,14 +109,16 @@ model DirectMessages {
 }
 
 model Messages {
-  id             String         @id @default(uuid())
-  message        String
-  senderId       String
-  createdAt      DateTime       @default(now())
-  conversationId String
-  isFile         Boolean        @default(false)
-  sender         User           @relation("Sender", fields: [senderId], references: [id])
-  DirectMessages DirectMessages @relation("Messages", fields: [conversationId], references: [id])
+    id             String         @id @default(uuid())
+    message        String
+    sender         User           @relation("Sender", fields: [senderId], references: [id])
+    senderId       String
+    createdAt      DateTime       @default(now())
+    conversationId String
+    DirectMessages DirectMessages @relation("Messages", fields: [conversationId], references: [id])
+    embeddedPostId String?
+    embeddedPost Post? @relation("Embed", fields: [embeddedPostId], references: [id])
+    isFile         Boolean        @default(false)
 }
 
 model Education {
@@ -140,14 +142,15 @@ model VerificationToken {
 }
 
 model Post {
-  id        String    @id @default(cuid())
-  userId    String
-  createdAt DateTime  @default(now())
-  content   String?   @db.Text
-  hasFiles  Boolean   @default(false)
-  comments  Comment[]
-  likes     Like[]
-  User      User      @relation(fields: [userId], references: [id])
+    id        String   @id @default(cuid())
+    userId    String
+    createdAt DateTime @default(now())
+    content   String?  @db.Text
+    comments  Comment[]
+    likes     Like[]
+    User      User     @relation(fields: [userId], references: [id])
+    messagesEmbed Messages[] @relation("Embed")
+    hasFiles Boolean @default(false)
 }
 
 model Comment {
